@@ -1,0 +1,55 @@
+name: scout
+
+on:
+  schedule:
+    - cron: "0 5,11,17 * * *" # 3 run/giorno (UTC)
+  workflow_dispatch:
+    inputs:
+      only:
+        description: "Id fonte singola (opzionale)"
+        required: false
+      force:
+        description: "Ignora hash contenuto invariato"
+        type: boolean
+        default: false
+
+concurrency:
+  group: scout
+  cancel-in-progress: false
+
+jobs:
+  scout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+      TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      NOMINATIM_USER_AGENT: ${{ vars.NOMINATIM_USER_AGENT }}
+      SCOUT_LLM_MODEL: ${{ vars.SCOUT_LLM_MODEL }}
+      SITE_URL: ${{ vars.SITE_URL }}
+      REVALIDATE_SECRET: ${{ secrets.REVALIDATE_SECRET }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run scout:test
+      - name: Playwright Chromium (solo se c'è una fonte attiva con format "js")
+        run: |
+          if node -e 'process.exit(require("./sources.json").some(s => s.format === "js" && (s.status ?? "active") === "active" && s.enabled !== false) ? 0 : 1)'; then
+            npx playwright install --with-deps chromium
+          fi
+        working-directory: apps/scout
+      - run: npm run db:migrate
+      - name: Run scout
+        env:
+          ONLY: ${{ inputs.only }}
+          FORCE: ${{ inputs.force }}
+        run: |
+          ARGS=()
+          [ -n "$ONLY" ] && ARGS+=(--only "$ONLY")
+          [ "$FORCE" = "true" ] && ARGS+=(--force)
+          npm run scout -- "${ARGS[@]}"

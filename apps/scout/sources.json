@@ -1,0 +1,313 @@
+[
+  {
+    "id": "eventbrite-torino",
+    "name": "Eventbrite – Torino",
+    "url": "https://www.eventbrite.it/d/italy--torino/all-events/",
+    "format": "jsonld",
+    "status": "active",
+    "phase": 1,
+    "pages": 2,
+    "detail": {
+      "max": 40
+    },
+    "area": "Torino",
+    "notes": "Lista: JSON-LD con sola data (20/pagina). Dettaglio: startDate con ora e offset. Sonda 2026-10-11"
+  },
+  {
+    "id": "torinotoday",
+    "name": "TorinoToday – Eventi",
+    "url": "https://www.torinotoday.it/eventi/",
+    "format": "html",
+    "status": "active",
+    "phase": 1,
+    "detail": {
+      "linkPattern": "^/eventi/(?!dal/|weekend/)[a-z-]+/[a-z0-9-]+\\.html$",
+      "max": 30
+    },
+    "area": "Torino",
+    "notes": "Lista senza JSON-LD; pagine evento con schema.org/Event. RSS 403. Sonda 2026-10-11"
+  },
+  {
+    "id": "zero-torino",
+    "name": "Zero – Torino",
+    "url": "https://zero.eu/it/torino/eventi/",
+    "format": "api",
+    "adapter": "zero",
+    "status": "active",
+    "phase": 1,
+    "area": "Torino",
+    "notes": "API JSON del sito /api/v2/events?metro_area=torino (orari + coordinate). Ottobre 2026: pochi eventi (2)"
+  },
+  {
+    "id": "museo-egizio",
+    "name": "Museo Egizio",
+    "url": "https://www.museoegizio.it/esplora/appuntamenti/",
+    "format": "api",
+    "adapter": "egizio",
+    "status": "active",
+    "phase": 1,
+    "category": "mostre",
+    "area": "Torino",
+    "notes": "Dati in __NEXT_DATA__ di /esplora/appuntamenti/ e /esplora/mostre/"
+  },
+  {
+    "id": "circolo-lettori",
+    "name": "Circolo dei Lettori – Torino",
+    "url": "https://torino.circololettori.it/eventi/",
+    "format": "api",
+    "adapter": "circolo",
+    "status": "active",
+    "phase": 1,
+    "area": "Torino",
+    "notes": "Archivio mensile /eventi/AAAA/MM/ con schede data | ora | luogo. Segnalata dall'utente 2026-10-11"
+  },
+  {
+    "id": "accademia-scienze",
+    "name": "Accademia delle Scienze di Torino",
+    "url": "https://www.accademiadellescienze.it/",
+    "format": "js",
+    "status": "skill",
+    "phase": 1,
+    "area": "Torino",
+    "notes": "SPA (Vite) con API GraphQL interna /_graph, nessun HTML lato server. Segnalata dall'utente 2026-10-11. Adapter possibile se l'API risponde senza login"
+  },
+  {
+    "id": "teatro-stabile",
+    "name": "Teatro Stabile di Torino",
+    "url": "https://www.teatrostabiletorino.it/stagione-2026-2027/",
+    "format": "html",
+    "status": "skill",
+    "phase": 1,
+    "category": "teatro",
+    "area": "Torino",
+    "notes": "Nessun calendario strutturato (/calendario 404, WP senza rotte evento, vendita su vivaticket). Solo /scout-eventi"
+  },
+  {
+    "id": "ogr-torino",
+    "name": "OGR Torino",
+    "url": "https://ogrtorino.it/events",
+    "format": "html",
+    "status": "skill",
+    "phase": 1,
+    "area": "Torino",
+    "notes": "Link /events/<slug>, nessun JSON-LD. Escludere /corporate-events. Candidato a selettori"
+  },
+  {
+    "id": "club-to-club",
+    "name": "Club to Club",
+    "url": "https://clubtoclub.it/",
+    "format": "html",
+    "status": "skill",
+    "phase": 1,
+    "category": "musica",
+    "area": "Torino",
+    "notes": "Festival annuale (/event/c2c-festival-2026/), nessun JSON-LD"
+  },
+  {
+    "id": "teatro-regio",
+    "name": "Teatro Regio Torino",
+    "url": "https://www.teatroregio.torino.it/calendario",
+    "format": "html",
+    "status": "excluded",
+    "category": "musica",
+    "area": "Torino",
+    "notes": "Escluso: lirica e opera non interessano all'utente (2026-10-11)"
+  },
+  {
+    "id": "teatro-astra",
+    "name": "Teatro Astra (TPE)",
+    "url": "https://www.fondazionetpe.it/",
+    "format": "html",
+    "status": "unverified",
+    "category": "teatro",
+    "area": "Torino",
+    "notes": "Trovare pagina calendario"
+  },
+  {
+    "id": "visit-cuneese",
+    "name": "Visit Cuneese",
+    "url": "https://www.visitcuneese.it/",
+    "format": "html",
+    "status": "unverified",
+    "area": "Provincia di Cuneo",
+    "notes": "Trovare pagina eventi"
+  },
+  {
+    "id": "turismo-torino",
+    "name": "Turismo Torino e Provincia - Official Guide",
+    "url": "https://www.turismotorino.org",
+    "format": "html",
+    "status": "unverified",
+    "phase": 3,
+    "area": "Torino",
+    "notes": "Da catalogo agente (homepage, non calendario): Official Turin tourism office portal. Gate to regional events."
+  },
+  {
+    "id": "gam-torino",
+    "name": "GAM - Galleria d'Arte Moderna Torino",
+    "url": "https://www.gamtorino.it",
+    "format": "html",
+    "status": "unverified",
+    "phase": 3,
+    "category": "mostre",
+    "area": "Torino",
+    "notes": "Da catalogo agente (homepage, non calendario): Modern Art Gallery. Regular exhibitions and contemporary art shows."
+  },
+  {
+    "id": "castello-rivoli",
+    "name": "Castello di Rivoli - Museo d'Arte Contemporanea",
+    "url": "https://www.castellodirivoli.org",
+    "format": "html",
+    "status": "unverified",
+    "phase": 3,
+    "category": "mostre",
+    "area": "Rivoli",
+    "notes": "Da catalogo agente (homepage, non calendario): Contemporary Art Museum. Has exhibitions calendar. Online ticket booking available."
+  },
+  {
+    "id": "collisioni-festival",
+    "name": "Collisioni Festival - Alba",
+    "url": "https://www.collisioni.it",
+    "format": "html",
+    "status": "unverified",
+    "phase": 3,
+    "category": "musica",
+    "area": "Alba",
+    "notes": "Da catalogo agente (homepage, non calendario): Annual music/culture festival in Alba. 2026 artist lineup. Tickets via Ticketone."
+  },
+  {
+    "id": "rockit",
+    "name": "Rockit - Musica e Spettacoli",
+    "url": "https://rockit.it",
+    "format": "html",
+    "status": "unverified",
+    "phase": 3,
+    "category": "musica",
+    "area": "Italia",
+    "notes": "Da catalogo agente (homepage, non calendario): National music news platform. Concert reviews and artist content. Covers Piedmont events."
+  },
+  {
+    "id": "cinema-ambiente",
+    "name": "Festival Cinema Ambiente",
+    "url": "https://www.cinemambiente.it",
+    "format": "html",
+    "status": "unverified",
+    "phase": 3,
+    "category": "cinema",
+    "area": "Torino",
+    "notes": "Da catalogo agente (homepage, non calendario): International environmental film festival. Annual September event."
+  },
+  {
+    "id": "museo-cinema",
+    "name": "Museo Nazionale del Cinema - Mole Antonelliana",
+    "url": "https://www.museocinema.it",
+    "format": "html",
+    "status": "unverified",
+    "phase": 3,
+    "category": "cinema",
+    "area": "Torino",
+    "notes": "Da catalogo agente (homepage, non calendario): National Cinema Museum. Located in iconic tower. Regular screenings and exhibitions."
+  },
+  {
+    "id": "fondazione-agnelli",
+    "name": "Fondazione Agnelli",
+    "url": "https://www.fondazioneagnelli.it",
+    "format": "html",
+    "status": "unverified",
+    "phase": 3,
+    "category": "mostre",
+    "area": "Torino",
+    "notes": "Da catalogo agente (homepage, non calendario): Educational foundation with exhibitions and cultural events."
+  },
+  {
+    "id": "comune-torino-eventi",
+    "name": "Comune di Torino - Manifestazioni e Calendario",
+    "url": "https://www.comune.torino.it",
+    "format": "html",
+    "status": "unverified",
+    "phase": 2,
+    "area": "Torino",
+    "notes": "Da catalogo agente (homepage, non calendario): Official city events. Example: 'Portici di Carta 2026' (Oct 10-11). Cultural calendar."
+  },
+  {
+    "id": "comune-asti",
+    "name": "Comune di Asti - Calendario Culturale",
+    "url": "https://www.comune.asti.it",
+    "format": "html",
+    "status": "unverified",
+    "phase": 2,
+    "area": "Asti",
+    "notes": "Da catalogo agente (homepage, non calendario): Hosts theatrical season 2026/2027 and cultural events. Events calendar with detailed schedule."
+  },
+  {
+    "id": "comune-alessandria",
+    "name": "Comune di Alessandria",
+    "url": "https://www.comune.alessandria.it",
+    "format": "html",
+    "status": "unverified",
+    "phase": 2,
+    "area": "Alessandria",
+    "notes": "Da catalogo agente (homepage, non calendario): Municipal portal. Limited current events visible."
+  },
+  {
+    "id": "comune-cuneo",
+    "name": "Comune di Cuneo",
+    "url": "https://www.comune.cuneo.it",
+    "format": "html",
+    "status": "unverified",
+    "phase": 2,
+    "area": "Cuneo",
+    "notes": "Da catalogo agente (homepage, non calendario): Official portal. Gateway to Langhe-Roero region events."
+  },
+  {
+    "id": "comune-novara",
+    "name": "Comune di Novara - Eventi",
+    "url": "https://www.comune.novara.it",
+    "format": "html",
+    "status": "unverified",
+    "phase": 2,
+    "area": "Novara",
+    "notes": "Da catalogo agente (homepage, non calendario): Municipal portal with cultural event listings."
+  },
+  {
+    "id": "comune-biella",
+    "name": "Comune di Biella",
+    "url": "https://www.comune.biella.it",
+    "format": "html",
+    "status": "unverified",
+    "phase": 2,
+    "area": "Biella",
+    "notes": "Da catalogo agente (homepage, non calendario): Official city portal. Access to local events and exhibitions."
+  },
+  {
+    "id": "comune-vercelli",
+    "name": "Comune di Vercelli - Notizie ed Eventi",
+    "url": "https://www.comune.vercelli.it",
+    "format": "html",
+    "status": "unverified",
+    "phase": 2,
+    "area": "Vercelli",
+    "notes": "Da catalogo agente (homepage, non calendario): Municipal portal. Example: 'Chagall, Vercelli si prende la prima europea' exhibition."
+  },
+  {
+    "id": "mailticket",
+    "name": "Mailticket - Biglietti Online",
+    "url": "https://www.mailticket.it",
+    "format": "html",
+    "status": "unverified",
+    "phase": 3,
+    "area": "Italia",
+    "notes": "Da catalogo agente (homepage, non calendario): Online ticket sales platform. Events, concerts, festivals. Examples: 'Morbegno in Cantina 2026'."
+  },
+  {
+    "id": "citta-cinema",
+    "name": "Città del Cinema - Cinema Guide",
+    "url": "https://www.lacittadelcinema.it",
+    "format": "html",
+    "status": "unverified",
+    "phase": 3,
+    "category": "cinema",
+    "area": "Torino",
+    "notes": "Da catalogo agente (homepage, non calendario): Cinema listing and film guide. Movies, showtimes, locations."
+  }
+]

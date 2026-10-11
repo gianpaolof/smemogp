@@ -1,0 +1,27 @@
+{
+  "name": "scout",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "tsx --env-file-if-exists=../../.env src/index.ts",
+    "typecheck": "tsc --noEmit",
+    "ingest": "tsx --env-file-if-exists=../../.env src/ingest.ts",
+    "verify": "tsx --env-file-if-exists=../../.env src/verify.ts",
+    "test": "tsx --test test/*.test.ts"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.133.0",
+    "@smemogp/db": "^0.1.0",
+    "cheerio": "^1.2.0",
+    "drizzle-orm": "^0.45.4",
+    "node-ical": "^0.27.3",
+    "playwright": "^1.64.0",
+    "zod": "^4.6.6"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3"
+  }
+}
