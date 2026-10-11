@@ -1,0 +1,15 @@
+node_modules
+.env
+.env*.local
+*.db
+*.db-journal
+.next
+.vercel
+dist
+.DS_Store
+.scout-cache
+
+# Non versionati: documentazione, file per Claude, markdown
+docs/
+.claude/
+*.md
