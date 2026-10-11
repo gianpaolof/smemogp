@@ -19,12 +19,12 @@ const ATTRIBUTION = 'Tiles &copy; Esri &mdash; Esri, HERE, Garmin, &copy; <a hre
 
 type Row = MapVM["rows"][number];
 
-/** Marker quadrato; con più eventi nello stesso luogo mostra il numero. `count` serve ai cluster. */
+/** I luoghi con più eventi usano un pin con badge, distinto dai cluster quadrati. */
 const icon = (selected: boolean, count: number) =>
   divIcon({
     className: `nowy-marker${selected ? " is-selected" : ""}${count > 1 ? " has-count" : ""}`,
-    html: count > 1 ? `<span>${count}</span>` : "",
-    iconSize: count > 1 ? [24, 24] : [18, 18],
+    html: count > 1 ? `<svg viewBox="0 0 24 28" aria-hidden="true"><path d="M12 26S2 17 2 11a10 10 0 0 1 20 0c0 6-10 15-10 15Z"/><circle cx="12" cy="11" r="3"/></svg><span class="nowy-place-count">${count}</span>` : "",
+    iconSize: count > 1 ? (selected ? [38, 42] : [32, 36]) : (selected ? [24, 24] : [18, 18]),
     // Opzione extra: Leaflet copia tutte le opzioni dell'icona, la rilegge clusterIcon
     ...({ count } as object),
   });
@@ -53,6 +53,10 @@ function FitRadius({ origin, radiusKm }: Pick<MapVM, "origin" | "radiusKm">) {
     // Anche al ritorno da <Activity> nascosta: il contenitore era display:none
     map.invalidateSize();
     map.fitBounds(latLng(origin.lat, origin.lng).toBounds(radiusKm * 2000), { padding: [8, 8] });
+    // Il pannello del luogo cambia altezza senza ridimensionare la finestra.
+    const resize = new ResizeObserver(() => map.invalidateSize({ animate: false }));
+    resize.observe(map.getContainer());
+    return () => resize.disconnect();
   }, [map, origin.lat, origin.lng, radiusKm]);
   return null;
 }
@@ -69,15 +73,20 @@ function ShowSelected({
 }) {
   const map = useMap();
   useEffect(() => {
-    // Nell'effect i marker sono già montati e nel gruppo
-    const marker = id ? markers.current.get(id) : undefined;
-    if (!marker) return;
-    const g = group.current;
-    if (g?.hasLayer(marker) && !g.getVisibleParent(marker)?.getLatLng().equals(marker.getLatLng())) {
-      g.zoomToShowLayer(marker, () => map.panTo(marker.getLatLng()));
-    } else {
-      map.panTo(marker.getLatLng(), { animate: true });
-    }
+    let cancelled = false;
+    // react-leaflet-cluster applica aggiunte/rimozioni in una microtask.
+    queueMicrotask(() => {
+      if (cancelled) return;
+      const marker = id ? markers.current.get(id) : undefined;
+      if (!marker) return;
+      const g = group.current;
+      if (g?.hasLayer(marker)) {
+        g.zoomToShowLayer(marker);
+      } else {
+        map.panTo(marker.getLatLng(), { animate: true });
+      }
+    });
+    return () => { cancelled = true; };
   }, [map, id, markers, group]);
   return null;
 }
@@ -85,7 +94,7 @@ function ShowSelected({
 type Props = {
   vm: MapVM;
   selectedId: string | null;
-  onSelect: (id: string) => void;
+  onSelect: (id: string, place: string) => void;
   /** Incrementato dal pulsante "Inquadra raggio" */
   fitKey: number;
 };
@@ -97,11 +106,12 @@ export default function LeafletMap({ vm, selectedId, onSelect, fitKey }: Props) 
 
   // Più eventi nello stesso luogo: un solo marker (il selezionato o il primo), gli altri si scorrono nella card
   const markers = useMemo(() => {
-    const byPlace = new Map<string, { row: Row; count: number }>();
+    const byPlace = new Map<string, { key: string; row: Row; count: number }>();
     for (const r of vm.rows) {
       const key = `${r.lat.toFixed(5)},${r.lng.toFixed(5)}`;
       const prev = byPlace.get(key);
       byPlace.set(key, {
+        key,
         row: !prev || r.id === selectedId ? r : prev.row,
         count: (prev?.count ?? 0) + 1,
       });
@@ -143,23 +153,24 @@ export default function LeafletMap({ vm, selectedId, onSelect, fitKey }: Props) 
         maxClusterRadius={44}
         showCoverageOnHover={false}
         spiderfyOnMaxZoom
+        spiderLegPolylineOptions={{ className: "leaflet-cluster-spider-leg", weight: 1.5, opacity: 1 }}
         zoomToBoundsOnClick
         animate={!reducedMotion}
         chunkedLoading
       >
-        {markers.map(({ row, count }) => (
+        {markers.map(({ key, row, count }) => (
           <Marker
-            key={row.id}
+            key={key}
             ref={(m) => {
               if (m) markerRefs.current.set(row.id, m);
               else markerRefs.current.delete(row.id);
             }}
             position={[row.lat, row.lng]}
             icon={icon(row.id === selectedId, count)}
-            title={count > 1 ? `${row.title} e altri ${count - 1}` : row.title}
+            title={count > 1 ? `${count} eventi qui. ${row.title}` : row.title}
             alt={row.title}
             zIndexOffset={row.id === selectedId ? 1000 : 0}
-            eventHandlers={{ click: () => onSelect(row.id) }}
+            eventHandlers={{ click: () => onSelect(row.id, key) }}
           />
         ))}
       </MarkerClusterGroup>

@@ -14,13 +14,16 @@ const ctrl = "flex size-12 items-center justify-center border-b border-line bg-b
 
 export function MapScreen({ vm }: { vm: MapVM }) {
   const [selectedId, setSelectedId] = useState<string | null>(vm.selectedId ?? vm.rows[0]?.id ?? null);
+  const [place, setPlace] = useState<string | null>(null);
+  const placeRows = place ? vm.rows.filter((r) => `${r.lat.toFixed(5)},${r.lng.toFixed(5)}` === place) : [];
+  const rows = placeRows.length ? placeRows : vm.rows;
   const [fitKey, setFitKey] = useState(0);
-  const index = vm.rows.findIndex((r) => r.id === selectedId);
-  const row = index >= 0 ? vm.rows[index] : null;
+  const index = Math.max(0, rows.findIndex((r) => r.id === selectedId));
+  const row = rows[index] ?? null;
 
   const move = (delta: number) => {
-    if (!vm.rows.length) return;
-    setSelectedId(vm.rows[(index + delta + vm.rows.length) % vm.rows.length].id);
+    if (!rows.length) return;
+    setSelectedId(rows[(index + delta + rows.length) % rows.length].id);
   };
 
   return (
@@ -28,7 +31,7 @@ export function MapScreen({ vm }: { vm: MapVM }) {
       <div className="relative min-h-[320px] flex-1">
         {/* Altezza esplicita: Leaflet non segue il flex del contenitore */}
         <div className="absolute inset-0">
-          <LeafletMap vm={vm} selectedId={selectedId} onSelect={setSelectedId} fitKey={fitKey} />
+          <LeafletMap vm={vm} selectedId={row?.id ?? null} onSelect={(id, key) => { setSelectedId(id); setPlace(key); }} fitKey={fitKey} />
         </div>
         <div className="absolute top-3 right-0 z-[500] flex flex-col border border-r-0 border-line">
           <button type="button" className={ctrl} onClick={() => setFitKey((k) => k + 1)} aria-label="Inquadra raggio">
@@ -39,6 +42,33 @@ export function MapScreen({ vm }: { vm: MapVM }) {
 
       {row ? (
         <section aria-label="Evento selezionato" aria-live="polite" className="border-t border-line bg-bg">
+          {placeRows.length > 0 && (
+            <>
+              <div className="flex min-h-11 items-center justify-between gap-2 border-b border-line px-3 text-xs font-semibold">
+                <span>{rows.length === 1 ? "1 evento qui" : `${rows.length} eventi qui`}</span>
+                <button type="button" onClick={() => setPlace(null)} className="min-h-11 underline underline-offset-4">
+                  Tutti gli eventi
+                </button>
+              </div>
+              {rows.length > 1 && (
+                <ul aria-label="Eventi in questo luogo" className="max-h-32 overflow-y-auto overscroll-contain border-b border-line">
+                  {rows.map((event) => (
+                    <li key={event.id}>
+                      <button
+                        type="button"
+                        onClick={() => setSelectedId(event.id)}
+                        aria-current={event.id === row.id ? "true" : undefined}
+                        className="flex min-h-11 w-full items-center gap-3 px-3 py-2 text-left text-xs hover:bg-line-soft aria-current:bg-line-soft"
+                      >
+                        <span className="shrink-0 font-semibold">{event.dayNum} {event.dayLabel}</span>
+                        <span className="min-w-0 truncate">{event.title}</span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </>
+          )}
           <Link
             href={row.href}
             scroll={false}
@@ -59,7 +89,7 @@ export function MapScreen({ vm }: { vm: MapVM }) {
               ←
             </button>
             <span className="flex items-center justify-center text-xs font-semibold tabular-nums">
-              {index + 1} / {vm.rows.length}
+              {index + 1} / {rows.length}
             </span>
             <button type="button" onClick={() => move(1)} aria-label="Evento successivo" className="h-12 border-l border-line hover:bg-line-soft">
               →

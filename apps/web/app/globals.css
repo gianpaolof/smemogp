@@ -158,11 +158,10 @@ html[data-theme-switch]::view-transition-new(root) { animation: 520ms cubic-bezi
 .nowy-marker.is-selected {
   background: var(--accent);
   border: 3px solid var(--fg);
-  transform: scale(1.35);
 }
 /* Più eventi nello stesso luogo: quadrato più grande col numero */
 .nowy-marker.has-count,
-.nowy-cluster {
+.leaflet-marker-icon.nowy-cluster {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -170,8 +169,38 @@ html[data-theme-switch]::view-transition-new(root) { animation: 520ms cubic-bezi
   font: 700 12px/1 var(--font-sans);
   font-variant-numeric: tabular-nums;
 }
-.nowy-marker.is-selected.has-count {
+.nowy-marker.has-count {
+  background: transparent;
+  border: 0;
+}
+.nowy-marker.has-count svg {
+  width: 100%;
+  height: 100%;
+  fill: var(--fg);
+  stroke: var(--bg);
+  stroke-width: 1.5;
+}
+.nowy-marker.has-count circle { fill: var(--bg); stroke: none; }
+.nowy-marker.is-selected.has-count svg { fill: var(--accent); stroke: var(--fg); }
+.nowy-place-count {
+  position: absolute;
+  top: -4px;
+  right: -6px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 4px;
+  border: 1px solid var(--bg);
+  border-radius: 10px;
+  background: var(--fg);
+  color: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.is-selected .nowy-place-count {
+  background: var(--accent);
   color: var(--accent-fg);
+  border-color: var(--fg);
 }
 /* Cluster: quadrato pieno, bordo nel colore di fondo per staccarlo dalla mappa */
 .nowy-cluster {
