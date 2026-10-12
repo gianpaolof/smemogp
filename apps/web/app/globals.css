@@ -68,7 +68,6 @@ nav a, nav button { -webkit-touch-callout: none; user-select: none; }
    farebbe crossfade con le view transition. */
 .dim-unsaved .row:has([data-state="false"]) > a { opacity: 0.4; }
 .dim-unsaved .row:has([data-state="false"]) img { filter: grayscale(1); }
-.dim-unsaved .row.is-next:has([data-state="false"]) { background: transparent; color: var(--fg); }
 
 body {
   font-family: var(--font-sans);

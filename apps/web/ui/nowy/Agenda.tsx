@@ -100,11 +100,14 @@ function Collapsible({ label, className = "", children }: { label: string; class
   );
 }
 
-/** Salvati già conclusi, i più recenti prima: dopo l'agenda, chiusi. null → nulla */
+/**
+ * Salvati già conclusi, i più recenti prima: dopo l'agenda, chiusi. null → nulla.
+ * Solo in /salvati: le righe tolte si attenuano come nell'agenda (`dim-unsaved`).
+ */
 export function PastGroup({ group }: { group: RowGroupVM | null }) {
-  if (!group || group.rows.length === 0) return null;
+  if (!group) return null;
   return (
-    <Collapsible label={`${group.label ?? "Passati"} (${group.rows.length})`} className="border-t-2 border-fg">
+    <Collapsible label={`Passati (${group.rows.length})`} className="dim-unsaved border-t-2 border-fg">
       <Group group={{ ...group, label: null }} past />
     </Collapsible>
   );

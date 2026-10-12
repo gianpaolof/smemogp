@@ -1,20 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { toggleSaved, useIsSaved } from "@/hooks/useSaved";
-import { haptic } from "@/hooks/useMotion";
 import type { SaveVM } from "@/ui/contracts";
 import { Icon } from "./icons";
+import { useSaveToggle } from "./SaveToggle";
 
 const cell = "press flex h-12 items-center justify-center gap-1.5 border-r border-line text-xs font-semibold last:border-r-0 hover:bg-line-soft";
 
 /** Salva (in questo browser), aggiungi al calendario, condividi. */
 export function EventActions({ entry, shareText, icsHref }: { entry: SaveVM; shareText: string; icsHref: string }) {
   const { id, title } = entry;
-  const saved = useIsSaved(id) === true;
+  const star = useSaveToggle(entry);
+  const saved = star.saved === true;
   const [copied, setCopied] = useState(false);
-  // Il «pop» della ★ solo al passaggio a salvato
-  const [pop, setPop] = useState(false);
 
   const share = async () => {
     // Il link canonico è la pagina dell'evento, senza filtri
@@ -37,13 +35,10 @@ export function EventActions({ entry, shareText, icsHref }: { entry: SaveVM; sha
       {/* Etichetta visibile «Salva»/«Salvato»: niente aria-pressed, lo stato è già nel nome */}
       <button
         type="button"
-        onClick={() => {
-          setPop(toggleSaved(entry));
-          haptic();
-        }}
+        onClick={star.onClick}
         className={`${cell} ${saved ? "bg-accent text-accent-fg hover:bg-accent" : ""}`}
       >
-        <Icon name="star" filled={saved} className={pop ? "star-pop" : undefined} onAnimationEnd={() => setPop(false)} />
+        <Icon name="star" filled={saved} className={star.pop ? "star-pop" : undefined} onAnimationEnd={star.onAnimationEnd} />
         {saved ? "Salvato" : "Salva"}
       </button>
       <a href={icsHref} download className={cell}>

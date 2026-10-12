@@ -123,12 +123,10 @@ export type EventDetailVM = {
 
 /** Eventi salvati: stesse righe della lista, senza filtri. */
 export type SavedVM = {
-  /** Prossimi e in corso, senza «Prossimo» evidenziato */
+  /** Prossimi e in corso, senza «Prossimo» evidenziato; countLabel "12 salvati" / "1 salvato" */
   upcoming: AgendaVM;
   /** Già conclusi, i più recenti prima; null se nessuno */
   past: RowGroupVM | null;
   /** Id salvati che il catalogo non ha più */
   missingIds: readonly string[];
-  /** "12 salvati" / "1 salvato" (prossimi + in corso) */
-  countLabel: string;
 };

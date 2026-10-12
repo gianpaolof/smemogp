@@ -5,6 +5,7 @@ import {
   countUpcoming,
   idsForUrl,
   isPastEntry,
+  KEEP_PAST_DAYS,
   MAX_URL_IDS,
   mergeSnapshots,
   parseSaved,
@@ -55,9 +56,10 @@ test("parseSaved: duplicati tenendo il primo", () => {
   assert.deepEqual(list, [{ id: id(1), title: "primo", until: null }]);
 });
 
-test("pruneSaved: via i passati da oltre 30 giorni, stesso riferimento se nulla cambia", () => {
-  const recent = entry(1, "2026-09-20T20:00:00Z");
-  const old = entry(2, "2026-09-01T20:00:00Z");
+test("pruneSaved: via i passati da oltre KEEP_PAST_DAYS (7, come lo scout), stesso riferimento se nulla cambia", () => {
+  assert.equal(KEEP_PAST_DAYS, 7);
+  const recent = entry(1, "2026-10-06T20:00:00Z"); // 6 giorni fa: resta
+  const old = entry(2, "2026-10-04T20:00:00Z"); // 8 giorni fa: lo scout l'ha già cancellato
   const future = entry(3, "2026-10-20T20:00:00Z");
   const unknown = entry(4, null);
   assert.deepEqual(pruneSaved([recent, old, future, unknown], NOW), [recent, future, unknown]);
@@ -103,4 +105,11 @@ test("idsForUrl: i primi MAX_URL_IDS", () => {
   const ids = idsForUrl(list);
   assert.equal(ids.length, MAX_URL_IDS);
   assert.equal(ids[0], id(1));
+});
+
+test("countUpcoming: solo le prime MAX_URL_IDS voci (badge = pagina /salvati)", () => {
+  const list = Array.from({ length: MAX_URL_IDS + 10 }, (_, i) => entry(i + 1));
+  assert.equal(countUpcoming(list, NOW), MAX_URL_IDS);
+  const withPast = [entry(0, "2026-10-11T20:00:00Z"), ...list];
+  assert.equal(countUpcoming(withPast, NOW), MAX_URL_IDS - 1);
 });

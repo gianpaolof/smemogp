@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
-import { idsForUrl, type SavedEntry } from "@/domain/saved";
+import { idsForUrl, MAX_URL_IDS, type SavedEntry } from "@/domain/saved";
 import { syncSaved, useSavedEntries } from "@/hooks/useSaved";
 
 /**
@@ -21,9 +21,12 @@ export function SavedSync({ current, found }: { current: string[]; found: readon
   }, [found]);
 
   useEffect(() => {
-    const ids = idsForUrl(entries);
+    const stored = idsForUrl(entries);
     const have = new Set(current);
-    if (!ids.some((id) => !have.has(id))) return;
+    if (!stored.some((id) => !have.has(id))) return;
+    // Si tengono anche le righe della pagina tolte qui (attenuate, ri-toccabili): spariscono al
+    // prossimo caricamento pulito, non a metà gesto per un salvataggio in un'altra scheda
+    const ids = [...new Set([...stored, ...current])].slice(0, MAX_URL_IDS);
     // Virgole valide nella query: niente encodeURIComponent (eviterebbe %2C ×150)
     const url = `/salvati?ids=${ids.join(",")}`;
     if (requested.current === url) return;

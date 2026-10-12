@@ -3,8 +3,7 @@ import Link from "next/link";
 import { connection } from "next/server";
 import { cache, Suspense } from "react";
 import { getEventsByIds } from "@/data/events";
-import { endOf } from "@/domain/agenda";
-import { isEventId, MAX_URL_IDS, type SavedEntry } from "@/domain/saved";
+import { isEventId, MAX_URL_IDS } from "@/domain/saved";
 import { presentSaved } from "@/presenters";
 import { Agenda, PastGroup } from "@/ui/nowy/Agenda";
 import { Icon } from "@/ui/nowy/icons";
@@ -31,10 +30,10 @@ function parseIds(raw: string) {
 const loadSaved = cache(async (raw: string) => {
   const ids = parseIds(raw);
   await connection();
-  const { events, foundIds } = await getEventsByIds(ids);
+  const { events, foundIds, snapshots } = await getEventsByIds(ids);
   const found = new Set(foundIds);
   const missingIds = ids.filter((id) => !found.has(id));
-  return { ids, events, vm: presentSaved(events, missingIds, new Date()) };
+  return { ids, snapshots, vm: presentSaved(events, missingIds, new Date()) };
 });
 
 async function rawIds(searchParams: SearchParams) {
@@ -46,16 +45,15 @@ async function SavedCount({ searchParams }: { searchParams: SearchParams }) {
   const { vm } = await loadSaved(await rawIds(searchParams));
   // Solo se c'è almeno un evento prossimo o in corso
   if (!vm.upcoming.days.length) return null;
-  return <p className="px-3 pb-2 text-xs font-semibold text-muted">{vm.countLabel}</p>;
+  return <p className="px-3 pb-2 text-xs font-semibold text-muted">{vm.upcoming.countLabel}</p>;
 }
 
 async function SavedList({ searchParams }: { searchParams: SearchParams }) {
-  const { ids, events, vm } = await loadSaved(await rawIds(searchParams));
-  // Snapshot freschi per lo store: titolo e fine aggiornati dal catalogo
-  const found: SavedEntry[] = events.map((e) => ({ id: e.id, title: e.title, until: endOf(e).toISOString() }));
+  const { ids, snapshots, vm } = await loadSaved(await rawIds(searchParams));
   return (
     <>
-      <SavedSync current={ids} found={found} />
+      {/* Snapshot freschi per lo store (anche eventi senza coordinate): titolo e fine dal catalogo */}
+      <SavedSync current={ids} found={snapshots} />
       <Agenda vm={vm.upcoming} dimUnsaved />
       <PastGroup group={vm.past} />
       <SavedOrphans ids={vm.missingIds} />

@@ -17,9 +17,12 @@ const unknownOnServer = () => null;
 
 // parseSaved crea sempre un array nuovo: memorizzato sul valore grezzo (stabile finché il testo
 // non cambia) per dare a useSyncExternalStore snapshot stabili. Niente `now` qui.
+const NONE: readonly SavedEntry[] = parseSaved(null);
 let lastRaw: unknown;
-let lastParsed: readonly SavedEntry[] = parseSaved(null);
+let lastParsed: readonly SavedEntry[] = NONE;
 function entries(raw: unknown): readonly SavedEntry[] {
+  // Vuoto (anche dal server in idratazione): costante, senza toccare la cache del browser
+  if (raw == null) return NONE;
   if (raw !== lastRaw) {
     lastRaw = raw;
     lastParsed = parseSaved(raw);
@@ -41,9 +44,49 @@ export function useIsSaved(id: string): boolean | null {
 
 /** Salvati non ancora passati; numero, quindi stabile per valore anche se dipende dall'ora. */
 export function useUpcomingCount(): number | null {
-  return useSyncExternalStore(sub, upcomingNow, unknownOnServer);
+  return useSyncExternalStore(subUpcoming, upcomingNow, unknownOnServer);
 }
 const upcomingNow = () => countUpcoming(current(), new Date());
+
+const MIN_DELAY = 1000;
+const MAX_DELAY = 24 * 60 * 60 * 1000;
+
+/** Fine futura più vicina (ms), o null se nessun salvato ha un `until` futuro. */
+function nextUntil(list: readonly SavedEntry[], now: number): number | null {
+  let next: number | null = null;
+  for (const e of list) {
+    if (e.until == null) continue;
+    const t = Date.parse(e.until);
+    if (t > now && (next == null || t < next)) next = t;
+  }
+  return next;
+}
+
+// Come `sub`, ma avvisa anche quando il prossimo salvato finisce: il conteggio dipende dall'ora
+function subUpcoming(cb: () => void) {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const arm = () => {
+    clearTimeout(timer);
+    timer = undefined;
+    const now = Date.now();
+    const next = nextUntil(current(), now);
+    if (next == null) return;
+    const delay = Math.min(MAX_DELAY, Math.max(MIN_DELAY, next - now));
+    timer = setTimeout(() => {
+      arm();
+      cb();
+    }, delay);
+  };
+  arm();
+  const unsub = subscribeLocal(KEY, () => {
+    arm();
+    cb();
+  });
+  return () => {
+    clearTimeout(timer);
+    unsub();
+  };
+}
 
 /** Ritorna true se ora è salvato. Legge fresco: mai da chiamare durante il render. */
 export function toggleSaved(entry: SavedEntry): boolean {

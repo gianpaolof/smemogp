@@ -195,10 +195,10 @@ export function presentSaved(events: EventItem[], missingIds: readonly string[],
           })),
       }
     : null;
-  const label = savedCountLabel(total);
   return {
     upcoming: {
-      countLabel: label,
+      // "12 salvati" / "1 salvato" (prossimi + in corso): anche l'intestazione di /salvati
+      countLabel: savedCountLabel(total),
       days,
       empty:
         total || past || missingIds.length
@@ -211,7 +211,6 @@ export function presentSaved(events: EventItem[], missingIds: readonly string[],
     },
     past,
     missingIds,
-    countLabel: label,
   };
 }
 

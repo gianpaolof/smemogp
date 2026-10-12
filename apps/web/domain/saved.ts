@@ -11,8 +11,12 @@ export type SavedEntry = Readonly<{
   until: string | null;
 }>;
 
-/** I passati restano visibili in «Passati» per questi giorni, poi escono. */
-export const KEEP_PAST_DAYS = 30;
+/**
+ * I passati restano visibili in «Passati» per questi giorni, poi escono. Allineato alla
+ * retention dello scout (`pruneOldEvents`, apps/scout/src/index.ts: cutoff 7 giorni): oltre,
+ * l'evento non è più nel DB e diventerebbe un orfano «Non più disponibile».
+ */
+export const KEEP_PAST_DAYS = 7;
 /** Id letti dal server per /salvati: 150 × 41 caratteri ≈ 6 KB di URL. */
 export const MAX_URL_IDS = 150;
 const MAX_TITLE = 300;
@@ -77,8 +81,9 @@ export function pruneSaved(list: readonly SavedEntry[], now: Date): readonly Sav
   return kept.length === list.length ? list : kept;
 }
 
+/** Solo le prime `MAX_URL_IDS` voci, le stesse che /salvati chiede al server: badge = pagina. */
 export function countUpcoming(list: readonly SavedEntry[], now: Date): number {
-  return list.filter((e) => !isPastEntry(e, now)).length;
+  return list.slice(0, MAX_URL_IDS).filter((e) => !isPastEntry(e, now)).length;
 }
 
 /** I più recenti, fino a `MAX_URL_IDS`. */
