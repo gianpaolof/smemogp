@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { ViewTransition } from "react";
 import type { EventDetailVM } from "@/ui/contracts";
+import { HERO_SHARE, heroDay, heroTitle } from "@/ui/heroNames";
 import { EventActions } from "./EventActions";
 import { EventImage } from "./EventImage";
 import { Icon } from "./icons";
@@ -25,19 +27,27 @@ export function EventDetail({ vm }: { vm: EventDetailVM }) {
           )}
           {vm.categoryLabel}
         </span>
-        <h1
-          id="event-title"
-          className={`display-title break-words hyphens-auto ${
-            vm.longTitle ? "text-[clamp(1.5rem,7cqi,2.25rem)]" : "text-[clamp(2rem,10cqi,3rem)]"
-          }`}
-        >
-          {vm.title}
-        </h1>
+        {/* Titolo e giorno arrivano in volo dalla riga della lista (SharedHero) */}
+        <ViewTransition name={heroTitle(vm.id)} share={HERO_SHARE} default="none">
+          <h1
+            id="event-title"
+            data-hero={heroTitle(vm.id)}
+            className={`display-title break-words hyphens-auto ${
+              vm.longTitle ? "text-[clamp(1.5rem,7cqi,2.25rem)]" : "text-[clamp(2rem,10cqi,3rem)]"
+            }`}
+          >
+            {vm.title}
+          </h1>
+        </ViewTransition>
       </div>
 
       <div className="grid grid-cols-[88px_minmax(0,1fr)] border-b border-line">
         <div className="flex flex-col border-r border-line px-3 py-2.5">
-          <span className="display-num text-[64px]">{vm.dayNum}</span>
+          <ViewTransition name={heroDay(vm.dayKey)} share={HERO_SHARE} default="none">
+            <span data-hero={heroDay(vm.dayKey)} className="display-num text-[64px]">
+              {vm.dayNum}
+            </span>
+          </ViewTransition>
           <span className="pt-1 text-[11px] font-semibold text-muted">{vm.dayLabel}</span>
         </div>
         <div className="flex flex-col justify-center gap-0.5 px-3 py-2.5 text-sm">

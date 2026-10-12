@@ -223,7 +223,8 @@ export function presentDetail(e: EventItem, f: Filters, now: Date): EventDetailV
   const multiDay = e.endsAt && dayKey(e.endsAt) !== dayKey(e.startsAt);
   // Come nella lista: una mostra già iniziata sta sotto oggi, non sotto il giorno di apertura
   const ongoing = multiDay && new Date(e.startsAt) < now;
-  const { num, label } = formatDayHeading(ongoing ? now.toISOString() : e.startsAt);
+  const shownDay = ongoing ? now.toISOString() : e.startsAt;
+  const { num, label } = formatDayHeading(shownDay);
   const external = safeExternalUrl(e.url);
   const venue = e.venueName;
   const address = joinAddress(e.address, e.city);
@@ -232,6 +233,7 @@ export function presentDetail(e: EventItem, f: Filters, now: Date): EventDetailV
     title: e.title,
     longTitle: e.title.length > 60,
     categoryLabel: CATEGORY_LABELS[e.category],
+    dayKey: dayKey(shownDay),
     dayNum: num,
     dayLabel: label,
     statusLabel: ongoing ? "In corso" : null,
