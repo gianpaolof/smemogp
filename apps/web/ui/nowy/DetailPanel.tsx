@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, ViewTransition, type ReactNode } from "react";
+import { DESKTOP_QUERY } from "@/hooks/useMediaQuery";
 import { haptic } from "@/hooks/useMotion";
 import { Icon } from "./icons";
 
@@ -23,10 +24,13 @@ export function DetailPanel({ children }: { children: ReactNode }) {
     const el = panel.current;
     const previous = document.activeElement as HTMLElement | null;
     el?.focus();
+    // Desktop: il pannello sta accanto alla lista e sopra la mappa, che resta usabile → non modale
+    const desktop = matchMedia(DESKTOP_QUERY).matches;
+    el?.setAttribute("aria-modal", desktop ? "false" : "true");
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") return router.back();
-      // aria-modal: il Tab gira dentro il pannello
-      if (e.key !== "Tab" || !el) return;
+      // aria-modal: il Tab gira dentro il pannello (solo se modale)
+      if (desktop || e.key !== "Tab" || !el) return;
       const items = [...el.querySelectorAll<HTMLElement>(FOCUSABLE)].filter((n) => n.offsetParent !== null);
       if (!items.length) return;
       const first = items[0];
@@ -41,7 +45,7 @@ export function DetailPanel({ children }: { children: ReactNode }) {
       }
     };
     document.addEventListener("keydown", onKey);
-    document.documentElement.style.overflow = "hidden";
+    if (!desktop) document.documentElement.style.overflow = "hidden";
     return () => {
       document.removeEventListener("keydown", onKey);
       document.documentElement.style.overflow = "";
@@ -82,14 +86,14 @@ export function DetailPanel({ children }: { children: ReactNode }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-stretch sm:justify-end">
+    <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-stretch sm:justify-end lg:pointer-events-none lg:inset-auto lg:top-0 lg:right-0 lg:bottom-0 lg:w-[440px]">
       <ViewTransition enter="reveal" exit="reveal-out" default="none">
         <button
           type="button"
           aria-label="Chiudi dettaglio"
           tabIndex={-1}
           onClick={() => router.back()}
-          className="absolute inset-0 cursor-default bg-[var(--overlay)]"
+          className="absolute inset-0 cursor-default bg-[var(--overlay)] lg:hidden"
         />
       </ViewTransition>
       <ViewTransition enter="panel-in" exit="panel-out" default="none">
@@ -103,7 +107,7 @@ export function DetailPanel({ children }: { children: ReactNode }) {
           onTouchMove={onTouchMove}
           onTouchEnd={onTouchEnd}
           onTouchCancel={onTouchEnd}
-          className="relative flex max-h-[92dvh] w-full flex-col overflow-y-auto overscroll-contain border-t border-line bg-bg outline-none sm:max-h-none sm:max-w-md sm:border-t-0 sm:border-l sm:pt-[env(safe-area-inset-top)]"
+          className="relative flex lg:pointer-events-auto max-h-[92dvh] w-full flex-col overflow-y-auto overscroll-contain border-t border-line bg-bg outline-none sm:max-h-none sm:max-w-md sm:border-t-0 sm:border-l sm:pt-[env(safe-area-inset-top)]"
         >
           <div className="sticky top-0 z-10 flex items-center justify-between border-b border-line bg-bg">
             {/* Maniglia: indica che il pannello si trascina giù */}

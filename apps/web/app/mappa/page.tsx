@@ -8,7 +8,7 @@ export const metadata: Metadata = { title: "Mappa · Eventi Torino" };
 
 export default function MapPage({ searchParams }: PageProps<"/mappa">) {
   return (
-    <Screen>
+    <Screen wide>
       <Suspense
         fallback={
           <>
