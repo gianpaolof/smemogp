@@ -1,16 +1,19 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 import type { BottomBarVM } from "@/ui/contracts";
 import { FiltersSheet } from "./FiltersSheet";
+import { Icon } from "./icons";
 import { PendingBar } from "./PendingBar";
-import { ThemeToggle } from "./ThemeToggle";
+import { SavedLink } from "./SavedLink";
 
-const cell = "relative flex h-14 items-center justify-center border-r border-line text-xs font-semibold last:border-r-0";
+const cell =
+  "press relative flex h-14 items-center justify-center gap-1.5 border-r border-line text-xs font-semibold last:border-r-0";
 
-export function BottomBar({ vm }: { vm: BottomBarVM }) {
+export function BottomBar({ vm, count }: { vm: BottomBarVM; count?: ReactNode }) {
   return (
     <nav
       aria-label="Filtri rapidi"
-      className="sticky bottom-0 z-20 grid grid-cols-4 border-t border-line bg-bg pb-[env(safe-area-inset-bottom)]"
+      className="sticky bottom-0 z-20 grid grid-cols-4 border-t border-line bg-bg pb-[env(safe-area-inset-bottom)] [view-transition-name:app-tabbar]"
     >
       {vm.quickCategories.map((c) => (
         <Link
@@ -18,16 +21,16 @@ export function BottomBar({ vm }: { vm: BottomBarVM }) {
           href={c.href}
           replace
           scroll={false}
-          aria-pressed={c.active}
+          aria-current={c.active ? "true" : undefined}
           className={`${cell} ${c.active ? "bg-fg text-bg" : "hover:bg-line-soft"}`}
         >
-          {c.active && <span aria-hidden="true">✓&nbsp;</span>}
+          {c.active && <Icon name="check" />}
           {c.label}
           <PendingBar />
         </Link>
       ))}
-      <FiltersSheet vm={vm.panel} className={`${cell} hover:bg-line-soft`} />
-      <ThemeToggle className={`${cell} hover:bg-line-soft`} />
+      <FiltersSheet vm={vm.panel} count={count} className={`${cell} hover:bg-line-soft`} />
+      <SavedLink className={`${cell} hover:bg-line-soft`} />
     </nav>
   );
 }

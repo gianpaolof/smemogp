@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { HeaderSkeleton } from "@/ui/nowy/Skeletons";
+import { HeaderSkeleton, MapSkeleton } from "@/ui/nowy/Skeletons";
 import { MapRoute } from "../_screens/MapRoute";
 import { Screen } from "../_screens/Screen";
 
@@ -13,7 +13,7 @@ export default function MapPage({ searchParams }: PageProps<"/mappa">) {
         fallback={
           <>
             <HeaderSkeleton />
-            <div className="flex-1 animate-pulse bg-line-soft" />
+            <MapSkeleton />
           </>
         }
       >

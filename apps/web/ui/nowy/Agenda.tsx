@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { ViewTransition } from "react";
-import type { AgendaVM, EventRowVM } from "@/ui/contracts";
+import type { AgendaVM, EventRowVM, RowGroupVM } from "@/ui/contracts";
 import { EmptyState } from "./EmptyState";
+import { EventImage } from "./EventImage";
+import { Icon } from "./icons";
+import { NewBadge } from "./NewBadge";
 
 function Row({ row }: { row: EventRowVM }) {
   return (
@@ -9,31 +12,28 @@ function Row({ row }: { row: EventRowVM }) {
       {/* Due link affiancati, non annidati: riga → pannello dettaglio, ↗ → pagina sulla fonte */}
       <div
         className={`scroll-reveal flex items-stretch border-b border-line last:border-b-0 ${
-          row.highlight ? "bg-accent text-accent-fg" : ""
+          row.highlight ? "is-next bg-accent text-accent-fg" : ""
         }`}
       >
         <Link
           href={row.href}
           scroll={false}
-          className={`flex min-w-0 flex-1 items-center gap-3 px-3 py-2.5 ${row.highlight ? "" : "hover:bg-line-soft"}`}
+          className={`press flex min-w-0 flex-1 items-center gap-3 px-3 py-2.5 ${row.highlight ? "" : "hover:bg-line-soft"}`}
         >
           <div className="flex min-w-0 flex-1 flex-col gap-0.5">
             <span className={`text-xs font-semibold tabular-nums ${row.highlight ? "" : "text-muted"}`}>
+              {row.highlight && (
+                <span className="mr-1.5 bg-accent-fg px-1 py-px text-[10px] font-bold tracking-wide text-accent uppercase">
+                  Prossimo
+                </span>
+              )}
               {row.kicker}
+              <NewBadge addedAt={row.addedAt} />
             </span>
-            <h3 className="display-title line-clamp-2 text-[22px]">{row.title}</h3>
-            {row.meta && <span className={`text-xs ${row.highlight ? "" : "text-muted"}`}>{row.meta}</span>}
+            <h3 className="display-title line-clamp-3 text-[20px] sm:text-[24px]">{row.title}</h3>
+            {row.meta && <span className={`truncate text-xs ${row.highlight ? "" : "text-muted"}`}>{row.meta}</span>}
           </div>
-          {row.imageUrl && (
-            // Immagini da fonti esterne arbitrarie: niente next/image (domini non noti a priori)
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={row.imageUrl}
-              alt=""
-              loading="lazy"
-              className="size-18 shrink-0 object-cover grayscale contrast-[1.15] dark:brightness-90"
-            />
-          )}
+          {row.imageUrl && <EventImage src={row.imageUrl} sizes="72px" className="size-16 shrink-0 sm:size-18" />}
         </Link>
         {row.external && (
           <a
@@ -42,15 +42,30 @@ function Row({ row }: { row: EventRowVM }) {
             rel="noopener noreferrer"
             aria-label={`Apri «${row.title}» su ${row.external.host} (nuova scheda)`}
             title={`Apri su ${row.external.host}`}
-            className={`flex w-11 shrink-0 items-center justify-center border-l text-lg font-semibold hover:bg-fg hover:text-bg ${
+            className={`press flex w-10 shrink-0 items-center justify-center border-l text-base hover:bg-fg hover:text-bg ${
               row.highlight ? "border-accent-fg/30" : "border-line"
             }`}
           >
-            ↗
+            <Icon name="external" />
           </a>
         )}
       </div>
     </ViewTransition>
+  );
+}
+
+function Group({ group }: { group: RowGroupVM }) {
+  return (
+    <>
+      {group.label && (
+        <p className="border-b border-line px-3 pt-3 pb-1 text-[11px] font-bold tracking-[0.12em] text-muted uppercase">
+          {group.label}
+        </p>
+      )}
+      {group.rows.map((row) => (
+        <Row key={row.id} row={row} />
+      ))}
+    </>
   );
 }
 
@@ -61,19 +76,31 @@ export function Agenda({ vm }: { vm: AgendaVM }) {
       {vm.days.map((day) => (
         <section
           key={day.key}
-          aria-label={`${day.num} ${day.label}`}
-          className="grid grid-cols-[88px_minmax(0,1fr)] border-b border-line sm:grid-cols-[112px_minmax(0,1fr)]"
+          aria-labelledby={`giorno-${day.key}`}
+          className="grid grid-cols-[88px_minmax(0,1fr)] border-b-2 border-fg sm:grid-cols-[112px_minmax(0,1fr)]"
         >
           <div className="border-r border-line">
             {/* Il numero del giorno resta agganciato mentre scorri la sua giornata */}
-            <div className="sticky top-[90px] flex flex-col px-3 py-2.5">
+            <h2 id={`giorno-${day.key}`} className="sticky top-[var(--header-h)] flex flex-col px-3 py-2.5">
               <span className="display-num text-[80px] sm:text-[96px]">{day.num}</span>
               <span className="pt-1.5 text-xs font-semibold text-muted">{day.label}</span>
-            </div>
+            </h2>
           </div>
-          <div className="flex flex-col">
-            {day.rows.map((row) => (
-              <Row key={row.id} row={row} />
+          <div className="flex min-w-0 flex-col">
+            {day.ongoing && (
+              // Mostre e rassegne: chiuse, così le serate restano in vista
+              <details className="group border-b border-line">
+                <summary className="press flex min-h-11 cursor-pointer list-none items-center justify-between px-3 text-[11px] font-bold tracking-[0.12em] text-muted uppercase hover:bg-line-soft [&::-webkit-details-marker]:hidden">
+                  {day.ongoing.label}
+                  <Icon name="right" className="transition-transform group-open:rotate-90" />
+                </summary>
+                <div className="border-t border-line">
+                  <Group group={{ ...day.ongoing, label: null }} />
+                </div>
+              </details>
+            )}
+            {day.groups.map((g) => (
+              <Group key={g.key} group={g} />
             ))}
           </div>
         </section>

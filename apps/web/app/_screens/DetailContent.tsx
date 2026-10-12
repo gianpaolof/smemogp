@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { connection } from "next/server";
 import { getEvent } from "@/data/events";
 import { parseFilters } from "@/domain/filters";
 import { presentDetail } from "@/presenters";
@@ -16,5 +17,7 @@ export async function DetailContent({
   const f = parseFilters(sp);
   const event = await getEvent(decodeURIComponent(id), f.origin);
   if (!event) notFound();
-  return <EventDetail vm={presentDetail(event, f)} />;
+  // "In corso" dipende da adesso: dato di richiesta
+  await connection();
+  return <EventDetail vm={presentDetail(event, f, new Date())} />;
 }

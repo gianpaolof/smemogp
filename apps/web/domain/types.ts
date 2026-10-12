@@ -4,7 +4,7 @@ export type { Category };
 
 export type LatLng = { lat: number; lng: number };
 
-export type Period = "oggi" | "weekend" | "settimana" | "mese";
+export type Period = "stasera" | "oggi" | "weekend" | "settimana" | "mese";
 
 /** Stato della ricerca: unica fonte di verità, serializzato nell'URL. */
 export type Filters = {
@@ -33,6 +33,7 @@ export type EventItem = {
   imageUrl: string | null;
   url: string;
   sourceId: string;
+  createdAt: string;
   updatedAt: string;
   distanceKm: number | null;
 };

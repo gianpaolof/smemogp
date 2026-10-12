@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { EmptyVM } from "@/ui/contracts";
+import { Icon } from "./icons";
 
 export function EmptyState({ vm }: { vm: EmptyVM }) {
   return (
@@ -13,10 +14,10 @@ export function EmptyState({ vm }: { vm: EmptyVM }) {
             href={a.href}
             replace
             scroll={false}
-            className="flex h-12 items-center justify-between border-b border-line text-sm font-semibold hover:bg-line-soft"
+            className="press flex h-12 items-center justify-between border-b border-line text-sm font-semibold hover:bg-line-soft"
           >
             {a.label}
-            <span aria-hidden="true">→</span>
+            <Icon name="right" />
           </Link>
         ))}
       </div>

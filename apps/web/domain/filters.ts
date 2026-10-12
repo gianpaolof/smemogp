@@ -1,9 +1,11 @@
 import { CATEGORIES } from "@smemogp/db/constants";
 import type { Category, Filters, LatLng, Period } from "./types";
 
-export const PERIODS: readonly Period[] = ["oggi", "weekend", "settimana", "mese"];
+export const PERIODS: readonly Period[] = ["stasera", "oggi", "weekend", "settimana", "mese"];
 export const RADIUS_MIN_KM = 1;
 export const RADIUS_MAX_KM = 100;
+/** Valori dello slider: fitti dove servono (in città), radi verso la provincia. */
+export const RADIUS_STEPS = [1, 2, 3, 4, 5, 7, 10, 12, 15, 20, 25, 30, 40, 50, 75, 100] as const;
 
 export const DEFAULT_FILTERS: Filters = {
   period: "settimana",

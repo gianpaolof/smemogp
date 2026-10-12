@@ -44,7 +44,19 @@ html {
   background: var(--bg);
   color: var(--fg);
   -webkit-tap-highlight-color: transparent;
+  /* Altezza dell'header sticky (48 periodi + 38 scope + bordi): il numero del giorno si aggancia sotto */
+  --header-h: calc(87px + env(safe-area-inset-top));
+  overscroll-behavior-y: none;
 }
+
+/* Niente attesa del doppio tap, niente callout di iOS sui controlli */
+a, button, summary, input[type="range"] { touch-action: manipulation; }
+nav a, nav button { -webkit-touch-callout: none; user-select: none; }
+
+/* Feedback al tocco: inversione immediata, coerente con lo stile brutalista */
+.press { transition: background-color 60ms, color 60ms; }
+.press:active { background: var(--fg); color: var(--bg); }
+.is-next .press:active { background: var(--accent-fg); color: var(--accent); }
 
 body {
   font-family: var(--font-sans);
@@ -105,6 +117,12 @@ input[type="range"] { accent-color: var(--accent); }
 /* ── View Transitions ────────────────────────────────────────────────────── */
 ::view-transition-group(*) { animation-duration: 220ms; animation-timing-function: cubic-bezier(0.2, 0, 0, 1); }
 
+/* Header e barra in basso restano fermi: scorre solo il contenuto (come le tab di un'app nativa) */
+::view-transition-group(app-header), ::view-transition-group(app-tabbar) { animation: none; z-index: 100; }
+::view-transition-old(app-header), ::view-transition-old(app-tabbar) { display: none; }
+::view-transition-new(app-header), ::view-transition-new(app-tabbar) { animation: none; }
+::view-transition { pointer-events: none; }
+
 /* Lista ↔ mappa: direzione spaziale */
 ::view-transition-old(.nav-forward) { animation: 220ms ease-in both vt-out-left; }
 ::view-transition-new(.nav-forward) { animation: 260ms cubic-bezier(0.2, 0, 0, 1) both vt-in-right; }
@@ -144,64 +162,70 @@ html[data-theme-switch]::view-transition-new(root) { animation: 520ms cubic-bezi
   ::view-transition-new(*) { animation: none !important; }
 }
 
+/* ── Immagini in bicromia: nero → accento, poster eterogenei in un solo sistema ───── */
+.duotone { background: var(--accent); isolation: isolate; }
+.duotone-img { filter: grayscale(1) contrast(1.1) brightness(1.25); mix-blend-mode: multiply; }
+[data-theme="dark"] .duotone { background: var(--accent); }
+[data-theme="dark"] .duotone-img { filter: grayscale(1) contrast(1.1) brightness(1.1); mix-blend-mode: multiply; }
+
+/* ── Skeleton nel linguaggio della griglia: tratteggio, non blob che pulsano ──────── */
+.hatch {
+  background-image: repeating-linear-gradient(135deg, var(--line-soft) 0 2px, transparent 2px 8px);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .hatch { animation: hatch-slide 1.2s linear infinite; background-size: 11.3137px 11.3137px; }
+}
+@keyframes hatch-slide { to { background-position: 11.3137px 0; } }
+
+/* ── Slider raggio: quadrato come il resto ────────────────────────────────────────── */
+input.nowy-range { appearance: none; height: 28px; background: transparent; }
+input.nowy-range::-webkit-slider-runnable-track { height: 4px; background: var(--fg); }
+input.nowy-range::-moz-range-track { height: 4px; background: var(--fg); }
+input.nowy-range::-webkit-slider-thumb { appearance: none; width: 24px; height: 24px; margin-top: -10px; border: 3px solid var(--fg); background: var(--accent); border-radius: 0; }
+input.nowy-range::-moz-range-thumb { width: 18px; height: 18px; border: 3px solid var(--fg); background: var(--accent); border-radius: 0; }
+
 /* ── Mappa (Leaflet) ─────────────────────────────────────────────────────── */
 .leaflet-container {
   background: var(--bg);
   font-family: var(--font-sans);
 }
-.nowy-marker {
+/* Area di tocco 28px; il quadrato visibile è disegnato dentro, così resta piccolo ma facile da colpire */
+/* .leaflet-marker-icon imposta display:block: serve la specificità doppia */
+.leaflet-marker-icon.nowy-marker { position: relative; display: flex; align-items: center; justify-content: center; }
+.nowy-marker::before {
+  content: "";
+  width: 18px;
+  height: 18px;
   background: var(--fg);
   border: 2px solid var(--bg);
+  box-shadow: 0 0 0 1px var(--fg);
   box-sizing: border-box;
-  transition: transform 150ms;
+  transition: transform 120ms;
 }
-.nowy-marker.is-selected {
-  background: var(--accent);
-  border: 3px solid var(--fg);
+.nowy-marker:hover::before { transform: scale(1.15); }
+.nowy-marker.is-selected::before { width: 24px; height: 24px; background: var(--accent); border: 3px solid var(--fg); box-shadow: none; }
+@media (prefers-reduced-motion: no-preference) {
+  .nowy-marker.is-selected::after {
+    content: "";
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    border: 2px solid var(--accent);
+    animation: marker-ping 900ms cubic-bezier(0.2, 0, 0, 1) 1;
+  }
 }
-/* Più eventi nello stesso luogo: quadrato più grande col numero */
-.nowy-marker.has-count,
-.leaflet-marker-icon.nowy-cluster {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+@keyframes marker-ping { to { transform: scale(2); opacity: 0; } }
+/* Più eventi nello stesso luogo: quadrato col numero e ombra "a pila" */
+.nowy-marker.has-count::before { width: 24px; height: 24px; box-shadow: 3px 3px 0 var(--bg), 4px 4px 0 var(--fg); }
+.nowy-marker.is-selected.has-count::before { width: 30px; height: 30px; box-shadow: none; }
+.nowy-marker.has-count span {
+  position: relative;
   color: var(--bg);
-  font: 700 12px/1 var(--font-sans);
+  font: 900 13px/1 var(--font-sans);
+  font-stretch: 75%;
   font-variant-numeric: tabular-nums;
 }
-.nowy-marker.has-count {
-  background: transparent;
-  border: 0;
-}
-.nowy-marker.has-count svg {
-  width: 100%;
-  height: 100%;
-  fill: var(--fg);
-  stroke: var(--bg);
-  stroke-width: 1.5;
-}
-.nowy-marker.has-count circle { fill: var(--bg); stroke: none; }
-.nowy-marker.is-selected.has-count svg { fill: var(--accent); stroke: var(--fg); }
-.nowy-place-count {
-  position: absolute;
-  top: -4px;
-  right: -6px;
-  min-width: 20px;
-  height: 20px;
-  padding: 0 4px;
-  border: 1px solid var(--bg);
-  border-radius: 10px;
-  background: var(--fg);
-  color: var(--bg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.is-selected .nowy-place-count {
-  background: var(--accent);
-  color: var(--accent-fg);
-  border-color: var(--fg);
-}
+.nowy-marker.is-selected.has-count span { color: var(--accent-fg); }
 /* Cluster: quadrato pieno, bordo nel colore di fondo per staccarlo dalla mappa */
 .nowy-cluster {
   background: var(--fg);
@@ -225,10 +249,31 @@ html[data-theme-switch]::view-transition-new(root) { animation: 520ms cubic-bezi
     transition: none !important;
   }
 }
-.nowy-origin {
+/* Origine: mirino nell'accento */
+.nowy-origin { position: relative; }
+.nowy-origin::before, .nowy-origin::after { content: ""; position: absolute; background: var(--accent); box-shadow: 0 0 0 1.5px var(--bg); }
+.nowy-origin::before { left: 13px; top: 2px; width: 2px; height: 24px; }
+.nowy-origin::after { top: 13px; left: 2px; height: 2px; width: 24px; }
+.nowy-origin i { position: absolute; left: 9px; top: 9px; width: 10px; height: 10px; border: 2px solid var(--accent); background: var(--bg); box-sizing: border-box; z-index: 1; }
+
+/* Cerchio del raggio e sua etichetta */
+/* className non viene riapplicato da react-leaflet dopo la creazione: si colpisce il pane */
+.leaflet-overlay-pane path:not(.leaflet-interactive) { stroke: var(--fg); }
+.nowy-radius-label span {
+  position: absolute;
+  transform: translate(-100%, -50%);
+  padding: 1px 4px;
+  background: var(--bg);
+  border: 1px solid var(--fg);
   color: var(--fg);
-  font: 700 22px/1 var(--font-sans);
-  text-align: center;
+  font: 700 10px/1.2 var(--font-sans);
+  white-space: nowrap;
+}
+
+/* Tema scuro: le tile chiare invertite danno un fondo quasi nero come l'app, senza etichette abbaglianti */
+.leaflet-container.is-dark .leaflet-tile-pane { filter: invert(1) grayscale(1) brightness(0.8) contrast(1.15); }
+@media (prefers-reduced-motion: reduce) {
+  .leaflet-zoom-anim .leaflet-zoom-animated, .leaflet-fade-anim .leaflet-tile { transition: none !important; }
 }
 .leaflet-control-attribution {
   background: color-mix(in srgb, var(--bg) 85%, transparent) !important;

@@ -7,7 +7,9 @@ import { presentAgenda, presentBottomBar, presentHeader } from "@/presenters";
 import { Agenda } from "@/ui/nowy/Agenda";
 import { BottomBar } from "@/ui/nowy/BottomBar";
 import { Header } from "@/ui/nowy/Header";
+import { RestoreFilters } from "@/ui/nowy/RestoreFilters";
 import { AgendaSkeleton } from "@/ui/nowy/Skeletons";
+import { serializeFilters } from "@/domain/filters";
 import { buildQuery, type SearchParams } from "./query";
 
 async function loadAgenda(f: Filters) {
@@ -47,7 +49,8 @@ export async function ListScreen({ searchParams }: { searchParams: SearchParams 
           <AgendaData f={f} />
         </Suspense>
       </main>
-      <BottomBar vm={presentBottomBar(f, "lista")} />
+      <BottomBar vm={presentBottomBar(f, "lista")} count={<Suspense fallback="gli eventi"><Count f={f} /></Suspense>} />
+      <RestoreFilters path="/" query={serializeFilters(f)} />
     </>
   );
 }

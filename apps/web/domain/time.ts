@@ -34,6 +34,16 @@ function romeMidnight({ y, m, d }: YMD): Date {
   return new Date(guess - offsetMs(new Date(first)));
 }
 
+/** Istante UTC dell'ora `h` (ora di Roma) nel giorno dato. */
+export function romeAt(day: YMD, h: number): Date {
+  const guess = Date.UTC(day.y, day.m - 1, day.d, h);
+  return new Date(guess - offsetMs(new Date(guess - offsetMs(new Date(guess)))));
+}
+
+/** Sera: dalle 17 di oggi alle 6 di domani. */
+const EVENING_FROM_H = 17;
+const EVENING_TO_H = 6;
+
 function addDays({ y, m, d }: YMD, n: number): YMD {
   const t = new Date(Date.UTC(y, m - 1, d + n));
   return { y: t.getUTCFullYear(), m: t.getUTCMonth() + 1, d: t.getUTCDate() };
@@ -62,6 +72,8 @@ export function periodBounds(period: Period, now: Date): { from: Date; to: Date 
   });
 
   switch (period) {
+    case "stasera":
+      return { from: romeAt(today, EVENING_FROM_H), to: romeAt(addDays(today, 1), EVENING_TO_H) };
     case "oggi":
       return span(today, 1);
     case "settimana":
@@ -75,6 +87,11 @@ export function periodBounds(period: Period, now: Date): { from: Date; to: Date 
       return span(addDays(today, 6 - wd), 2);
     }
   }
+}
+
+/** Ora (0–23) di Roma dell'istante. */
+export function romeHour(iso: string): number {
+  return romeParts(new Date(iso)).h;
 }
 
 /** Chiave "YYYY-MM-DD" del giorno di Roma in cui cade l'istante. */

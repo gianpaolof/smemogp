@@ -37,6 +37,7 @@ function toItem(e: Event, origin: LatLng | null): EventItem {
     imageUrl: e.imageUrl,
     url: e.url,
     sourceId: e.sourceId,
+    createdAt: e.createdAt.toISOString(),
     updatedAt: e.updatedAt.toISOString(),
     distanceKm: origin && e.lat != null && e.lng != null ? haversineKm(origin, { lat: e.lat, lng: e.lng }) : null,
   };

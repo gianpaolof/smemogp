@@ -2,6 +2,7 @@ import type { Category, Period } from "./types";
 import { TIME_ZONE } from "./time";
 
 export const PERIOD_LABELS: Record<Period, string> = {
+  stasera: "Stasera",
   oggi: "Oggi",
   weekend: "Weekend",
   settimana: "7 giorni",
@@ -65,6 +66,37 @@ export function safeExternalUrl(url: string | null | undefined): { href: string;
   } catch {
     return null;
   }
+}
+
+/** Nomi leggibili delle fonti (id di `apps/scout/sources.json`). */
+const SOURCE_LABELS: Record<string, string> = {
+  "eventbrite-torino": "Eventbrite",
+  torinotoday: "TorinoToday",
+  "zero-torino": "Zero",
+  "museo-egizio": "Museo Egizio",
+  "circolo-lettori": "Circolo dei Lettori",
+  "accademia-scienze": "Accademia delle Scienze",
+  "teatro-stabile": "Teatro Stabile",
+  "ogr-torino": "OGR Torino",
+  "club-to-club": "Club to Club",
+};
+
+export function sourceLabel(sourceId: string, url: string | null) {
+  return SOURCE_LABELS[sourceId] ?? safeExternalUrl(url)?.host ?? sourceId;
+}
+
+/** "Via Roma 1, Torino" senza ripetizioni ("…Torino, Torino" dalle fonti). */
+export function joinAddress(...parts: (string | null | undefined)[]): string | null {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const piece of parts.flatMap((p) => (p ?? "").split(","))) {
+    const t = piece.trim();
+    const key = t.toLowerCase();
+    if (!t || seen.has(key)) continue;
+    seen.add(key);
+    out.push(t);
+  }
+  return out.length ? out.join(", ") : null;
 }
 
 export function formatKm(km: number) {

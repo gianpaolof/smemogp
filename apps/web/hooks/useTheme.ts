@@ -7,11 +7,14 @@ export type ResolvedTheme = "light" | "dark";
 
 export const THEME_STORAGE_KEY = "tema";
 
+/** Sfondo per tema (= --bg in globals.css): colora la barra del browser e lo splash. */
+export const BG = { light: "#ffffff", dark: "#0d0d0d" } as const;
+
 /**
  * Eseguito inline nel <head> prima del primo paint: evita il lampo di tema sbagliato.
  * Tenere in sync con `resolve()` qui sotto.
  */
-export const THEME_INIT_SCRIPT = `(function(){try{var c=localStorage.getItem("${THEME_STORAGE_KEY}");var d=c==="dark"||(c!=="light"&&matchMedia("(prefers-color-scheme: dark)").matches);document.documentElement.dataset.theme=d?"dark":"light"}catch(e){}})()`;
+export const THEME_INIT_SCRIPT = `(function(){try{var c=localStorage.getItem("${THEME_STORAGE_KEY}");var d=c==="dark"||(c!=="light"&&matchMedia("(prefers-color-scheme: dark)").matches);document.documentElement.dataset.theme=d?"dark":"light";var t=function(){document.querySelectorAll('meta[name="theme-color"]').forEach(function(m){m.removeAttribute("media");m.content=d?"${BG.dark}":"${BG.light}"})};t();document.addEventListener("DOMContentLoaded",t)}catch(e){}})()`;
 
 const media = () => window.matchMedia("(prefers-color-scheme: dark)");
 
@@ -30,7 +33,13 @@ function resolve(choice: ThemeChoice): ResolvedTheme {
 }
 
 function apply(choice: ThemeChoice) {
-  document.documentElement.dataset.theme = resolve(choice);
+  const theme = resolve(choice);
+  document.documentElement.dataset.theme = theme;
+  // La barra di stato segue il tema scelto nell'app, non solo quello di sistema
+  document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]').forEach((m) => {
+    m.removeAttribute("media");
+    m.content = BG[theme];
+  });
 }
 
 const listeners = new Set<() => void>();
