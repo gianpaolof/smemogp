@@ -1,17 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { useSaved } from "@/hooks/useSaved";
+import { useUpcomingCount } from "@/hooks/useSaved";
 import { Icon } from "./icons";
 
+/** Badge: solo i salvati ancora da venire (null sul server → nascosto, niente mismatch) */
 export function SavedLink({ className = "" }: { className?: string }) {
-  const saved = useSaved();
+  const count = useUpcomingCount();
+  const n = count ?? 0;
   return (
-    <Link href="/salvati" transitionTypes={["nav-forward"]} className={className}>
-      <Icon name="star" filled={saved.length > 0} />
+    <Link href="/salvati" transitionTypes={["nav-forward"]} aria-label={n > 0 ? `Salvati, ${n}` : "Salvati"} className={className}>
+      <Icon name="star" filled={n > 0} />
       Salvati
-      {saved.length > 0 && (
-        <span className="bg-accent px-1 text-[10px] font-bold text-accent-fg tabular-nums">{saved.length}</span>
+      {n > 0 && (
+        <span aria-hidden className="bg-accent px-1 text-[10px] font-bold text-accent-fg tabular-nums">
+          {n}
+        </span>
       )}
     </Link>
   );

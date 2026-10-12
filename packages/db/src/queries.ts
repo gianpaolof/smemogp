@@ -46,3 +46,9 @@ export async function findEventById(db: Db, id: string): Promise<Event | undefin
   const [row] = await db.select().from(events).where(eq(events.id, id)).limit(1);
   return row;
 }
+
+/** Più eventi in un'unica `IN (…)`; ordine non garantito. Lista vuota: nessuna query. */
+export async function findEventsByIds(db: Db, ids: string[]): Promise<Event[]> {
+  if (ids.length === 0) return [];
+  return db.select().from(events).where(inArray(events.id, ids));
+}

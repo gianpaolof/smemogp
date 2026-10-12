@@ -56,7 +56,7 @@ export function EventDetail({ vm }: { vm: EventDetailVM }) {
         </div>
       </div>
 
-      <EventActions id={vm.id} title={vm.title} shareText={vm.shareText} icsHref={vm.icsHref} />
+      <EventActions entry={vm.savedEntry} shareText={vm.shareText} icsHref={vm.icsHref} />
 
       <dl className="grid grid-cols-[88px_minmax(0,1fr)] text-sm [&>dd]:border-b [&>dd]:border-line [&>dd]:px-3 [&>dd]:py-2.5 [&>dt]:border-r [&>dt]:border-b [&>dt]:border-line [&>dt]:px-3 [&>dt]:py-2.5 [&>dt]:text-xs [&>dt]:font-semibold [&>dt]:text-muted">
         {(vm.venue || vm.address) && (

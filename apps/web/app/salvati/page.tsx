@@ -1,29 +1,62 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { connection } from "next/server";
-import { Suspense } from "react";
-import { getEvent } from "@/data/events";
+import { cache, Suspense } from "react";
+import { getEventsByIds } from "@/data/events";
+import { isEventId, MAX_URL_IDS } from "@/domain/saved";
 import { presentSaved } from "@/presenters";
-import { Agenda } from "@/ui/nowy/Agenda";
+import { Agenda, PastGroup } from "@/ui/nowy/Agenda";
 import { Icon } from "@/ui/nowy/icons";
+import { SavedOrphans } from "@/ui/nowy/SavedOrphans";
 import { SavedSync } from "@/ui/nowy/SavedSync";
 import { AgendaSkeleton } from "@/ui/nowy/Skeletons";
 import { Screen } from "../_screens/Screen";
 
 export const metadata: Metadata = { title: "Salvati · Eventi Torino" };
 
-async function SavedList({ searchParams }: { searchParams: PageProps<"/salvati">["searchParams"] }) {
-  const sp = await searchParams;
-  const raw = typeof sp.ids === "string" ? sp.ids : "";
-  // Solo id plausibili (sha1 esadecimale), massimo 60: l'input arriva dall'URL
-  const ids = [...new Set(raw.split(","))].filter((id) => /^[0-9a-f]{40}$/.test(id)).slice(0, 60);
+type SearchParams = PageProps<"/salvati">["searchParams"];
+
+/** Solo id plausibili (sha1 esadecimale), senza doppioni, al massimo MAX_URL_IDS: l'input arriva dall'URL. */
+function parseIds(raw: string) {
+  const ids = [...new Set(raw.split(",").filter(isEventId))].slice(0, MAX_URL_IDS);
+  // Ordinati: lo stesso insieme dà la stessa chiave di cache
+  return ids.sort();
+}
+
+/**
+ * Una sola lettura per richiesta, condivisa da intestazione e lista (React `cache`, chiave
+ * primitiva): i due rami stanno in Suspense diversi ma non duplicano la query.
+ */
+const loadSaved = cache(async (raw: string) => {
+  const ids = parseIds(raw);
   await connection();
-  const events = (await Promise.all(ids.map((id) => getEvent(id, null)))).filter((e) => e !== null);
-  const now = new Date();
+  const { events, foundIds, snapshots } = await getEventsByIds(ids);
+  const found = new Set(foundIds);
+  const missingIds = ids.filter((id) => !found.has(id));
+  return { ids, snapshots, vm: presentSaved(events, missingIds, new Date()) };
+});
+
+async function rawIds(searchParams: SearchParams) {
+  const sp = await searchParams;
+  return typeof sp.ids === "string" ? sp.ids : "";
+}
+
+async function SavedCount({ searchParams }: { searchParams: SearchParams }) {
+  const { vm } = await loadSaved(await rawIds(searchParams));
+  // Solo se c'è almeno un evento prossimo o in corso
+  if (!vm.upcoming.days.length) return null;
+  return <p className="px-3 pb-2 text-xs font-semibold text-muted">{vm.upcoming.countLabel}</p>;
+}
+
+async function SavedList({ searchParams }: { searchParams: SearchParams }) {
+  const { ids, snapshots, vm } = await loadSaved(await rawIds(searchParams));
   return (
     <>
-      <SavedSync current={raw} />
-      <Agenda vm={presentSaved(events, now)} />
+      {/* Snapshot freschi per lo store (anche eventi senza coordinate): titolo e fine dal catalogo */}
+      <SavedSync current={ids} found={snapshots} />
+      <Agenda vm={vm.upcoming} dimUnsaved />
+      <PastGroup group={vm.past} />
+      <SavedOrphans ids={vm.missingIds} />
     </>
   );
 }
@@ -32,7 +65,12 @@ export default function SavedPage({ searchParams }: PageProps<"/salvati">) {
   return (
     <Screen>
       <header className="sticky top-0 z-20 flex items-center justify-between border-b border-line bg-bg pt-[env(safe-area-inset-top)] [view-transition-name:app-header]">
-        <h1 className="display-title px-3 py-2 text-3xl">Salvati</h1>
+        <div>
+          <h1 className="display-title px-3 py-2 text-3xl">Salvati</h1>
+          <Suspense fallback={null}>
+            <SavedCount searchParams={searchParams} />
+          </Suspense>
+        </div>
         <Link
           href="/"
           transitionTypes={["nav-back"]}

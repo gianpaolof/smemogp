@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ViewTransition } from "react";
+import { ViewTransition, type ReactNode } from "react";
 import type { AgendaVM, EventRowVM, RowGroupVM } from "@/ui/contracts";
 import { heroDay, heroTitle } from "@/ui/heroNames";
 import { EmptyState } from "./EmptyState";
@@ -7,14 +7,18 @@ import { EventImage } from "./EventImage";
 import { Icon } from "./icons";
 import { NewBadge } from "./NewBadge";
 import { RowPending } from "./RowPending";
+import { SaveToggle } from "./SaveToggle";
 import { SharedHero } from "./SharedHero";
 
-function Row({ row }: { row: EventRowVM }) {
+const sideCell = "flex min-h-11 flex-1 items-center justify-center hover:bg-fg hover:text-bg";
+
+/** `past`: righe di eventi conclusi (in «Passati»), titolo attenuato e niente comparsa allo scroll */
+function Row({ row, past = false }: { row: EventRowVM; past?: boolean }) {
   return (
     <ViewTransition key={row.id} enter="row-in" exit="row-out" default="none">
-      {/* Due link affiancati, non annidati: riga → pannello dettaglio, ↗ → pagina sulla fonte */}
+      {/* Controlli affiancati, non annidati: riga → pannello dettaglio, ★ → salva, ↗ → pagina sulla fonte */}
       <div
-        className={`scroll-reveal flex items-stretch border-b border-line last:border-b-0 ${
+        className={`row flex items-stretch border-b border-line last:border-b-0 ${past ? "" : "scroll-reveal"} ${
           row.highlight ? "is-next bg-accent text-accent-fg" : ""
         }`}
       >
@@ -36,7 +40,10 @@ function Row({ row }: { row: EventRowVM }) {
               <NewBadge addedAt={row.addedAt} />
             </span>
             <SharedHero name={heroTitle(row.id)} ids={[row.id]}>
-              <h3 data-hero={heroTitle(row.id)} className="display-title line-clamp-3 text-[20px] sm:text-[24px]">
+              <h3
+                data-hero={heroTitle(row.id)}
+                className={`display-title line-clamp-3 text-[20px] sm:text-[24px] ${past ? "text-muted" : ""}`}
+              >
                 {row.title}
               </h3>
             </SharedHero>
@@ -44,26 +51,28 @@ function Row({ row }: { row: EventRowVM }) {
           </div>
           {row.imageUrl && <EventImage src={row.imageUrl} sizes="72px" className="size-16 shrink-0 sm:size-18" />}
         </Link>
-        {row.external && (
-          <a
-            href={row.external.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={`Apri «${row.title}» su ${row.external.host} (nuova scheda)`}
-            title={`Apri su ${row.external.host}`}
-            className={`press flex w-10 shrink-0 items-center justify-center border-l text-base hover:bg-fg hover:text-bg ${
-              row.highlight ? "border-accent-fg/30" : "border-line"
-            }`}
-          >
-            <Icon name="external" />
-          </a>
-        )}
+        {/* Colonna destra impilata: ★ sopra, ↗ sotto (≥44 px ciascuna); senza ↗ la ★ è a tutta altezza */}
+        <div className={`flex w-11 shrink-0 flex-col border-l ${row.highlight ? "border-accent-fg/30" : "border-line"}`}>
+          <SaveToggle entry={row.savedEntry} onAccent={row.highlight} className={sideCell} />
+          {row.external && (
+            <a
+              href={row.external.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`Apri «${row.title}» su ${row.external.host} (nuova scheda)`}
+              title={`Apri su ${row.external.host}`}
+              className={`press ${sideCell} border-t text-base ${row.highlight ? "border-accent-fg/30" : "border-line"}`}
+            >
+              <Icon name="external" />
+            </a>
+          )}
+        </div>
       </div>
     </ViewTransition>
   );
 }
 
-function Group({ group }: { group: RowGroupVM }) {
+function Group({ group, past = false }: { group: RowGroupVM; past?: boolean }) {
   return (
     <>
       {group.label && (
@@ -72,16 +81,43 @@ function Group({ group }: { group: RowGroupVM }) {
         </p>
       )}
       {group.rows.map((row) => (
-        <Row key={row.id} row={row} />
+        <Row key={row.id} row={row} past={past} />
       ))}
     </>
   );
 }
 
-export function Agenda({ vm }: { vm: AgendaVM }) {
+/** Riquadro richiudibile, chiuso di partenza: «In corso» dentro un giorno, «Passati» in /salvati */
+function Collapsible({ label, className = "", children }: { label: string; className?: string; children: ReactNode }) {
+  return (
+    <details className={`group ${className}`}>
+      <summary className="press flex min-h-11 cursor-pointer list-none items-center justify-between px-3 text-[11px] font-bold tracking-[0.12em] text-muted uppercase hover:bg-line-soft [&::-webkit-details-marker]:hidden">
+        {label}
+        <Icon name="right" className="transition-transform group-open:rotate-90" />
+      </summary>
+      <div className="border-t border-line">{children}</div>
+    </details>
+  );
+}
+
+/**
+ * Salvati già conclusi, i più recenti prima: dopo l'agenda, chiusi. null → nulla.
+ * Solo in /salvati: le righe tolte si attenuano come nell'agenda (`dim-unsaved`).
+ */
+export function PastGroup({ group }: { group: RowGroupVM | null }) {
+  if (!group) return null;
+  return (
+    <Collapsible label={`Passati (${group.rows.length})`} className="dim-unsaved border-t-2 border-fg">
+      <Group group={{ ...group, label: null }} past />
+    </Collapsible>
+  );
+}
+
+/** `dimUnsaved`: in /salvati le righe tolte restano, attenuate, finché non si ricarica (vedi globals.css) */
+export function Agenda({ vm, dimUnsaved = false }: { vm: AgendaVM; dimUnsaved?: boolean }) {
   if (vm.empty) return <EmptyState vm={vm.empty} />;
   return (
-    <div>
+    <div className={dimUnsaved ? "dim-unsaved" : undefined}>
       {vm.days.map((day) => (
         <section
           key={day.key}
@@ -105,15 +141,9 @@ export function Agenda({ vm }: { vm: AgendaVM }) {
           <div className="flex min-w-0 flex-col">
             {day.ongoing && (
               // Mostre e rassegne: chiuse, così le serate restano in vista
-              <details className="group border-b border-line">
-                <summary className="press flex min-h-11 cursor-pointer list-none items-center justify-between px-3 text-[11px] font-bold tracking-[0.12em] text-muted uppercase hover:bg-line-soft [&::-webkit-details-marker]:hidden">
-                  {day.ongoing.label}
-                  <Icon name="right" className="transition-transform group-open:rotate-90" />
-                </summary>
-                <div className="border-t border-line">
-                  <Group group={{ ...day.ongoing, label: null }} />
-                </div>
-              </details>
+              <Collapsible label={day.ongoing.label ?? ""} className="border-b border-line">
+                <Group group={{ ...day.ongoing, label: null }} />
+              </Collapsible>
             )}
             {day.groups.map((g) => (
               <Group key={g.key} group={g} />

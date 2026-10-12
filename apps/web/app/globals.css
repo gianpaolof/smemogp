@@ -58,6 +58,17 @@ nav a, nav button { -webkit-touch-callout: none; user-select: none; }
 .press:active { background: var(--fg); color: var(--bg); }
 .is-next .press:active { background: var(--accent-fg); color: var(--accent); }
 
+/* ★ appena salvata: piccolo «pop» sull'icona (il bottone e i bordi restano fermi) */
+.star-pop { animation: star-pop 120ms cubic-bezier(.2, 0, 0, 1); }
+@keyframes star-pop { 50% { scale: 1.25; } }
+@media (prefers-reduced-motion: reduce) { .star-pop { animation: none; } }
+
+/* /salvati: le righe tolte restano, attenuate solo nella metà link (la ★ resta leggibile e ri-toccabile).
+   Stato "unknown" = non attenuato, niente lampo al primo paint. Nessuna transizione sull'opacità:
+   farebbe crossfade con le view transition. */
+.dim-unsaved .row:has([data-state="false"]) > a { opacity: 0.4; }
+.dim-unsaved .row:has([data-state="false"]) img { filter: grayscale(1); }
+
 body {
   font-family: var(--font-sans);
   font-optical-sizing: auto;

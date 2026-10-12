@@ -1,6 +1,8 @@
 import "server-only";
 import { cacheLife, cacheTag } from "next/cache";
-import { createDb, findEventById, findEventsNear, haversineKm, TORINO, type Db, type Event } from "@smemogp/db";
+import { createDb, findEventById, findEventsByIds, findEventsNear, haversineKm, TORINO, type Db, type Event } from "@smemogp/db";
+import { endOf } from "@/domain/agenda";
+import type { SavedEntry } from "@/domain/saved";
 import type { Category, EventItem, LatLng } from "@/domain/types";
 
 /** Tag invalidato dallo scout a fine run (`POST /api/revalidate`). */
@@ -67,4 +69,30 @@ export async function getEvent(id: string, origin: LatLng | null): Promise<Event
   const row = await findEventById(getDb(), id);
   if (!row || row.lat == null || row.lng == null) return null;
   return toItem(row, origin ?? TORINO);
+}
+
+/**
+ * Eventi salvati in un colpo solo. Gli id arrivano già ordinati e deduplicati: fanno da
+ * chiave di cache stabile. `foundIds` e `snapshots` si calcolano prima del filtro coordinate:
+ * un evento senza lat/lng esiste (non è orfano) anche se non lo mostriamo — raro. Grazie allo
+ * snapshot riceve comunque title/until, quindi esce dal badge quando è passato e viene potato
+ * da `pruneSaved` dopo `KEEP_PAST_DAYS`.
+ */
+export async function getEventsByIds(
+  sortedIds: string[],
+): Promise<{ events: EventItem[]; foundIds: string[]; snapshots: SavedEntry[] }> {
+  "use cache";
+  cacheTag(EVENTS_TAG);
+  cacheLife("hours");
+
+  const rows = await findEventsByIds(getDb(), sortedIds);
+  return {
+    events: rows.filter((e) => e.lat != null && e.lng != null).map((e) => toItem(e, TORINO)),
+    foundIds: rows.map((e) => e.id),
+    snapshots: rows.map((e) => ({
+      id: e.id,
+      title: e.title,
+      until: endOf({ startsAt: e.startsAt.toISOString(), endsAt: e.endsAt?.toISOString() ?? null }).toISOString(),
+    })),
+  };
 }

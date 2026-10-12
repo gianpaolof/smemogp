@@ -6,6 +6,13 @@
 
 export type NavItem = { label: string; href: string; active: boolean };
 
+/**
+ * Dati per salvare un evento con un tocco (★). Eccezione documentata alla regola «stringhe già
+ * formattate»: è un payload opaco che la UI passa così com'è allo store dei salvati, e `until`
+ * è la data ISO grezza di fine (fine dichiarata o inizio + 3 h), non un testo da mostrare.
+ */
+export type SaveVM = { id: string; title: string; until: string };
+
 export type ViewSwitch = { label: string; href: string; direction: "nav-forward" | "nav-back"; icon: "map" | "list" };
 
 export type HeaderVM = {
@@ -32,6 +39,8 @@ export type EventRowVM = {
   highlight: boolean;
   /** Inserimento nel catalogo (ms): il client lo confronta con l'ultima visita per «Nuovo» */
   addedAt: number;
+  /** Per la ★ della riga */
+  savedEntry: SaveVM;
 };
 
 /** Link verso un sito esterno già validato: `host` senza "www." ("eventbrite.it") */
@@ -108,7 +117,16 @@ export type EventDetailVM = {
   icsHref: string;
   /** Testo per Condividi */
   shareText: string;
+  /** Per «Salva» */
+  savedEntry: SaveVM;
 };
 
 /** Eventi salvati: stesse righe della lista, senza filtri. */
-export type SavedVM = AgendaVM;
+export type SavedVM = {
+  /** Prossimi e in corso, senza «Prossimo» evidenziato; countLabel "12 salvati" / "1 salvato" */
+  upcoming: AgendaVM;
+  /** Già conclusi, i più recenti prima; null se nessuno */
+  past: RowGroupVM | null;
+  /** Id salvati che il catalogo non ha più */
+  missingIds: readonly string[];
+};
