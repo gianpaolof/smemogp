@@ -1,5 +1,5 @@
 import { CATEGORIES } from "@smemogp/db/constants";
-import { groupByDay, isOngoing, slotOf, type Slot } from "@/domain/agenda";
+import { endOf, groupByDay, isOngoing, isOver, slotOf, type Slot } from "@/domain/agenda";
 import {
   DEFAULT_FILTERS,
   hrefWith,
@@ -32,6 +32,8 @@ import type {
   HeaderVM,
   MapVM,
   RowGroupVM,
+  SavedVM,
+  SaveVM,
 } from "@/ui/contracts";
 
 export type View = "lista" | "mappa";
@@ -64,6 +66,9 @@ export function presentHeader(f: Filters, view: View): HeaderVM {
   };
 }
 
+/** Payload della ★: `until` è la fine (dichiarata o inizio + 3 h), per potare e contare i passati. */
+const saveEntry = (e: EventItem): SaveVM => ({ id: e.id, title: e.title, until: endOf(e).toISOString() });
+
 function presentRow(e: EventItem, f: Filters, day: string, highlight: boolean): EventRowVM {
   const when = isOngoing(e, day)
     ? `fino al ${formatShortDate(e.endsAt ?? e.startsAt)}`
@@ -87,6 +92,7 @@ function presentRow(e: EventItem, f: Filters, day: string, highlight: boolean): 
     lng: e.lng,
     highlight,
     addedAt: new Date(e.createdAt).getTime(),
+    savedEntry: saveEntry(e),
   };
 }
 
@@ -123,13 +129,19 @@ function slotGroups(rows: { e: EventItem; row: EventRowVM }[]): RowGroupVM[] {
   return groups;
 }
 
-export function presentAgenda(events: EventItem[], f: Filters, firstDay: Date, now: Date): AgendaVM {
+export function presentAgenda(
+  events: EventItem[],
+  f: Filters,
+  firstDay: Date,
+  now: Date,
+  { highlightNext = true }: { highlightNext?: boolean } = {},
+): AgendaVM {
   // Stasera: solo eventi con orario che iniziano dalle 17 (quelli già finiti escono da soli)
   const onlyFrom = f.period === "stasera" ? periodBounds("stasera", now).from : undefined;
   const grouped = groupByDay(events, dayKey(firstDay.toISOString()), now, onlyFrom);
-  const next = grouped
-    .flatMap((d) => d.events.filter((e) => !e.allDay))
-    .find((e) => new Date(e.startsAt) >= now);
+  const next = highlightNext
+    ? grouped.flatMap((d) => d.events.filter((e) => !e.allDay)).find((e) => new Date(e.startsAt) >= now)
+    : undefined;
   const days: AgendaDayVM[] = grouped.map((d) => {
     const { num, label } = formatDayHeading(`${d.key}T12:00:00Z`);
     const present = (e: EventItem) => ({ e, row: presentRow(e, f, d.key, e.id === next?.id) });
@@ -147,22 +159,59 @@ export function presentAgenda(events: EventItem[], f: Filters, firstDay: Date, n
   return { countLabel: countLabel(total), days, empty: total ? null : presentEmpty(f, "lista") };
 }
 
-/** Eventi salvati: tutti i giorni, nessun filtro, nessun evidenziato. */
-export function presentSaved(events: EventItem[], now: Date): AgendaVM {
-  const vm = presentAgenda(events, { ...DEFAULT_FILTERS, period: "mese" }, now, now);
-  return {
-    ...vm,
+const savedCountLabel = (n: number) => (n === 1 ? "1 salvato" : `${n} salvati`);
+
+/**
+ * Eventi salvati: tutti i giorni, nessun filtro, nessun evidenziato. I conclusi vanno in
+ * «Passati» (i più recenti prima); gli id che il catalogo non ha più restano a parte.
+ */
+export function presentSaved(events: EventItem[], missingIds: readonly string[], now: Date): SavedVM {
+  const f: Filters = { ...DEFAULT_FILTERS, period: "mese" };
+  const ended = events.filter((e) => isOver(e, now));
+  const vm = presentAgenda(
+    events.filter((e) => !isOver(e, now)),
+    f,
+    now,
+    now,
+    { highlightNext: false },
+  );
+  const days = vm.days.map((d) => ({
+    ...d,
     // Nei salvati le mostre non vanno chiuse in "In corso": sono ciò che l'utente ha scelto
-    days: vm.days.map((d) => ({
-      ...d,
-      ongoing: null,
-      groups: [...(d.ongoing ? [{ ...d.ongoing, label: "In corso" }] : []), ...d.groups],
-    })),
-    empty: vm.empty && {
-      title: "Nessun salvato",
-      message: "Apri un evento e tocca «Salva»: lo ritrovi qui, anche senza filtri.",
-      actions: [{ label: "Tutti gli eventi", href: "/" }],
+    ongoing: null,
+    groups: [...(d.ongoing ? [{ ...d.ongoing, label: "In corso" }] : []), ...d.groups],
+  }));
+  const total = days.reduce((n, d) => n + d.groups.reduce((m, g) => m + g.rows.length, 0), 0);
+  const past: RowGroupVM | null = ended.length
+    ? {
+        key: "passati",
+        label: "Passati",
+        rows: ended
+          .sort((a, b) => endOf(b).getTime() - endOf(a).getTime())
+          .map((e) => ({
+            ...presentRow(e, f, dayKey(e.startsAt), false),
+            // Fuori dall'agenda manca l'intestazione del giorno: la data va nella riga
+            kicker: `${formatShortDate(e.startsAt)} — ${CATEGORY_LABELS[e.category]}`,
+          })),
+      }
+    : null;
+  const label = savedCountLabel(total);
+  return {
+    upcoming: {
+      countLabel: label,
+      days,
+      empty:
+        total || past || missingIds.length
+          ? null
+          : {
+              title: "Nessun salvato",
+              message: "Tocca ★ su un evento, in lista, sulla mappa o nel dettaglio. Restano in questo browser.",
+              actions: [{ label: "Tutti gli eventi", href: "/" }],
+            },
     },
+    past,
+    missingIds,
+    countLabel: label,
   };
 }
 
@@ -264,6 +313,7 @@ export function presentDetail(e: EventItem, f: Filters, now: Date): EventDetailV
     mapHref: hrefWith(PATHS.mappa, f) + `${serializeFilters(f) ? "&" : "?"}evento=${encodeURIComponent(e.id)}`,
     backHref: hrefWith(PATHS.lista, f),
     icsHref: `/evento/${encodeURIComponent(e.id)}/ics`,
+    savedEntry: saveEntry(e),
     shareText: [e.title, ongoing ? `fino al ${formatShortDate(e.endsAt!)}` : `${formatLongDate(e.startsAt)}${e.allDay ? "" : `, ${formatTime(e.startsAt)}`}`, venue]
       .filter(Boolean)
       .join(" · "),

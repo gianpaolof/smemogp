@@ -9,6 +9,7 @@ import { EmptyState } from "./EmptyState";
 import { EventImage } from "./EventImage";
 import { Icon } from "./icons";
 import { NewBadge } from "./NewBadge";
+import { SaveToggle } from "./SaveToggle";
 
 const LeafletMap = dynamic(() => import("./LeafletMap"), {
   ssr: false,
@@ -135,27 +136,27 @@ export function MapScreen({ vm }: { vm: MapVM }) {
               )}
             </>
           )}
-          <Link
-            href={row.href}
-            scroll={false}
-            className="press grid grid-cols-[88px_minmax(0,1fr)] bg-accent text-accent-fg"
-          >
-            <div className="flex flex-col border-r border-line px-3 py-2.5">
-              <span className="display-num text-[56px]">{row.dayNum}</span>
-              <span className="pt-1 text-[11px] font-semibold">{row.dayLabel}</span>
-            </div>
-            <div className="flex min-w-0 items-center gap-3 px-3 py-2.5">
-              <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                <span className="text-xs font-semibold tabular-nums">
-                  {row.kicker}
-                  <NewBadge addedAt={row.addedAt} />
-                </span>
-                <h2 className="display-title line-clamp-2 text-2xl">{row.title}</h2>
-                {row.meta && <span className="truncate text-xs">{row.meta}</span>}
+          {/* Link e ★ affiancati, non annidati */}
+          <div className="grid grid-cols-[minmax(0,1fr)_48px] bg-accent text-accent-fg">
+            <Link href={row.href} scroll={false} className="press grid grid-cols-[88px_minmax(0,1fr)]">
+              <div className="flex flex-col border-r border-line px-3 py-2.5">
+                <span className="display-num text-[56px]">{row.dayNum}</span>
+                <span className="pt-1 text-[11px] font-semibold">{row.dayLabel}</span>
               </div>
-              {row.imageUrl && <EventImage src={row.imageUrl} sizes="64px" className="size-16 shrink-0" />}
-            </div>
-          </Link>
+              <div className="flex min-w-0 items-center gap-3 px-3 py-2.5">
+                <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                  <span className="text-xs font-semibold tabular-nums">
+                    {row.kicker}
+                    <NewBadge addedAt={row.addedAt} />
+                  </span>
+                  <h2 className="display-title line-clamp-2 text-2xl">{row.title}</h2>
+                  {row.meta && <span className="truncate text-xs">{row.meta}</span>}
+                </div>
+                {row.imageUrl && <EventImage src={row.imageUrl} sizes="64px" className="size-16 shrink-0" />}
+              </div>
+            </Link>
+            <SaveToggle entry={row.savedEntry} onAccent className="border-l border-accent-fg/30 hover:bg-fg hover:text-bg" />
+          </div>
           {rows.length > 1 && (
             <Pager index={index} total={rows.length} onPrev={() => move(-1)} onNext={() => move(1)} />
           )}

@@ -52,7 +52,8 @@ export function readLocal<T>(key: string, fallback: T): T {
   return value;
 }
 
-function subscribe(key: string, cb: () => void) {
+/** Per selettori derivati con `useSyncExternalStore` (es. boolean per id). */
+export function subscribeLocal(key: string, cb: () => void) {
   let set = listeners.get(key);
   if (!set) listeners.set(key, (set = new Set()));
   set.add(cb);
@@ -66,7 +67,7 @@ function subscribe(key: string, cb: () => void) {
 
 /** `fallback` deve essere stabile (costante di modulo): è anche il valore lato server. */
 export function useLocalStore<T>(key: string, fallback: T): T {
-  const sub = useCallback((cb: () => void) => subscribe(key, cb), [key]);
+  const sub = useCallback((cb: () => void) => subscribeLocal(key, cb), [key]);
   return useSyncExternalStore(
     sub,
     () => readLocal(key, fallback),

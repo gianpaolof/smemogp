@@ -4,9 +4,13 @@ import { dayKey, romeHour } from "./time";
 /** Senza orario di fine, un evento si considera concluso 3 ore dopo l'inizio. */
 const DEFAULT_DURATION_MS = 3 * 3_600_000;
 
-export function isOver(e: EventItem, now: Date) {
-  const end = e.endsAt ? new Date(e.endsAt) : new Date(new Date(e.startsAt).getTime() + DEFAULT_DURATION_MS);
-  return end <= now;
+/** Fine effettiva: `endsAt`, o inizio + 3 ore. */
+export function endOf(e: Pick<EventItem, "startsAt" | "endsAt">): Date {
+  return e.endsAt ? new Date(e.endsAt) : new Date(new Date(e.startsAt).getTime() + DEFAULT_DURATION_MS);
+}
+
+export function isOver(e: Pick<EventItem, "startsAt" | "endsAt">, now: Date) {
+  return endOf(e) <= now;
 }
 
 /** In corso su più giorni (mostre, rassegne): iniziato prima del giorno in cui lo mostriamo. */

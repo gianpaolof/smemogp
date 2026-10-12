@@ -1,6 +1,6 @@
 import "server-only";
 import { cacheLife, cacheTag } from "next/cache";
-import { createDb, findEventById, findEventsNear, haversineKm, TORINO, type Db, type Event } from "@smemogp/db";
+import { createDb, findEventById, findEventsByIds, findEventsNear, haversineKm, TORINO, type Db, type Event } from "@smemogp/db";
 import type { Category, EventItem, LatLng } from "@/domain/types";
 
 /** Tag invalidato dallo scout a fine run (`POST /api/revalidate`). */
@@ -67,4 +67,21 @@ export async function getEvent(id: string, origin: LatLng | null): Promise<Event
   const row = await findEventById(getDb(), id);
   if (!row || row.lat == null || row.lng == null) return null;
   return toItem(row, origin ?? TORINO);
+}
+
+/**
+ * Eventi salvati in un colpo solo. Gli id arrivano già ordinati e deduplicati: fanno da
+ * chiave di cache stabile. `foundIds` si calcola prima del filtro coordinate: un evento
+ * senza lat/lng esiste (non è orfano) anche se non lo mostriamo — raro.
+ */
+export async function getEventsByIds(sortedIds: string[]): Promise<{ events: EventItem[]; foundIds: string[] }> {
+  "use cache";
+  cacheTag(EVENTS_TAG);
+  cacheLife("hours");
+
+  const rows = await findEventsByIds(getDb(), sortedIds);
+  return {
+    events: rows.filter((e) => e.lat != null && e.lng != null).map((e) => toItem(e, TORINO)),
+    foundIds: rows.map((e) => e.id),
+  };
 }
