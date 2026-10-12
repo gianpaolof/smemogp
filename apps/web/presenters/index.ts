@@ -16,6 +16,7 @@ import {
   formatShortDate,
   formatTime,
   PERIOD_LABELS,
+  safeExternalUrl,
 } from "@/domain/format";
 import { dayKey } from "@/domain/time";
 import type { Category, EventItem, Filters } from "@/domain/types";
@@ -63,13 +64,16 @@ function presentRow(e: EventItem, f: Filters, day: string, highlight: boolean): 
   const place = [e.venueName ?? e.city, e.distanceKm != null ? formatKm(e.distanceKm) : null]
     .filter(Boolean)
     .join(", ");
+  const external = safeExternalUrl(e.url);
   return {
     id: e.id,
     href: hrefWith(`/evento/${encodeURIComponent(e.id)}`, f),
     title: e.title,
     kicker: `${when} — ${CATEGORY_LABELS[e.category]}`,
-    meta: [place, e.priceText].filter(Boolean).join(" · "),
+    // Il dominio dice dove porta il link ↗ prima di aprirlo
+    meta: [place, e.priceText, external?.host].filter(Boolean).join(" · "),
     imageUrl: e.imageUrl,
+    external,
     lat: e.lat,
     lng: e.lng,
     highlight,
@@ -177,7 +181,7 @@ export function presentDetail(e: EventItem, f: Filters): EventDetailVM {
     priceLabel: e.priceText,
     description: e.description,
     imageUrl: e.imageUrl,
-    url: e.url,
+    external: safeExternalUrl(e.url),
     sourceLabel: e.sourceId,
     updatedLabel: `Aggiornato ${updatedFmt.format(new Date(e.updatedAt))}`,
     mapHref: hrefWith(PATHS.mappa, f) + `${serializeFilters(f) ? "&" : "?"}evento=${encodeURIComponent(e.id)}`,

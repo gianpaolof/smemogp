@@ -52,6 +52,21 @@ export function formatShortDate(iso: string) {
   return shortDateFmt.format(new Date(iso));
 }
 
+/**
+ * Link verso la fonte dell'evento, solo se http(s). Gli URL arrivano da siti esterni (scraping):
+ * un `javascript:` finito in un href sarebbe eseguito al clic.
+ */
+export function safeExternalUrl(url: string | null | undefined): { href: string; host: string } | null {
+  if (!url) return null;
+  try {
+    const u = new URL(url);
+    if (u.protocol !== "https:" && u.protocol !== "http:") return null;
+    return { href: u.href, host: u.hostname.replace(/^www\./, "") };
+  } catch {
+    return null;
+  }
+}
+
 export function formatKm(km: number) {
   const digits = km < 10 ? 1 : 0;
   return `${km.toLocaleString("it-IT", { maximumFractionDigits: digits, minimumFractionDigits: digits })} km`;

@@ -24,11 +24,16 @@ export type EventRowVM = {
   /** "Spazio A, 2,4 km · da €15" */
   meta: string;
   imageUrl: string | null;
+  /** Pagina dell'evento sulla fonte; null se l'URL non è http(s) */
+  external: ExternalLinkVM | null;
   lat: number;
   lng: number;
   /** Il prossimo evento che inizia: evidenziato */
   highlight: boolean;
 };
+
+/** Link verso un sito esterno già validato: `host` senza "www." ("eventbrite.it") */
+export type ExternalLinkVM = { href: string; host: string };
 
 export type AgendaDayVM = { key: string; num: string; label: string; rows: EventRowVM[] };
 
@@ -72,7 +77,7 @@ export type EventDetailVM = {
   priceLabel: string | null;
   description: string | null;
   imageUrl: string | null;
-  url: string;
+  external: ExternalLinkVM | null;
   sourceLabel: string;
   updatedLabel: string;
   mapHref: string;
