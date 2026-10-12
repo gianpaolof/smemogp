@@ -56,22 +56,29 @@ export function EventDetail({ vm }: { vm: EventDetailVM }) {
         Fonte: {vm.sourceLabel} · {vm.updatedLabel}
       </p>
 
-      <div className="sticky bottom-0 mt-auto grid grid-cols-2 border-t border-line bg-bg pb-[env(safe-area-inset-bottom)]">
+      <div
+        className={`sticky bottom-0 mt-auto grid border-t border-line bg-bg pb-[env(safe-area-inset-bottom)] ${
+          vm.external ? "grid-cols-2" : "grid-cols-1"
+        }`}
+      >
         <Link
           href={vm.mapHref}
           transitionTypes={["nav-forward"]}
-          className="flex h-14 items-center justify-center border-r border-line text-sm font-semibold hover:bg-line-soft"
+          className="flex h-14 items-center justify-center border-r border-line text-sm font-semibold last:border-r-0 hover:bg-line-soft"
         >
           Mostra sulla mappa
         </Link>
-        <a
-          href={vm.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex h-14 items-center justify-center bg-fg text-sm font-semibold text-bg"
-        >
-          Sito evento ↗
-        </a>
+        {vm.external && (
+          <a
+            href={vm.external.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            title={`Apri su ${vm.external.host} (nuova scheda)`}
+            className="flex h-14 items-center justify-center bg-fg text-sm font-semibold text-bg"
+          >
+            Sito evento ↗
+          </a>
+        )}
       </div>
     </article>
   );
