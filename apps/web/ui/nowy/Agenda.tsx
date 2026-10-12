@@ -1,10 +1,13 @@
 import Link from "next/link";
 import { ViewTransition } from "react";
 import type { AgendaVM, EventRowVM, RowGroupVM } from "@/ui/contracts";
+import { heroDay, heroTitle } from "@/ui/heroNames";
 import { EmptyState } from "./EmptyState";
 import { EventImage } from "./EventImage";
 import { Icon } from "./icons";
 import { NewBadge } from "./NewBadge";
+import { RowPending } from "./RowPending";
+import { SharedHero } from "./SharedHero";
 
 function Row({ row }: { row: EventRowVM }) {
   return (
@@ -18,8 +21,10 @@ function Row({ row }: { row: EventRowVM }) {
         <Link
           href={row.href}
           scroll={false}
-          className={`press flex min-w-0 flex-1 items-center gap-3 px-3 py-2.5 ${row.highlight ? "" : "hover:bg-line-soft"}`}
+          transitionTypes={["hero"]}
+          className={`press relative flex min-w-0 flex-1 items-center gap-3 px-3 py-2.5 ${row.highlight ? "" : "hover:bg-line-soft"}`}
         >
+          <RowPending />
           <div className="flex min-w-0 flex-1 flex-col gap-0.5">
             <span className={`text-xs font-semibold tabular-nums ${row.highlight ? "" : "text-muted"}`}>
               {row.highlight && (
@@ -30,7 +35,11 @@ function Row({ row }: { row: EventRowVM }) {
               {row.kicker}
               <NewBadge addedAt={row.addedAt} />
             </span>
-            <h3 className="display-title line-clamp-3 text-[20px] sm:text-[24px]">{row.title}</h3>
+            <SharedHero name={heroTitle(row.id)} ids={[row.id]}>
+              <h3 data-hero={heroTitle(row.id)} className="display-title line-clamp-3 text-[20px] sm:text-[24px]">
+                {row.title}
+              </h3>
+            </SharedHero>
             {row.meta && <span className={`truncate text-xs ${row.highlight ? "" : "text-muted"}`}>{row.meta}</span>}
           </div>
           {row.imageUrl && <EventImage src={row.imageUrl} sizes="72px" className="size-16 shrink-0 sm:size-18" />}
@@ -82,7 +91,14 @@ export function Agenda({ vm }: { vm: AgendaVM }) {
           <div className="border-r border-line">
             {/* Il numero del giorno resta agganciato mentre scorri la sua giornata */}
             <h2 id={`giorno-${day.key}`} className="sticky top-[var(--header-h)] flex flex-col px-3 py-2.5">
-              <span className="display-num text-[80px] sm:text-[96px]">{day.num}</span>
+              <SharedHero
+                name={heroDay(day.key)}
+                ids={[...(day.ongoing?.rows ?? []), ...day.groups.flatMap((g) => g.rows)].map((r) => r.id)}
+              >
+                <span data-hero={heroDay(day.key)} className="display-num text-[80px] sm:text-[96px]">
+                  {day.num}
+                </span>
+              </SharedHero>
               <span className="pt-1.5 text-xs font-semibold text-muted">{day.label}</span>
             </h2>
           </div>

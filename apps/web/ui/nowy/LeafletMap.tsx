@@ -3,7 +3,7 @@
 import "leaflet/dist/leaflet.css";
 import "leaflet.markercluster/dist/MarkerCluster.css";
 import { divIcon, latLng, point, type MarkerCluster, type Marker as LMarker, type MarkerClusterGroup as LGroup } from "leaflet";
-import { useEffect, useMemo, useRef, type RefObject } from "react";
+import { useEffect, useMemo, useRef, useState, type RefObject } from "react";
 import { Circle, MapContainer, Marker, TileLayer, useMap } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import { useReducedMotion } from "@/hooks/useMotion";
@@ -121,7 +121,27 @@ type Props = {
   fitKey: number;
 };
 
-export default function LeafletMap({ vm, selectedId, focusSelected, onSelect, fitKey }: Props) {
+let mapGeneration = 0;
+
+/**
+ * Next conserva le pagine visitate in un'<Activity> nascosta e le riattiva con Indietro: gli effetti
+ * ripartono sulla mappa che react-leaflet ha già rimosso e Leaflet va in errore ("Map container is
+ * being reused"). Quindi la mappa si smonta quando la pagina si nasconde e rinasce, con una key
+ * nuova, quando torna visibile.
+ */
+export default function LeafletMap(props: Props) {
+  const [generation, setGeneration] = useState(0);
+  useEffect(() => {
+    // Contatore che sale sempre: se l'azzeramento da nascosta non è ancora applicato, la key cambia comunque
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- serve proprio dopo il mount/la riattivazione
+    setGeneration(++mapGeneration);
+    return () => setGeneration(0);
+  }, []);
+  if (!generation) return <div className="hatch h-full w-full" />;
+  return <LiveMap key={generation} {...props} />;
+}
+
+function LiveMap({ vm, selectedId, focusSelected, onSelect, fitKey }: Props) {
   const theme = useResolvedTheme();
   const reducedMotion = useReducedMotion();
   const groupRef = useRef<LGroup | null>(null);

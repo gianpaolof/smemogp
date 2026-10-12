@@ -86,6 +86,8 @@ export type EventDetailVM = {
   /** Titoli lunghi: un gradino di corpo in meno */
   longTitle: boolean;
   categoryLabel: string;
+  /** Giorno mostrato (aaaa-mm-gg), lo stesso della sezione in lista: aggancia il numero del giorno */
+  dayKey: string;
   dayNum: string;
   dayLabel: string;
   /** "In corso" per mostre già iniziate: il giorno mostrato è oggi, come nella lista */

@@ -135,7 +135,24 @@ input[type="range"] { accent-color: var(--accent); }
 
 /* Pannello dettaglio */
 ::view-transition-new(.panel-in) { animation: 280ms cubic-bezier(0.2, 0, 0, 1) both vt-panel-in; }
-::view-transition-old(.panel-out) { animation: 200ms ease-in both vt-panel-out; }
+::view-transition-new(.panel-fade) { animation: 300ms cubic-bezier(0.2, 0, 0, 1) both vt-panel-fade; }
+/* Uscita in dissolvenza: il titolo torna in volo nella riga mentre il pannello svanisce */
+::view-transition-old(.panel-out) { animation: 220ms ease-in both vt-panel-dismiss; }
+
+/* Dettaglio in caricamento dalla riga (RowPending): barra che avanza, solo se l'attesa si nota */
+.row-pending { position: absolute; left: 0; bottom: 0; height: 3px; width: 0; background: currentColor; }
+.row-pending.is-pending { animation: 1.6s cubic-bezier(0.2, 0, 0, 1) 150ms both vt-row-pending; }
+@keyframes vt-row-pending { from { width: 0; } to { width: 90%; } }
+@media (prefers-reduced-motion: reduce) { .row-pending.is-pending { animation: none; width: 100%; opacity: 0.4; } }
+
+/* Elemento condiviso riga ↔ dettaglio (titolo, numero del giorno): sopra il pannello in entrambe le direzioni */
+::view-transition-group(.hero) { animation-duration: 380ms; animation-timing-function: cubic-bezier(0.2, 0, 0, 1); z-index: 60; }
+/* Scala con l'altezza senza deformare il testo, ancorato in alto a sinistra come il titolo.
+   Il vecchio impaginato (righe spezzate diversamente) sparisce presto: si legge un solo titolo in volo */
+::view-transition-old(.hero),
+::view-transition-new(.hero) { width: auto; height: 100%; }
+::view-transition-old(.hero) { animation: 160ms ease-out both vt-fade-out; }
+::view-transition-new(.hero) { animation: 220ms ease-out both vt-fade-in; }
 
 /* Contenuto caricato (Suspense) */
 ::view-transition-new(.reveal) { animation: 240ms ease-out both vt-fade-in; }
@@ -153,7 +170,8 @@ html[data-theme-switch]::view-transition-new(root) { animation: 520ms cubic-bezi
 @keyframes vt-fade-in { from { opacity: 0; } }
 @keyframes vt-fade-out { to { opacity: 0; } }
 @keyframes vt-panel-in { from { translate: 0 100%; } }
-@keyframes vt-panel-out { to { translate: 0 100%; } }
+@keyframes vt-panel-fade { from { opacity: 0; translate: 0 24px; } }
+@keyframes vt-panel-dismiss { to { opacity: 0; translate: 0 24px; } }
 @keyframes vt-theme { from { clip-path: circle(0 at 100% 100%); } to { clip-path: circle(150% at 100% 100%); } }
 
 @media (prefers-reduced-motion: reduce) {

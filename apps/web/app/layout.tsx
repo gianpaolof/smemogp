@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Archivo } from "next/font/google";
+import { Suspense } from "react";
 import { BG, THEME_INIT_SCRIPT } from "@/hooks/useTheme";
 import { PwaBoot } from "@/ui/nowy/PwaBoot";
 import "./globals.css";
@@ -40,7 +41,8 @@ export default function RootLayout({ children, modal }: LayoutProps<"/">) {
       </head>
       <body className="min-h-dvh bg-bg text-fg">
         {children}
-        {modal}
+        {/* Già visibile (vuota) prima di aprire un evento: in una transition non torna al fallback */}
+        <Suspense>{modal}</Suspense>
         <PwaBoot />
       </body>
     </html>

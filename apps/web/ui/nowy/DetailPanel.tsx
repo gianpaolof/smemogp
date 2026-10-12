@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, ViewTransition, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, ViewTransition, type ReactNode } from "react";
 import { DESKTOP_QUERY } from "@/hooks/useMediaQuery";
 import { haptic } from "@/hooks/useMotion";
 import { Icon } from "./icons";
@@ -13,6 +13,30 @@ const DISMISS_RATIO = 0.25;
 const FLICK_PX_PER_MS = 0.6;
 
 /**
+ * Risolve quando `done()` è vero, o comunque dopo `ms`. Timer e non requestAnimationFrame:
+ * durante l'aggiornamento di una view transition il rendering è sospeso e i frame non arrivano.
+ */
+const waitFor = (done: () => boolean, ms = 1000) =>
+  new Promise<void>((resolve) => {
+    const start = performance.now();
+    const tick = () => (done() || performance.now() - start > ms ? resolve() : setTimeout(tick, 16));
+    tick();
+  });
+
+const tag = (el: HTMLElement, name: string, cls: string) => {
+  el.style.setProperty("view-transition-name", name);
+  el.style.setProperty("view-transition-class", cls);
+};
+const untag = (el: HTMLElement) => {
+  el.style.removeProperty("view-transition-name");
+  el.style.removeProperty("view-transition-class");
+};
+const inViewport = (el: HTMLElement) => {
+  const r = el.getBoundingClientRect();
+  return r.bottom > 0 && r.top < innerHeight && r.right > 0 && r.left < innerWidth;
+};
+
+/**
  * Pannello sopra lista/mappa per la rotta intercettata `/evento/[id]`.
  * Chiudere = tornare indietro nella history, così l'URL resta coerente.
  */
@@ -20,15 +44,67 @@ export function DetailPanel({ children }: { children: ReactNode }) {
   const router = useRouter();
   const panel = useRef<HTMLDivElement>(null);
 
+  // router.back() è un popstate: React lo applica in modo sincrono, senza view transition.
+  // La avviamo qui e diamo noi i nomi (data-hero): titolo e giorno tornano in volo nella riga
+  // mentre il pannello svanisce. Il back del browser chiude senza morph.
+  // Una sola chiusura alla volta: Esc tenuto premuto o Esc + Chiudi farebbero due passi indietro
+  const closing = useRef(false);
+  const close = useCallback(() => {
+    const el = panel.current;
+    if (closing.current) return;
+    closing.current = true;
+    // Il trascinamento lascia il pannello spostato: se Next lo conserva nascosto, con Avanti tornerebbe così
+    const resetDrag = () => {
+      el?.style.removeProperty("translate");
+      el?.style.removeProperty("transition");
+    };
+    if (!el || !document.startViewTransition || matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      router.back();
+      return resetDrag();
+    }
+    const tagged: HTMLElement[] = [];
+    const mark = (node: HTMLElement, name: string, cls: string) => {
+      tag(node, name, cls);
+      tagged.push(node);
+    };
+    const cleanup = () => tagged.forEach(untag);
+    const heroes = [...el.querySelectorAll<HTMLElement>("[data-hero]")];
+    mark(el, "detail-panel", "panel-out");
+    for (const h of heroes) mark(h, h.dataset.hero!, "hero");
+    const from = location.pathname;
+    const transition = document.startViewTransition(async () => {
+      router.back();
+      // Finché l'URL non cambia il browser non dipinge: attesa breve
+      await waitFor(() => location.pathname !== from, 400);
+      await new Promise((r) => setTimeout(r, 0)); // commit di React
+      cleanup();
+      resetDrag();
+      // Indietro può portare a un altro evento (desktop): il pannello resta, niente volo
+      if (el.isConnected && el.checkVisibility()) {
+        closing.current = false;
+        return;
+      }
+      for (const h of heroes) {
+        const target = [...document.querySelectorAll<HTMLElement>(`[data-hero="${h.dataset.hero}"]`)].find(
+          (n) => !el.contains(n) && n.checkVisibility() && inViewport(n),
+        );
+        if (target) mark(target, h.dataset.hero!, "hero");
+      }
+    });
+    transition.ready.catch(() => {}); // saltata da un'altra transizione: va bene così
+    transition.finished.then(cleanup, cleanup);
+  }, [router]);
+
   useEffect(() => {
     const el = panel.current;
+    closing.current = false; // pannello (ri)mostrato, anche con Avanti
     const previous = document.activeElement as HTMLElement | null;
     el?.focus();
     // Desktop: il pannello sta accanto alla lista e sopra la mappa, che resta usabile → non modale
     const desktop = matchMedia(DESKTOP_QUERY).matches;
     el?.setAttribute("aria-modal", desktop ? "false" : "true");
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") return router.back();
+      if (e.key === "Escape") return close();
       // aria-modal: il Tab gira dentro il pannello (solo se modale)
       if (desktop || e.key !== "Tab" || !el) return;
       const items = [...el.querySelectorAll<HTMLElement>(FOCUSABLE)].filter((n) => n.offsetParent !== null);
@@ -51,7 +127,7 @@ export function DetailPanel({ children }: { children: ReactNode }) {
       document.documentElement.style.overflow = "";
       previous?.focus();
     };
-  }, [router]);
+  }, [close]);
 
   // Trascina giù dalla maniglia (o dal pannello già in cima) per chiudere. Solo touch, solo mobile.
   const drag = useRef<{ y: number; t: number; dy: number } | null>(null);
@@ -75,10 +151,9 @@ export function DetailPanel({ children }: { children: ReactNode }) {
     if (!d || !el) return;
     const speed = d.dy / Math.max(1, performance.now() - d.t);
     if (d.dy > el.offsetHeight * DISMISS_RATIO || (d.dy > 40 && speed > FLICK_PX_PER_MS)) {
+      // Si chiude da dove l'hai lasciato: il titolo vola da lì alla riga
       haptic();
-      el.style.transition = "translate 180ms ease-in";
-      el.style.translate = "0 100%";
-      setTimeout(() => router.back(), 160);
+      close();
     } else {
       el.style.transition = "translate 220ms cubic-bezier(0.2, 0, 0, 1)";
       el.style.translate = "0 0";
@@ -92,11 +167,12 @@ export function DetailPanel({ children }: { children: ReactNode }) {
           type="button"
           aria-label="Chiudi dettaglio"
           tabIndex={-1}
-          onClick={() => router.back()}
+          onClick={close}
           className="absolute inset-0 cursor-default bg-[var(--overlay)] lg:hidden"
         />
       </ViewTransition>
-      <ViewTransition enter="panel-in" exit="panel-out" default="none">
+      {/* Dalla lista (tipo hero) titolo e giorno arrivano in volo: il pannello compare attorno, non sale */}
+      <ViewTransition enter={{ hero: "panel-fade", default: "panel-in" }} exit="panel-out" default="none">
         <div
           ref={panel}
           role="dialog"
@@ -114,7 +190,7 @@ export function DetailPanel({ children }: { children: ReactNode }) {
             <span aria-hidden="true" className="ml-3 h-1 w-10 bg-line-soft sm:invisible" />
             <button
               type="button"
-              onClick={() => router.back()}
+              onClick={close}
               className="press flex h-12 items-center gap-1.5 px-4 text-sm font-semibold hover:bg-line-soft"
             >
               Chiudi
