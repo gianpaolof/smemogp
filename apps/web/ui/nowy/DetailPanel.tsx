@@ -31,6 +31,10 @@ const untag = (el: HTMLElement) => {
   el.style.removeProperty("view-transition-name");
   el.style.removeProperty("view-transition-class");
 };
+const inViewport = (el: HTMLElement) => {
+  const r = el.getBoundingClientRect();
+  return r.bottom > 0 && r.top < innerHeight && r.right > 0 && r.left < innerWidth;
+};
 
 /**
  * Pannello sopra lista/mappa per la rotta intercettata `/evento/[id]`.
@@ -43,35 +47,57 @@ export function DetailPanel({ children }: { children: ReactNode }) {
   // router.back() è un popstate: React lo applica in modo sincrono, senza view transition.
   // La avviamo qui e diamo noi i nomi (data-hero): titolo e giorno tornano in volo nella riga
   // mentre il pannello svanisce. Il back del browser chiude senza morph.
+  // Una sola chiusura alla volta: Esc tenuto premuto o Esc + Chiudi farebbero due passi indietro
+  const closing = useRef(false);
   const close = useCallback(() => {
     const el = panel.current;
+    if (closing.current) return;
+    closing.current = true;
+    // Il trascinamento lascia il pannello spostato: se Next lo conserva nascosto, con Avanti tornerebbe così
+    const resetDrag = () => {
+      el?.style.removeProperty("translate");
+      el?.style.removeProperty("transition");
+    };
     if (!el || !document.startViewTransition || matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      return router.back();
+      router.back();
+      return resetDrag();
     }
     const tagged: HTMLElement[] = [];
     const mark = (node: HTMLElement, name: string, cls: string) => {
       tag(node, name, cls);
       tagged.push(node);
     };
+    const cleanup = () => tagged.forEach(untag);
     const heroes = [...el.querySelectorAll<HTMLElement>("[data-hero]")];
     mark(el, "detail-panel", "panel-out");
     for (const h of heroes) mark(h, h.dataset.hero!, "hero");
+    const from = location.pathname;
     const transition = document.startViewTransition(async () => {
       router.back();
-      await waitFor(() => !el.isConnected || !el.checkVisibility());
-      tagged.forEach(untag);
+      // Finché l'URL non cambia il browser non dipinge: attesa breve
+      await waitFor(() => location.pathname !== from, 400);
+      await new Promise((r) => setTimeout(r, 0)); // commit di React
+      cleanup();
+      resetDrag();
+      // Indietro può portare a un altro evento (desktop): il pannello resta, niente volo
+      if (el.isConnected && el.checkVisibility()) {
+        closing.current = false;
+        return;
+      }
       for (const h of heroes) {
         const target = [...document.querySelectorAll<HTMLElement>(`[data-hero="${h.dataset.hero}"]`)].find(
-          (n) => !el.contains(n) && n.checkVisibility(),
+          (n) => !el.contains(n) && n.checkVisibility() && inViewport(n),
         );
         if (target) mark(target, h.dataset.hero!, "hero");
       }
     });
-    transition.finished.finally(() => tagged.forEach(untag));
+    transition.ready.catch(() => {}); // saltata da un'altra transizione: va bene così
+    transition.finished.then(cleanup, cleanup);
   }, [router]);
 
   useEffect(() => {
     const el = panel.current;
+    closing.current = false; // pannello (ri)mostrato, anche con Avanti
     const previous = document.activeElement as HTMLElement | null;
     el?.focus();
     // Desktop: il pannello sta accanto alla lista e sopra la mappa, che resta usabile → non modale

@@ -121,6 +121,8 @@ type Props = {
   fitKey: number;
 };
 
+let mapGeneration = 0;
+
 /**
  * Next conserva le pagine visitate in un'<Activity> nascosta e le riattiva con Indietro: gli effetti
  * ripartono sulla mappa che react-leaflet ha già rimosso e Leaflet va in errore ("Map container is
@@ -130,8 +132,9 @@ type Props = {
 export default function LeafletMap(props: Props) {
   const [generation, setGeneration] = useState(0);
   useEffect(() => {
+    // Contatore che sale sempre: se l'azzeramento da nascosta non è ancora applicato, la key cambia comunque
     // eslint-disable-next-line react-hooks/set-state-in-effect -- serve proprio dopo il mount/la riattivazione
-    setGeneration((g) => g + 1);
+    setGeneration(++mapGeneration);
     return () => setGeneration(0);
   }, []);
   if (!generation) return <div className="hatch h-full w-full" />;

@@ -6,6 +6,7 @@ import { EmptyState } from "./EmptyState";
 import { EventImage } from "./EventImage";
 import { Icon } from "./icons";
 import { NewBadge } from "./NewBadge";
+import { RowPending } from "./RowPending";
 import { SharedHero } from "./SharedHero";
 
 function Row({ row }: { row: EventRowVM }) {
@@ -21,8 +22,9 @@ function Row({ row }: { row: EventRowVM }) {
           href={row.href}
           scroll={false}
           transitionTypes={["hero"]}
-          className={`press flex min-w-0 flex-1 items-center gap-3 px-3 py-2.5 ${row.highlight ? "" : "hover:bg-line-soft"}`}
+          className={`press relative flex min-w-0 flex-1 items-center gap-3 px-3 py-2.5 ${row.highlight ? "" : "hover:bg-line-soft"}`}
         >
+          <RowPending />
           <div className="flex min-w-0 flex-1 flex-col gap-0.5">
             <span className={`text-xs font-semibold tabular-nums ${row.highlight ? "" : "text-muted"}`}>
               {row.highlight && (
