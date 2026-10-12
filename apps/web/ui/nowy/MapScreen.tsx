@@ -28,7 +28,9 @@ export function MapScreen({ vm }: { vm: MapVM }) {
 
   return (
     <div className="relative flex min-h-0 flex-1 flex-col">
-      <div className="relative min-h-[320px] flex-1">
+      {/* isolate: z-index di Leaflet (pane 400–800) e del pulsante restano qui dentro,
+          sotto pannello dettaglio e dialog (z-50) */}
+      <div className="relative isolate min-h-[320px] flex-1">
         {/* Altezza esplicita: Leaflet non segue il flex del contenitore */}
         <div className="absolute inset-0">
           <LeafletMap vm={vm} selectedId={row?.id ?? null} onSelect={(id, key) => { setSelectedId(id); setPlace(key); }} fitKey={fitKey} />
