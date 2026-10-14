@@ -19,7 +19,7 @@ export async function geocode(db: Db, query: string) {
   const url = new URL("https://nominatim.openstreetmap.org/search");
   url.search = new URLSearchParams({ q: key, format: "jsonv2", limit: "1", countrycodes: "it" }).toString();
   const res = await fetch(url, {
-    headers: { "user-agent": process.env.NOMINATIM_USER_AGENT ?? "smemogp-scout/0.1" },
+    headers: { "user-agent": process.env.NOMINATIM_USER_AGENT || "smemogp-scout/0.1" },
   });
   if (!res.ok) throw new Error(`Nominatim HTTP ${res.status}`);
   const [hit] = (await res.json()) as { lat: string; lon: string; display_name: string }[];

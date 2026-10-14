@@ -26,7 +26,8 @@ const { values: args } = parseArgs({
 const MODEL = args.model || process.env.SCOUT_SEARCH_MODEL || DEFAULT_MODEL;
 // Motore fisso di default: cambiando modello si confrontano i modelli, non i motori
 const ENGINE = args.engine || process.env.SCOUT_SEARCH_ENGINE || "exa";
-const BUDGET = Number(args.budget ?? process.env.SCOUT_SEARCH_MAX_USD ?? 0.5);
+// `||` e non `??`: le variabili GitHub non impostate arrivano come stringa vuota
+const BUDGET = Number(args.budget || process.env.SCOUT_SEARCH_MAX_USD || 0.5);
 const PAUSE_MS = 1000;
 const FORMAT = jsonSchemaFormat("pagine_evento", Candidates);
 
