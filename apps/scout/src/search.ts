@@ -33,7 +33,8 @@ const FORMAT = jsonSchemaFormat("pagine_evento", Candidates);
 
 const webSearch = {
   type: "openrouter:web_search",
-  parameters: { engine: ENGINE, max_results: 8, max_uses: 4, excluded_domains: ["teatroregio.torino.it"] },
+  // teatroregio: gusti utente. teatro.it: risponde 403 allo scout, le pagine non si leggono
+  parameters: { engine: ENGINE, max_results: 8, max_uses: 4, excluded_domains: ["teatroregio.torino.it", "teatro.it"] },
 };
 
 class BudgetExceeded extends Error {
