@@ -11,6 +11,8 @@
     "scout": "npm run start -w scout",
     "scout:ingest": "npm run ingest -w scout --",
     "scout:verify": "npm run verify -w scout --",
+    "scout:search": "npm run search -w scout --",
+    "scout:probe": "npm run probe -w scout --",
     "scout:test": "npm run test -w scout",
     "db:generate": "npm run generate -w @smemogp/db",
     "db:migrate": "npm run migrate -w @smemogp/db",

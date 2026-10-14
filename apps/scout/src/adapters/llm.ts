@@ -1,14 +1,11 @@
-import Anthropic from "@anthropic-ai/sdk";
-import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { z } from "zod";
 import { CATEGORIES } from "@smemogp/db";
 import { chunkText, htmlToText } from "../lib/html";
+import { chatJson, DEFAULT_MODEL, jsonSchemaFormat, parseJsonLoose } from "../lib/openrouter";
 import type { Adapter, RawEvent, Source } from "../types";
 
-// Lazy: le fonti JSON-LD/iCal girano anche senza API key
-let client: Anthropic | undefined;
-// Estrazione strutturata da testo: Haiku basta e costa ~40× meno di Opus
-const MODEL = process.env.SCOUT_LLM_MODEL || "claude-haiku-5-5";
+// Estrazione strutturata da testo: un modello piccolo basta. Si cambia con SCOUT_LLM_MODEL (id OpenRouter)
+export const llmModel = () => process.env.SCOUT_LLM_MODEL || DEFAULT_MODEL;
 
 const ExtractedEvents = z.object({
   events: z.array(
@@ -29,6 +26,8 @@ const ExtractedEvents = z.object({
   ),
 });
 
+const FORMAT = jsonSchemaFormat("eventi", ExtractedEvents);
+
 const SYSTEM = `Estrai eventi da pagine web italiane (Piemonte) per un'app che li mostra su mappa.
 Includi solo eventi reali con una data: ignora menu, pubblicità, articoli senza data, eventi già conclusi.
 Se l'anno manca, deducilo dalla data odierna (evento futuro più vicino).
@@ -38,36 +37,35 @@ Se la pagina non contiene eventi, restituisci una lista vuota.`;
 
 async function extractChunk(source: Source, pageUrl: string, text: string): Promise<RawEvent[]> {
   const today = new Date().toLocaleDateString("it-IT", { timeZone: "Europe/Rome", dateStyle: "full" });
-  client ??= new Anthropic();
-  const response = await client.messages.parse({
-    model: MODEL,
-    max_tokens: 16000,
-    output_config: { effort: "low", format: zodOutputFormat(ExtractedEvents) },
-    system: SYSTEM,
+  const response = await chatJson({
+    model: llmModel(),
+    maxTokens: 16000,
+    schema: FORMAT,
     messages: [
-      {
-        role: "user",
-        content: `Oggi: ${today}\nFonte: ${source.name}\nURL: ${pageUrl}\n\n<pagina>\n${text}\n</pagina>`,
-      },
+      { role: "system", content: SYSTEM },
+      { role: "user", content: `Oggi: ${today}\nFonte: ${source.name}\nURL: ${pageUrl}\n\n<pagina>\n${text}\n</pagina>` },
     ],
   });
 
-  if (response.stop_reason === "refusal" || !response.parsed_output) {
-    console.warn(`[llm] ${source.id}: nessun output (${response.stop_reason})`);
+  // Lo schema è strict, ma non tutti i provider lo garantiscono: si rivalida sempre
+  const parsed = ExtractedEvents.safeParse(parseJsonLoose(response.content));
+  if (!parsed.success) {
+    console.warn(`[llm] ${source.id}: output non valido (${response.model}, ${response.finishReason})`);
     return [];
   }
 
-  return response.parsed_output.events
-    .map((e) => ({
-      ...e,
-      startsAt: new Date(e.startsAt),
-      endsAt: e.endsAt ? new Date(e.endsAt) : null,
-      url: e.url ? new URL(e.url, pageUrl).href : pageUrl,
-    }))
+  return parsed.data.events
+    .flatMap((e) => {
+      try {
+        return [{ ...e, startsAt: new Date(e.startsAt), endsAt: e.endsAt ? new Date(e.endsAt) : null, url: e.url ? new URL(e.url, pageUrl).href : pageUrl }];
+      } catch {
+        return []; // url non valido
+      }
+    })
     .filter((e) => !Number.isNaN(e.startsAt.getTime()));
 }
 
-/** Fallback generico: HTML → testo → eventi strutturati via Claude. */
+/** Fallback generico: HTML → testo → eventi strutturati via LLM (OpenRouter). */
 export const llmAdapter: Adapter = {
   extract: async (source, content) => {
     const text = /<html|<body/i.test(content.body) ? htmlToText(content.body, content.url) : content.body;

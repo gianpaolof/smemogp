@@ -1,0 +1,32 @@
+[
+  {
+    "id": "musica-live",
+    "query": "concerti jazz, rock, indie, elettronica e musica dal vivo a Torino",
+    "category": "musica",
+    "maxPages": 8
+  },
+  {
+    "id": "mostre",
+    "query": "mostre d'arte, fotografia e musei: nuove esposizioni a Torino",
+    "category": "mostre",
+    "maxPages": 8
+  },
+  {
+    "id": "teatro",
+    "query": "spettacoli di teatro, danza e stand-up comedy a Torino (no lirica)",
+    "category": "teatro",
+    "maxPages": 6
+  },
+  {
+    "id": "sagre-food",
+    "query": "sagre, fiere enogastronomiche e mercati del gusto a Torino e in Piemonte vicino a Torino",
+    "category": "sagre",
+    "maxPages": 6
+  },
+  {
+    "id": "famiglie",
+    "query": "eventi per bambini e famiglie a Torino: laboratori, spettacoli, visite",
+    "category": "famiglie",
+    "maxPages": 5
+  }
+]
