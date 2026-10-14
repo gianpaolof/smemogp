@@ -8,10 +8,11 @@
     "typecheck": "tsc --noEmit",
     "ingest": "tsx --env-file-if-exists=../../.env src/ingest.ts",
     "verify": "tsx --env-file-if-exists=../../.env src/verify.ts",
+    "search": "tsx --env-file-if-exists=../../.env src/search.ts",
+    "probe": "tsx --env-file-if-exists=../../.env src/probe.ts",
     "test": "tsx --test test/*.test.ts"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.133.0",
     "@smemogp/db": "^0.1.0",
     "cheerio": "^1.2.0",
     "drizzle-orm": "^0.45.4",

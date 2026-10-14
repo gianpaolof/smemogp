@@ -3,6 +3,7 @@ name: scout
 on:
   schedule:
     - cron: "0 5,11,17 * * *" # 3 run/giorno (UTC)
+    - cron: "20 4 * * *" # ricerca web via OpenRouter, 1 run/giorno
   workflow_dispatch:
     inputs:
       only:
@@ -10,6 +11,23 @@ on:
         required: false
       force:
         description: "Ignora hash contenuto invariato"
+        type: boolean
+        default: false
+      search:
+        description: "Ricerca web (OpenRouter) invece dello scout delle fonti"
+        type: boolean
+        default: false
+      query:
+        description: "Ricerca: id tema singolo di searches.json (opzionale)"
+        required: false
+      model:
+        description: "Ricerca: id modello OpenRouter da provare (opzionale, es. openai/gpt-6-luna)"
+        required: false
+      engine:
+        description: "Ricerca: motore (exa, parallel, perplexity, native, auto)"
+        required: false
+      dry_run:
+        description: "Ricerca: non scrivere nel DB"
         type: boolean
         default: false
 
@@ -24,11 +42,16 @@ jobs:
     env:
       TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
       TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
-      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
       NOMINATIM_USER_AGENT: ${{ vars.NOMINATIM_USER_AGENT }}
       SCOUT_LLM_MODEL: ${{ vars.SCOUT_LLM_MODEL }}
+      SCOUT_SEARCH_MODEL: ${{ vars.SCOUT_SEARCH_MODEL }}
+      SCOUT_SEARCH_ENGINE: ${{ vars.SCOUT_SEARCH_ENGINE }}
+      SCOUT_SEARCH_MAX_USD: ${{ vars.SCOUT_SEARCH_MAX_USD }}
       SITE_URL: ${{ vars.SITE_URL }}
       REVALIDATE_SECRET: ${{ secrets.REVALIDATE_SECRET }}
+      # Run di ricerca: cron dedicato o lancio manuale con "search"
+      IS_SEARCH: ${{ github.event.schedule == '20 4 * * *' || (github.event_name == 'workflow_dispatch' && inputs.search) }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -38,6 +61,7 @@ jobs:
       - run: npm ci
       - run: npm run scout:test
       - name: Playwright Chromium (solo se c'è una fonte attiva con format "js")
+        if: env.IS_SEARCH != 'true'
         run: |
           if node -e 'process.exit(require("./sources.json").some(s => s.format === "js" && (s.status ?? "active") === "active" && s.enabled !== false) ? 0 : 1)'; then
             npx playwright install --with-deps chromium
@@ -45,6 +69,7 @@ jobs:
         working-directory: apps/scout
       - run: npm run db:migrate
       - name: Run scout
+        if: env.IS_SEARCH != 'true'
         env:
           ONLY: ${{ inputs.only }}
           FORCE: ${{ inputs.force }}
@@ -53,3 +78,17 @@ jobs:
           [ -n "$ONLY" ] && ARGS+=(--only "$ONLY")
           [ "$FORCE" = "true" ] && ARGS+=(--force)
           npm run scout -- "${ARGS[@]}"
+      - name: Ricerca web (OpenRouter)
+        if: env.IS_SEARCH == 'true'
+        env:
+          QUERY: ${{ inputs.query }}
+          MODEL: ${{ inputs.model }}
+          ENGINE: ${{ inputs.engine }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          ARGS=()
+          [ -n "$QUERY" ] && ARGS+=(--query "$QUERY")
+          [ -n "$MODEL" ] && ARGS+=(--model "$MODEL")
+          [ -n "$ENGINE" ] && ARGS+=(--engine "$ENGINE")
+          [ "$DRY_RUN" = "true" ] && ARGS+=(--dry-run)
+          npm run scout:search -- "${ARGS[@]}"
