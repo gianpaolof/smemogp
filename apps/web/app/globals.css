@@ -299,8 +299,8 @@ input.nowy-range::-moz-range-thumb { width: 18px; height: 18px; border: 3px soli
   white-space: nowrap;
 }
 
-/* Tema scuro: le tile chiare invertite danno un fondo quasi nero come l'app, senza etichette abbaglianti */
-.leaflet-container.is-dark .leaflet-tile-pane { filter: invert(1) grayscale(1) brightness(0.8) contrast(1.15); }
+/* Tema scuro: tile Dark Gray native un po' abbassate, vicine al nero dell'app con le strade ancora leggibili */
+.leaflet-container.is-dark .leaflet-tile-pane { filter: brightness(0.8); }
 @media (prefers-reduced-motion: reduce) {
   .leaflet-zoom-anim .leaflet-zoom-animated, .leaflet-fade-anim .leaflet-tile { transition: none !important; }
 }

@@ -11,10 +11,14 @@ import { useResolvedTheme } from "@/hooks/useTheme";
 import type { MapVM } from "@/ui/contracts";
 
 // CARTO ora richiede API key (anche Voyager): Esri Gray Canvas è raster, neutro, senza chiave.
-// In scuro si usano le tile chiare invertite (globals.css): più vicine al nero dell'app di Esri Dark Gray.
+// In scuro le tile Dark Gray native: strade chiare su fondo scuro. Le chiare invertite davano strade
+// più scure del fondo, illeggibili; un po' di brightness (globals.css) le avvicina al nero dell'app.
 // Alternativa futura: OpenFreeMap (vettoriale, richiede MapLibre).
 export const TILE_HOST = "https://server.arcgisonline.com";
-const TILES = `${TILE_HOST}/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}`;
+const TILES = {
+  light: `${TILE_HOST}/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}`,
+  dark: `${TILE_HOST}/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}`,
+};
 const ATTRIBUTION = 'Tiles &copy; Esri &mdash; Esri, HERE, Garmin, &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
 
 type Row = MapVM["rows"][number];
@@ -178,7 +182,8 @@ function LiveMap({ vm, selectedId, focusSelected, onSelect, fitKey }: Props) {
         m?.attributionControl.setPrefix(false);
       }}
     >
-      <TileLayer url={TILES} attribution={ATTRIBUTION} maxNativeZoom={16} maxZoom={18} />
+      {/* key: cambiando tema si ricrea il layer, senza tile del vecchio tema in cache sullo schermo */}
+      <TileLayer key={theme} url={TILES[theme]} attribution={ATTRIBUTION} maxNativeZoom={16} maxZoom={18} />
       <FitRadius key={fitKey} origin={vm.origin} radiusKm={vm.radiusKm} animate={!reducedMotion} />
       <Circle
         center={[vm.origin.lat, vm.origin.lng]}
