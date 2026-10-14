@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@smemogp/db": "^0.1.0",
+    "@vercel/analytics": "^2.0.1",
     "leaflet": "^1.9.4",
     "next": "16.4.0",
     "react": "19.3.0",

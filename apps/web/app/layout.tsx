@@ -1,3 +1,4 @@
+import { Analytics } from "@vercel/analytics/next";
 import type { Metadata, Viewport } from "next";
 import { Archivo } from "next/font/google";
 import { Suspense } from "react";
@@ -44,6 +45,7 @@ export default function RootLayout({ children, modal }: LayoutProps<"/">) {
         {/* Già visibile (vuota) prima di aprire un evento: in una transition non torna al fallback */}
         <Suspense>{modal}</Suspense>
         <PwaBoot />
+        <Analytics />
       </body>
     </html>
   );
