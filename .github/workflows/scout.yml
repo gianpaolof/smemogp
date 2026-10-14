@@ -3,7 +3,7 @@ name: scout
 on:
   schedule:
     - cron: "0 5,11,17 * * *" # 3 run/giorno (UTC)
-    - cron: "20 4 * * *" # ricerca web via OpenRouter, 1 run/giorno
+    - cron: "20 4 */3 * *" # ricerca web via OpenRouter, ogni 3 giorni (giorni 1, 4, 7… del mese)
   workflow_dispatch:
     inputs:
       only:
@@ -51,7 +51,7 @@ jobs:
       SITE_URL: ${{ vars.SITE_URL }}
       REVALIDATE_SECRET: ${{ secrets.REVALIDATE_SECRET }}
       # Run di ricerca: cron dedicato o lancio manuale con "search"
-      IS_SEARCH: ${{ github.event.schedule == '20 4 * * *' || (github.event_name == 'workflow_dispatch' && inputs.search) }}
+      IS_SEARCH: ${{ github.event.schedule == '20 4 */3 * *' || (github.event_name == 'workflow_dispatch' && inputs.search) }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
