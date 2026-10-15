@@ -11,7 +11,7 @@ import { extractJsonLd } from "../jsonld";
 //    {"date":"2026-10-22 18:00:00.000000","timezone":"UTC"} che in realtà sono ora di Torino,
 //    e ci sono virgole finali. Lo ripariamo prima di passarlo all'estrattore.
 const API = "https://eventi.comune.torino.it/wp-json/wp/v2/event";
-const DEFAULT_MAX = 150;
+const MAX_EVENTS = 150; // pubblicati negli ultimi due mesi circa
 const PARALLEL = 3;
 const PAUSE_MS = 500;
 
@@ -62,17 +62,16 @@ export function parseComuneDetail(html: string, url: string): RawEvent | null {
 }
 
 export const comuneAdapter: Adapter = {
-  fetch: async (source) => {
-    const max = source.detail?.max ?? DEFAULT_MAX;
+  fetch: async () => {
     const links: string[] = [];
-    for (let page = 1; links.length < max; page++) {
+    for (let page = 1; links.length < MAX_EVENTS; page++) {
       const url = `${API}?per_page=100&page=${page}&_fields=link`;
       const batch = JSON.parse(await fetchText(url)) as Listed[];
       links.push(...batch.map((b) => b.link));
       if (batch.length < 100) break;
     }
     // Il corpo è la lista dei link: se non cambia, lo scout salta la fonte senza leggere i dettagli
-    return { url: API, body: JSON.stringify(links.slice(0, max)) };
+    return { url: API, body: JSON.stringify(links.slice(0, MAX_EVENTS)) };
   },
   extract: async (_source, content) => {
     const links = JSON.parse(content.body) as string[];

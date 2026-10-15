@@ -228,10 +228,7 @@
     "phase": 1,
     "area": "Torino",
     "notes": "Attivata 2026-10-15. REST pubblica wp/v2/event (link dei 150 eventi pubblicati più di recente, circa due mesi) + JSON-LD della pagina evento, riparato: date come oggetti PHP «UTC» che sono ora di Torino, virgole finali. API Events Manager = 401; events.ics = sempre i 50 eventi più vecchi, ignora i filtri.",
-    "adapter": "comune",
-    "detail": {
-      "max": 150
-    }
+    "adapter": "comune"
   },
   {
     "id": "comune-asti",
