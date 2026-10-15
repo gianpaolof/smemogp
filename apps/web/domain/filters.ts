@@ -12,6 +12,8 @@ export const DEFAULT_FILTERS: Filters = {
   radiusKm: 10,
   categories: [],
   origin: null,
+  range: null,
+  weekendOnly: false,
 };
 
 type Params = Record<string, string | string[] | undefined> | URLSearchParams;
@@ -27,6 +29,10 @@ const clamp = (n: number, min: number, max: number) => Math.min(Math.max(n, min)
 /** Coordinate arrotondate a ~100 m: meno chiavi di cache, privacy migliore nell'URL. */
 const round3 = (n: number) => Math.round(n * 1000) / 1000;
 
+const MAX_RANGE_DAYS = 60;
+const isValidDate = (s: string) => /^\d{4}-\d{2}-\d{2}$/.test(s) && !isNaN(Date.parse(s));
+const dateIsBefore = (a: string, b: string) => a < b;
+
 /** URL → Filters. Valori invalidi ricadono sui default, mai errori. */
 export function parseFilters(params: Params): Filters {
   const period = get(params, "periodo");
@@ -38,22 +44,55 @@ export function parseFilters(params: Params): Filters {
   const lng = Number(get(params, "lng"));
   const hasOrigin = Number.isFinite(lat) && Number.isFinite(lng) && get(params, "lat") && get(params, "lng");
 
+  // Range parsing: dal/al in YYYY-MM-DD
+  const dal = get(params, "dal");
+  const al = get(params, "al");
+  const validDal = dal && isValidDate(dal) ? dal : null;
+  const validAl = al && isValidDate(al) ? al : null;
+  const today = new Date().toISOString().split("T")[0];
+
+  let range: { from: string; to: string } | null = null;
+  if (validDal) {
+    const from = validDal < today ? today : validDal;
+    const to = validAl && validAl >= from ? validAl : from;
+    const daysDiff = Math.floor((new Date(to).getTime() - new Date(from).getTime()) / (24 * 60 * 60 * 1000));
+    if (daysDiff <= MAX_RANGE_DAYS) {
+      range = { from, to };
+    }
+  }
+
+  // Solo weekend modifier
+  const solo = get(params, "solo");
+  const weekendOnly = range && solo === "weekend" ? true : false;
+
+  // Se c'è un range valido, periodo = "custom"
+  const effectivePeriod: Period | "custom" = range ? "custom" :
+    (PERIODS.includes(period as Period) ? (period as Period) : DEFAULT_FILTERS.period);
+
   return {
-    period: PERIODS.includes(period as Period) ? (period as Period) : DEFAULT_FILTERS.period,
+    period: effectivePeriod,
     radiusKm: Number.isFinite(radius) && radius > 0
       ? clamp(Math.round(radius), RADIUS_MIN_KM, RADIUS_MAX_KM)
       : DEFAULT_FILTERS.radiusKm,
     categories: [...new Set(cats)],
     origin: hasOrigin ? { lat: round3(lat), lng: round3(lng) } : null,
+    range,
+    weekendOnly,
   };
 }
 
 /** Filters → query string (solo i valori diversi dal default), senza "?". */
 export function serializeFilters(f: Filters): string {
   const p = new URLSearchParams();
-  if (f.period !== DEFAULT_FILTERS.period) p.set("periodo", f.period);
+  if (f.range) {
+    p.set("dal", f.range.from);
+    if (f.range.to !== f.range.from) p.set("al", f.range.to);
+  } else if (f.period !== DEFAULT_FILTERS.period) {
+    p.set("periodo", f.period);
+  }
   if (f.radiusKm !== DEFAULT_FILTERS.radiusKm) p.set("raggio", String(f.radiusKm));
   if (f.categories.length) p.set("cat", [...f.categories].sort().join(","));
+  if (f.weekendOnly) p.set("solo", "weekend");
   if (f.origin) {
     p.set("lat", String(round3(f.origin.lat)));
     p.set("lng", String(round3(f.origin.lng)));

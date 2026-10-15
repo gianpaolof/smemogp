@@ -20,7 +20,7 @@ import {
   safeExternalUrl,
   sourceLabel,
 } from "@/domain/format";
-import { dayKey, periodBounds } from "@/domain/time";
+import { dayKey, periodBounds, isWeekendDay } from "@/domain/time";
 import type { Category, EventItem, Filters } from "@/domain/types";
 import type {
   AgendaDayVM,
@@ -51,19 +51,38 @@ const SLOT_LABELS: Record<Slot, string> = { mattina: "Mattina", pomeriggio: "Pom
 
 const originLabel = (f: Filters) => (f.origin ? "La tua posizione" : "Torino");
 
+/** Etichetta del periodo/intervallo per header e stato vuoto. */
+const periodLabel = (f: Filters): string => {
+  if (f.range) {
+    const [yd, md, dd] = f.range.from.split("-");
+    const [ya, ma, da] = f.range.to.split("-");
+    const dateStr = dd === da
+      ? `${parseInt(dd)} ${new Intl.DateTimeFormat("it-IT", { month: "short" }).format(new Date(f.range.from))}`
+      : `${parseInt(dd)} ${new Intl.DateTimeFormat("it-IT", { month: "short" }).format(new Date(f.range.from))} – ${parseInt(da)} ${new Intl.DateTimeFormat("it-IT", { month: "short" }).format(new Date(f.range.to))}`;
+    return f.weekendOnly ? `${dateStr} · sab e dom` : dateStr;
+  }
+  const pLabel = PERIOD_LABELS[f.period as keyof typeof PERIOD_LABELS] || PERIOD_LABELS.settimana;
+  return f.weekendOnly ? `${pLabel} · sab e dom` : pLabel;
+};
+
 export function presentHeader(f: Filters, view: View): HeaderVM {
   const path = PATHS[view];
+  const scopeLabelPeriod = f.range ? `[${periodLabel(f).split(" ·")[0]}]` : periodLabel(f);
+  const scopeLabel = f.range
+    ? `${scopeLabelPeriod}${f.weekendOnly ? " sab e dom" : ""} · ${f.radiusKm} km`
+    : `${originLabel(f)} — raggio ${f.radiusKm} km`;
+
   return {
     periods: HEADER_PERIODS.map((p) => ({
       label: PERIOD_LABELS[p],
-      href: hrefWith(path, { ...f, period: p }),
-      active: f.period === p,
+      href: hrefWith(path, { ...f, period: p, range: null }),
+      active: f.period === p && !f.range,
     })),
     viewSwitch:
       view === "lista"
         ? { label: "Mappa", href: hrefWith(PATHS.mappa, f), direction: "nav-forward", icon: "map" }
         : { label: "Lista", href: hrefWith(PATHS.lista, f), direction: "nav-back", icon: "list" },
-    scopeLabel: `${originLabel(f)} — raggio ${f.radiusKm} km`,
+    scopeLabel,
   };
 }
 

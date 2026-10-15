@@ -99,3 +99,19 @@ export function dayKey(iso: string): string {
   const { y, m, d } = romeParts(new Date(iso));
   return `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
 }
+
+/** Intervallo date personalizzato [dal, al] ISO → bounds in Rome. */
+export function rangeBounds(from: string, to: string): { from: Date; to: Date } {
+  const fromYmd = { y: +from.slice(0, 4), m: +from.slice(5, 7), d: +from.slice(8, 10) };
+  const toYmd = { y: +to.slice(0, 4), m: +to.slice(5, 7), d: +to.slice(8, 10) };
+  return {
+    from: romeMidnight(fromYmd),
+    to: romeMidnight(addDays(toYmd, 1)),
+  };
+}
+
+/** Sabato (6) e domenica (0) in calendario Rome. */
+export function isWeekendDay(dayKey: string): boolean {
+  const wd = new Date(Date.UTC(+dayKey.slice(0, 4), +dayKey.slice(5, 7) - 1, +dayKey.slice(8, 10))).getUTCDay();
+  return wd === 0 || wd === 6;
+}

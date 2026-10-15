@@ -1,5 +1,5 @@
 import type { EventItem } from "./types";
-import { dayKey, romeHour } from "./time";
+import { dayKey, romeHour, isWeekendDay } from "./time";
 
 /** Senza orario di fine, un evento si considera concluso 3 ore dopo l'inizio. */
 const DEFAULT_DURATION_MS = 3 * 3_600_000;
@@ -33,6 +33,24 @@ export type AgendaDay = {
   /** Mostre e rassegne iniziate prima: raccolte a parte per non coprire le serate */
   ongoing: EventItem[];
 };
+
+/** Evento tocca un sabato/domenica Roma in [from, to). */
+export function touchesWeekend(e: EventItem, from: Date, to: Date): boolean {
+  const eventStart = new Date(e.startsAt);
+  const eventEnd = e.endsAt ? new Date(e.endsAt) : new Date(eventStart.getTime() + 3 * 3_600_000);
+  const overlayStart = new Date(Math.max(eventStart.getTime(), from.getTime()));
+  const overlayEnd = new Date(Math.min(eventEnd.getTime(), to.getTime()));
+
+  if (overlayStart >= overlayEnd) return false;
+
+  // Scannerizza ogni giorno dell'overlay
+  let current = new Date(overlayStart);
+  while (current < overlayEnd) {
+    if (isWeekendDay(dayKey(current.toISOString()))) return true;
+    current.setUTCDate(current.getUTCDate() + 1);
+  }
+  return false;
+}
 
 /**
  * Raggruppa per giorno di Roma. Gli eventi già iniziati (es. mostre) finiscono nel primo

@@ -1,6 +1,5 @@
 import { connection } from "next/server";
 import { Suspense } from "react";
-import { getEvents } from "@/data/events";
 import { parseFilters } from "@/domain/filters";
 import type { Filters } from "@/domain/types";
 import { presentBottomBar, presentHeader, presentMap } from "@/presenters";
@@ -10,13 +9,14 @@ import { MapScreen } from "@/ui/nowy/MapScreen";
 import { RestoreFilters } from "@/ui/nowy/RestoreFilters";
 import { MapSkeleton } from "@/ui/nowy/Skeletons";
 import { serializeFilters } from "@/domain/filters";
-import { buildQuery, type SearchParams } from "./query";
+import type { SearchParams } from "./query";
+import { loadEvents, buildQueryWithBounds } from "./_helpers";
 
 async function load(f: Filters, selectedId: string | null) {
   await connection();
   const now = new Date();
-  const { query, from } = buildQuery(f, now);
-  const events = await getEvents(query);
+  const { events, from } = await loadEvents(f, now);
+  const { query } = buildQueryWithBounds(f, now);
   return presentMap(events, f, from, now, { lat: query.lat, lng: query.lng }, selectedId);
 }
 

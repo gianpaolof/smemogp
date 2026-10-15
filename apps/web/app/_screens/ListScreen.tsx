@@ -1,6 +1,5 @@
 import { connection } from "next/server";
 import { Suspense, ViewTransition } from "react";
-import { getEvents } from "@/data/events";
 import { parseFilters } from "@/domain/filters";
 import type { Filters } from "@/domain/types";
 import { presentAgenda, presentBottomBar, presentHeader } from "@/presenters";
@@ -10,14 +9,15 @@ import { Header } from "@/ui/nowy/Header";
 import { RestoreFilters } from "@/ui/nowy/RestoreFilters";
 import { AgendaSkeleton } from "@/ui/nowy/Skeletons";
 import { serializeFilters } from "@/domain/filters";
-import { buildQuery, type SearchParams } from "./query";
+import type { SearchParams } from "./query";
+import { loadEvents } from "./_helpers";
 
 async function loadAgenda(f: Filters) {
   // "Adesso" è un dato di richiesta: fuori dalla shell prerenderizzata
   await connection();
   const now = new Date();
-  const { query, from } = buildQuery(f, now);
-  return presentAgenda(await getEvents(query), f, from, now);
+  const { events, from } = await loadEvents(f, now);
+  return presentAgenda(events, f, from, now);
 }
 
 async function Count({ f }: { f: Filters }) {
