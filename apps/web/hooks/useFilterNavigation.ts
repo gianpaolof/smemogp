@@ -12,7 +12,7 @@ export type Remembered = { radiusKm?: number; origin?: LatLng | null };
 
 export type GpsFailure = "denied" | "timeout" | "unavailable" | "unsupported";
 
-/** Azioni sui filtri che non sono semplici link: raggio, posizione. Aggiornano l'URL in una transition. */
+/** Azioni sui filtri che non sono semplici link: raggio, posizione, date range. Aggiornano l'URL in una transition. */
 export function useFilterNavigation(path: string, query: string) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -29,6 +29,15 @@ export function useFilterNavigation(path: string, query: string) {
 
   const setOrigin = (origin: LatLng | null) => go(withOrigin(current, origin));
 
+  const setRange = (from: string | null, to: string | null) => {
+    const next = from && to ? { ...current, period: "custom" as const, range: { from, to }, weekendOnly: current.weekendOnly } : { ...current, period: "mese", range: null };
+    go(next);
+  };
+
+  const setWeekendOnly = (weekendOnly: boolean) => {
+    go({ ...current, weekendOnly });
+  };
+
   const locateMe = () =>
     new Promise<void>((resolve, reject: (reason: GpsFailure) => void) => {
       if (!("geolocation" in navigator)) return reject("unsupported");
@@ -43,5 +52,5 @@ export function useFilterNavigation(path: string, query: string) {
       );
     });
 
-  return { pending, setRadius, setOrigin, locateMe };
+  return { pending, setRadius, setOrigin, setRange, setWeekendOnly, locateMe };
 }

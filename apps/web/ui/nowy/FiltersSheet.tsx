@@ -39,7 +39,7 @@ export function FiltersSheet({
   count?: ReactNode;
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
-  const { pending, setRadius, setOrigin, locateMe } = useFilterNavigation(vm.path, vm.query);
+  const { pending, setRadius, setOrigin, setRange, setWeekendOnly, locateMe } = useFilterNavigation(vm.path, vm.query);
   const { choice, setChoice } = useTheme();
   const steps = vm.radiusSteps;
   const [index, setIndex] = useState(() => nearestStep(steps, vm.radiusKm));
@@ -129,6 +129,62 @@ export function FiltersSheet({
               </Link>
             ))}
           </div>
+          <div className="mt-3 grid grid-cols-3 gap-2 border-t border-l border-line">
+            <label className="flex flex-col border-r border-b border-line p-2">
+              <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-muted">Dal</span>
+              <input
+                type="date"
+                value={vm.dal ?? ""}
+                min={vm.min}
+                max={vm.max}
+                onChange={(e) => {
+                  if (e.target.value) {
+                    setRange(e.target.value, vm.al ?? e.target.value);
+                  }
+                }}
+                className="h-9 bg-transparent text-sm font-semibold outline-none"
+              />
+            </label>
+            <label className="flex flex-col border-r border-b border-line p-2">
+              <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-muted">Al</span>
+              <input
+                type="date"
+                value={vm.al ?? ""}
+                min={vm.dal ?? vm.min}
+                max={vm.max}
+                onChange={(e) => {
+                  if (e.target.value && vm.dal) {
+                    setRange(vm.dal, e.target.value);
+                  }
+                }}
+                className="h-9 bg-transparent text-sm font-semibold outline-none"
+              />
+            </label>
+            <button
+              type="button"
+              onClick={() => setRange(null, null)}
+              className="press flex items-center justify-center border-b border-line text-lg hover:bg-line-soft disabled:text-line-soft"
+              aria-label="Cancella intervallo"
+              disabled={!vm.dal && !vm.al}
+            >
+              <Icon name="close" />
+            </button>
+          </div>
+          <button
+            type="button"
+            onClick={() => setWeekendOnly(!vm.weekendOnly)}
+            aria-pressed={vm.weekendOnly}
+            disabled={vm.weekendToggleDisabled}
+            className={`press mt-3 w-full border-t border-l border-r border-b border-line py-2 text-sm font-semibold ${
+              vm.weekendOnly ? "bg-fg text-bg" : "hover:bg-line-soft"
+            } disabled:opacity-60`}
+          >
+            {vm.weekendOnly && <Icon name="check" className="mr-1" />}
+            Solo sabato e domenica
+            {vm.weekendToggleDisabled && vm.weekendToggleDisabledReason && (
+              <span className="ml-1 text-xs font-normal">({vm.weekendToggleDisabledReason})</span>
+            )}
+          </button>
         </fieldset>
 
         <fieldset className="flow-root border-b border-line px-3 py-3">

@@ -125,6 +125,17 @@ dialog.sheet::backdrop { background: var(--overlay); }
 
 input[type="range"] { accent-color: var(--accent); }
 
+/* Date inputs: iOS styling override */
+input[type="date"] {
+  color-scheme: light dark;
+}
+[data-theme="dark"] input[type="date"] {
+  color-scheme: dark;
+}
+input[type="date"]::-webkit-date-and-time-value {
+  text-align: center;
+}
+
 /* ── View Transitions ────────────────────────────────────────────────────── */
 ::view-transition-group(*) { animation-duration: 220ms; animation-timing-function: cubic-bezier(0.2, 0, 0, 1); }
 

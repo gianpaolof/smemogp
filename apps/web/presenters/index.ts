@@ -272,6 +272,11 @@ export function presentMap(
 
 export function presentBottomBar(f: Filters, view: View): BottomBarVM {
   const path = PATHS[view];
+  const now = new Date();
+  const today = now.toISOString().split("T")[0];
+  const maxDate = new Date(now.getTime() + 60 * 24 * 60 * 60 * 1000);
+  const max = maxDate.toISOString().split("T")[0];
+  const isWeekendDisabled = f.period === "stasera" || f.period === "oggi";
   const catItem = (c: Category) => ({
     label: CATEGORY_LABELS[c],
     href: hrefWith(path, toggleCategory(f, c)),
@@ -282,7 +287,7 @@ export function presentBottomBar(f: Filters, view: View): BottomBarVM {
     panel: {
       path,
       query: serializeFilters(f),
-      periods: PERIODS.map((p) => ({ label: PERIOD_LABELS[p], href: hrefWith(path, { ...f, period: p }), active: f.period === p })),
+      periods: PERIODS.map((p) => ({ label: PERIOD_LABELS[p], href: hrefWith(path, { ...f, period: p, range: null }), active: f.period === p && !f.range })),
       categories: CATEGORIES.map(catItem),
       radiusKm: f.radiusKm,
       radiusSteps: RADIUS_STEPS,
@@ -290,6 +295,15 @@ export function presentBottomBar(f: Filters, view: View): BottomBarVM {
       usingCustomOrigin: f.origin !== null,
       resetHref: path,
       hasFilters: serializeFilters(f) !== "",
+      dal: f.range?.from ?? null,
+      al: f.range?.to ?? null,
+      weekendOnly: f.weekendOnly,
+      min: today,
+      max,
+      clearRangeHref: hrefWith(path, { ...f, period: "mese", range: null }),
+      weekendToggleHref: hrefWith(path, { ...f, weekendOnly: !f.weekendOnly }),
+      weekendToggleDisabled: isWeekendDisabled,
+      weekendToggleDisabledReason: f.period === "stasera" ? "Solo stasera" : f.period === "oggi" ? "Solo oggi" : undefined,
     },
   };
 }

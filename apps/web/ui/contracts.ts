@@ -74,6 +74,19 @@ export type FilterPanelVM = {
   usingCustomOrigin: boolean;
   resetHref: string;
   hasFilters: boolean;
+  /** Date range: ISO YYYY-MM-DD, null se preset attivo */
+  dal: string | null;
+  al: string | null;
+  weekendOnly: boolean;
+  /** min date (today ISO), max date (today + 60gg ISO) */
+  min: string;
+  max: string;
+  /** href per cancellare le date (ritorna al preset) */
+  clearRangeHref: string;
+  /** href per toggle weekend; disabilitato se periodo non supporta modificatore */
+  weekendToggleHref: string;
+  weekendToggleDisabled: boolean;
+  weekendToggleDisabledReason?: string;
 };
 
 export type BottomBarVM = { quickCategories: NavItem[]; panel: FilterPanelVM };
