@@ -62,7 +62,7 @@ const periodLabel = (f: Filters): string => {
     return f.weekendOnly ? `${dateStr} · sab e dom` : dateStr;
   }
   if (f.period === "custom") return f.weekendOnly ? "Personalizzato · sab e dom" : "Personalizzato";
-  const pLabel = PERIOD_LABELS[f.period];
+  const pLabel = PERIOD_LABELS[f.period as Exclude<typeof f.period, "custom">];
   return f.weekendOnly ? `${pLabel} · sab e dom` : pLabel;
 };
 
@@ -123,13 +123,14 @@ function presentEmpty(f: Filters, view: View): EmptyVM {
   if (f.period === "stasera") actions.push({ label: "Tutta la settimana", href: hrefWith(path, { ...f, period: "settimana" }) });
   if (f.radiusKm < 25) actions.push({ label: "Allarga a 25 km", href: hrefWith(path, { ...f, radiusKm: 25 }) });
   if (f.categories.length) actions.push({ label: "Tutte le categorie", href: hrefWith(path, { ...f, categories: [] }) });
-  if (f.period !== "mese") actions.push({ label: "Prossimi 30 giorni", href: hrefWith(path, { ...f, period: "mese" }) });
+  if (f.period !== "mese" && f.period !== "custom") actions.push({ label: "Prossimi 30 giorni", href: hrefWith(path, { ...f, period: "mese" }) });
   const what = f.categories.length
     ? `di ${f.categories.map((c) => CATEGORY_LABELS[c].toLowerCase()).join(" o ")}`
     : "";
+  const periodMsg = f.period === "custom" ? "personalizzato" : PERIOD_LABELS[f.period as Exclude<typeof f.period, "custom">].toLowerCase();
   return {
     title: "Niente in programma",
-    message: `Nessun evento ${what} entro ${f.radiusKm} km per ${PERIOD_LABELS[f.period].toLowerCase()}.`.replace("  ", " "),
+    message: `Nessun evento ${what} entro ${f.radiusKm} km per ${periodMsg}.`.replace("  ", " "),
     actions,
   };
 }
@@ -322,9 +323,9 @@ export function presentDetail(e: EventItem, f: Filters, now: Date): EventDetailV
   // Come nella lista: una mostra già iniziata sta sotto oggi, non sotto il giorno di apertura
   const ongoing = multiDay && new Date(e.startsAt) < now;
   // Già iniziata: in lista sta sotto il primo giorno del periodo (oggi, o sabato per il weekend)
-  const periodStart = f.period === "custom" && f.range
+  const periodStart = f.range
     ? new Date(f.range.from + "T23:00:00Z")
-    : periodBounds(f.period as any, now).from;
+    : periodBounds(f.period as Exclude<typeof f.period, "custom">, now).from;
   const shownDay = ongoing ? new Date(Math.max(now.getTime(), periodStart.getTime())).toISOString() : e.startsAt;
   const { num, label } = formatDayHeading(shownDay);
   const external = safeExternalUrl(e.url);

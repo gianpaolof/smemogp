@@ -1,11 +1,11 @@
 import { TORINO } from "@smemogp/db/constants";
 import type { EventsQuery } from "@/data/events";
-import { periodBounds } from "@/domain/time";
+import { periodBounds, rangeBounds } from "@/domain/time";
 import type { Filters } from "@/domain/types";
 
 /** Filters + ora corrente → argomenti (stabili per tutta la giornata) della query cache-ata. */
 export function buildQuery(f: Filters, now: Date): { query: EventsQuery; from: Date } {
-  const { from, to } = periodBounds(f.period, now);
+  const { from, to } = f.period === "custom" && f.range ? rangeBounds(f.range.from, f.range.to) : periodBounds(f.period as any, now);
   const origin = f.origin ?? TORINO;
   return {
     from,
