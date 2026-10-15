@@ -30,8 +30,10 @@ export function useFilterNavigation(path: string, query: string) {
   const setOrigin = (origin: LatLng | null) => go(withOrigin(current, origin));
 
   const setRange = (from: string | null, to: string | null) => {
-    const next = from && to ? { ...current, period: "custom" as const, range: { from, to }, weekendOnly: current.weekendOnly } : { ...current, period: "mese", range: null };
-    go(next);
+    const next = from && to
+      ? { ...current, period: "custom" as const, range: { from, to }, weekendOnly: current.weekendOnly }
+      : { ...current, period: "mese", range: null };
+    go(next as Filters);
   };
 
   const setWeekendOnly = (weekendOnly: boolean) => {
