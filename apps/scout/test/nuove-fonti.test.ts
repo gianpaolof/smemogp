@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import { parseComuneDetail, repairJsonLd } from "../src/adapters/custom/comune.ts";
 import { inferYear, parseMagazzinoPage } from "../src/adapters/custom/magazzino.ts";
 import { maoDetail, parseMaoList } from "../src/adapters/custom/mao.ts";
 import { taccoEvents } from "../src/adapters/custom/tacco.ts";
@@ -100,4 +101,30 @@ test("sede predefinita: solo se manca, e titolo senza il nome del locale", () =>
   const elsewhere = withDefaultVenue({ ...base, venueName: "Parco del Valentino" }, venue);
   assert.equal(elsewhere.venueName, "Parco del Valentino");
   assert.equal(elsewhere.address, undefined);
+});
+
+test("Comune di Torino: JSON-LD riparato, mostra di più giorni", () => {
+  const e = parseComuneDetail(fixture("comune-mostra.html"), "https://eventi.comune.torino.it/calendario/roberto-capucci-vestire-le-muse/")!;
+  assert.equal(e.title, "Roberto Capucci. Vestire LE muse");
+  assert.equal(e.category, "mostre");
+  assert.equal(e.allDay, true);
+  assert.equal(e.startsAt.toISOString(), "2026-11-06T11:00:00.000Z");
+  assert.equal(e.endsAt?.toISOString(), "2027-02-28T22:59:00.000Z");
+  assert.equal(e.venueName, "Fondazione Accorsi Ometto");
+  assert.match(e.address ?? "", /via Po, 55/);
+});
+
+test("Comune di Torino: l'ora «UTC» del sito è ora di Torino", () => {
+  const e = parseComuneDetail(fixture("comune-conferenza.html"), "https://eventi.comune.torino.it/calendario/x/")!;
+  assert.match(e.title, /^Narrare la natura/);
+  assert.equal(e.allDay, false);
+  assert.equal(e.startsAt.toISOString(), "2026-10-22T16:00:00.000Z");
+  assert.equal(e.endsAt?.toISOString(), "2026-10-22T17:30:00.000Z");
+  assert.equal(e.category, undefined);
+  assert.equal(e.venueName, "Museo Regionale di Scienze Naturali");
+});
+
+test("repairJsonLd: virgola finale e date PHP", () => {
+  const html = `<script type="application/ld+json">{"@type":"Event","name":"X","startDate":{"date":"2026-10-22 00:00:00.000000","timezone":"UTC"},"organizer":{"name":"Y",}}</script>`;
+  assert.equal(extractJsonLd(repairJsonLd(html), "https://e.it/").length, 1);
 });

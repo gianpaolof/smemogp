@@ -221,13 +221,17 @@
   },
   {
     "id": "comune-torino-eventi",
-    "name": "Comune di Torino - Manifestazioni e Calendario",
-    "url": "https://www.comune.torino.it",
-    "format": "html",
-    "status": "unverified",
-    "phase": 2,
+    "name": "Comune di Torino – Eventi a Torino",
+    "url": "https://eventi.comune.torino.it/calendario/",
+    "format": "api",
+    "status": "active",
+    "phase": 1,
     "area": "Torino",
-    "notes": "Da catalogo agente (homepage, non calendario): Official city events. Example: 'Portici di Carta 2026' (Oct 10-11). Cultural calendar."
+    "notes": "Attivata 2026-10-15. REST pubblica wp/v2/event (link dei 150 eventi pubblicati più di recente, circa due mesi) + JSON-LD della pagina evento, riparato: date come oggetti PHP «UTC» che sono ora di Torino, virgole finali. API Events Manager = 401; events.ics = sempre i 50 eventi più vecchi, ignora i filtri.",
+    "adapter": "comune",
+    "detail": {
+      "max": 150
+    }
   },
   {
     "id": "comune-asti",
