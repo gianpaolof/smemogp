@@ -93,11 +93,15 @@ function FitRadius({ origin, radiusKm, fitKey, animate, keepFrom }: Pick<MapVM, 
   keepFrom: FitArgs | null;
 }) {
   const map = useMap();
+  // Lasciato l'arrivo una volta (raggio, origine o «Inquadra raggio»), si inquadra sempre: tornare agli
+  // stessi valori (raggio 10 → 20 → 10) deve reinquadrare
+  const leftArrival = useRef(false);
   useEffect(() => {
     // Anche al ritorno da <Activity> nascosta: il contenitore era display:none
     map.invalidateSize();
     const args = { lat: origin.lat, lng: origin.lng, radiusKm, fitKey };
-    if (!keepFrom || !sameFit(keepFrom, args)) map.fitBounds(radiusBounds(origin, radiusKm), { padding: [12, 12], animate });
+    if (!keepFrom || !sameFit(keepFrom, args)) leftArrival.current = true;
+    if (leftArrival.current) map.fitBounds(radiusBounds(origin, radiusKm), { padding: [12, 12], animate });
     // Il pannello del luogo cambia altezza senza ridimensionare finestra.
     const resize = new ResizeObserver(() => map.invalidateSize({ animate: false }));
     resize.observe(map.getContainer());
@@ -137,13 +141,19 @@ function ShowSelected({
       // Dentro un cluster chiuso: il "genitore visibile" è il cluster, non il marker
       // Margini per il callout (centrato sul pin, largo fino a ~240px, alto ~60px) e per l'eventuale
       // pannello che copre il lato destro della mappa
-      const pan = () =>
-        !cancelled &&
+      const pan = () => {
+        if (cancelled) return;
+        // Il callout può essersi aperto col tooltipAnchor dell'icona precedente (effetti figlio prima del padre)
+        marker.getTooltip()?.update();
+        // Su una mappa stretta i margini si riducono: oltre la larghezza il riquadro si capovolgerebbe
+        const free = map.getSize().x - coverRight - 48;
+        const side = Math.max(0, Math.min(CALLOUT_HALF_W, free / 2));
         map.panInside(marker.getLatLng(), {
-          paddingTopLeft: [CALLOUT_HALF_W, 96],
-          paddingBottomRight: [coverRight + CALLOUT_HALF_W, 32],
+          paddingTopLeft: [side, 96],
+          paddingBottomRight: [coverRight + side, 32],
           animate,
         });
+      };
       if (g?.hasLayer(marker) && g.getVisibleParent(marker) !== marker) g.zoomToShowLayer(marker, pan);
       else pan();
     });
@@ -284,6 +294,8 @@ function LiveMap({ vm, selectedId, focusSelected, onSelect, fitKey, arriveZoomed
         spiderfyOnMaxZoom
         spiderLegPolylineOptions={{ className: "leaflet-cluster-spider-leg", weight: 1.5, opacity: 1 }}
         zoomToBoundsOnClick
+        // Allo zoom d'arrivo niente cluster: il selezionato è già visibile, senza salire oltre le tile native
+        disableClusteringAtZoom={ARRIVAL_ZOOM}
         animate={!reducedMotion}
         // Niente caricamento a blocchi: all'arrivo il marker selezionato dev'essere già nel gruppo
         // (ShowSelected apre il suo cluster). Le righe sono al massimo qualche centinaio.
@@ -307,7 +319,7 @@ function LiveMap({ vm, selectedId, focusSelected, onSelect, fitKey, arriveZoomed
               <Tooltip permanent direction="top" className="nowy-callout">
                 {/* Ripete la card sotto la mappa: nascosto agli screen reader */}
                 <span aria-hidden="true">
-                  <b>{row.venue ?? row.title}</b>
+                  <b>{row.venue || row.title}</b>
                   {row.address && <span>{row.address}</span>}
                 </span>
               </Tooltip>

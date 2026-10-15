@@ -293,8 +293,9 @@ input.nowy-range::-moz-range-thumb { width: 18px; height: 18px; border: 3px soli
   border: 0;
   background: var(--fg);
 }
-/* Da lontano coprirebbe i marker vicini */
-.leaflet-container.callout-far .nowy-callout { display: none; }
+/* Da lontano coprirebbe i marker vicini. visibility, non display: Leaflet misura il callout per
+   posizionarlo, e a display:none varrebbe 0×0 (resterebbe storto quando riappare) */
+.leaflet-container.callout-far .nowy-callout { visibility: hidden; }
 .nowy-marker.has-count span {
   position: relative;
   color: var(--bg);

@@ -217,7 +217,7 @@ export function presentSaved(events: EventItem[], missingIds: readonly string[],
 
 /** Luogo e indirizzo: il nome del luogo spesso è ripetuto all'inizio dell'indirizzo. */
 function placeLines(e: EventItem): Pick<MapRowVM, "venue" | "address"> {
-  const venue = e.venueName;
+  const venue = e.venueName || null;
   const address = joinAddress(e.address, e.city);
   return {
     venue,
@@ -243,7 +243,10 @@ export function presentMap(
     countLabel: agenda.countLabel,
     empty: agenda.empty ? presentEmpty(f, "mappa") : null,
     rows: agenda.days.flatMap((d) =>
-      [...(d.ongoing?.rows ?? []), ...d.groups.flatMap((g) => g.rows)].map((r) => ({ ...r, ...placeLines(byId.get(r.id)!), dayNum: d.num, dayLabel: d.label })),
+      [...(d.ongoing?.rows ?? []), ...d.groups.flatMap((g) => g.rows)].map((r) => {
+        const e = byId.get(r.id);
+        return { ...r, ...(e ? placeLines(e) : { venue: null, address: null }), dayNum: d.num, dayLabel: d.label };
+      }),
     ),
   };
 }
