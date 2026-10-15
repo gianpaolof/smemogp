@@ -61,7 +61,8 @@ const periodLabel = (f: Filters): string => {
       : `${parseInt(dd)} ${new Intl.DateTimeFormat("it-IT", { month: "short" }).format(new Date(f.range.from))} – ${parseInt(da)} ${new Intl.DateTimeFormat("it-IT", { month: "short" }).format(new Date(f.range.to))}`;
     return f.weekendOnly ? `${dateStr} · sab e dom` : dateStr;
   }
-  const pLabel = PERIOD_LABELS[f.period as keyof typeof PERIOD_LABELS] || PERIOD_LABELS.settimana;
+  if (f.period === "custom") return f.weekendOnly ? "Personalizzato · sab e dom" : "Personalizzato";
+  const pLabel = PERIOD_LABELS[f.period];
   return f.weekendOnly ? `${pLabel} · sab e dom` : pLabel;
 };
 
@@ -321,7 +322,9 @@ export function presentDetail(e: EventItem, f: Filters, now: Date): EventDetailV
   // Come nella lista: una mostra già iniziata sta sotto oggi, non sotto il giorno di apertura
   const ongoing = multiDay && new Date(e.startsAt) < now;
   // Già iniziata: in lista sta sotto il primo giorno del periodo (oggi, o sabato per il weekend)
-  const periodStart = periodBounds(f.period, now).from;
+  const periodStart = f.period === "custom" && f.range
+    ? new Date(f.range.from + "T23:00:00Z")
+    : periodBounds(f.period as any, now).from;
   const shownDay = ongoing ? new Date(Math.max(now.getTime(), periodStart.getTime())).toISOString() : e.startsAt;
   const { num, label } = formatDayHeading(shownDay);
   const external = safeExternalUrl(e.url);
