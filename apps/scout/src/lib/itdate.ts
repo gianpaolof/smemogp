@@ -1,7 +1,7 @@
 // Date in italiano scritte nel testo delle pagine ("dal 10 al 25 ottobre 2026", "17 ottobre 2026").
 // Solo giorni (niente ore): servono a completare intervalli che il JSON-LD non dà.
 
-const MONTHS = ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"];
+export const MONTHS = ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"];
 const MONTH = `(${MONTHS.join("|")})`;
 
 export type DayRange = { from: string; to: string }; // YYYY-MM-DD
@@ -63,6 +63,18 @@ export function parseDateTime(text: string): { startsAt: Date; allDay: boolean }
   const [, d, mon, y, h, min] = m;
   if (h == null) return { startsAt: romeTime(+y, month(mon), +d, 12), allDay: true };
   return { startsAt: romeTime(+y, month(mon), +d, +h, +min), allDay: false };
+}
+
+/**
+ * Orario del giorno `day` (YYYY-MM-DD) scritto nel testo: «lunedì 5 ottobre 2026 alle ore 20.00».
+ * Per le liste che nel JSON-LD danno solo la data ma raccontano l'ora nella descrizione.
+ */
+export function timeOnDay(text: string, day: string): Date | null {
+  for (const m of text.matchAll(new RegExp(DATE_TIME.source, "gi"))) {
+    const [, d, mon, y, h, min] = m;
+    if (h != null && iso(+y, month(mon), +d) === day) return romeTime(+y, month(mon), +d, +h, +min);
+  }
+  return null;
 }
 
 /** Intervallo che parte dal giorno `startDay` (YYYY-MM-DD) ed è più lungo di un giorno, se il testo lo contiene. */

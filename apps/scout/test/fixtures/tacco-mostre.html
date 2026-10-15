@@ -1,0 +1,2628 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+
+<meta name="color-scheme" content="light">
+
+    <link rel="canonical" href="https://iltaccodibacco.it/torino/"/>
+
+    <!--META RUBRICA-->
+    
+                    <meta name="description" content="Mostre, esposizioni ed incontri di arte e fotografia a Torino"/>
+            <meta name="keywords" content="Mostre, esposizioni ed incontri di arte e fotografia a Torino"/>
+        
+
+    
+
+
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+
+
+
+<link rel="apple-touch-icon" href="https://iltaccodibacco.it/i/custom_icon.png" />
+<link rel="icon" href="https://iltaccodibacco.it/favicon.ico?v=2026.09.010" type="image/x-icon" />
+
+<link rel="alternate" type="application/rss+xml" title="Eventi, concerti e spettacolo in Piemonte! il Tacco di Bacco" href="https://iltaccodibacco.it/piemonte/rss.xml" />
+<link rel="alternate" type="application/rss+xml" title="il Blog del Tacco di Bacco - intrattenimento quotidiano" href="https://iltaccodibacco.it/blog/rss.xml" />
+
+<link rel="manifest" href="https://iltaccodibacco.it/manifest.json">
+
+
+<link rel="alternate" href="https://iltaccodibacco.it/torino/mostre/" hreflang="it-IT" />
+<link rel="alternate" href="https://iltaccodibacco.it/torino/mostre/" hreflang="x-default"  />
+
+
+
+<title>
+    Arte e fotografia - Torino -&nbsp;il Tacco di Bacco - Mostre, arte e fotografia in Piemonte</title>
+
+
+<link href="https://iltaccodibacco.it/css/main-tdb.css?v=2026.09.010" rel="stylesheet" type="text/css" />
+<script src="https://iltaccodibacco.it/js/funzioni.js?v=2026.09.010"></script>
+<script src="https://iltaccodibacco.it/js/jquery.min.js"></script>
+
+
+
+<script  src="https://iltaccodibacco.it/js/jquery.placeholder.js"></script>
+
+
+ 
+    <!-- Matomo -->
+    <script type="text/javascript">
+        var _paq = window._paq = window._paq || [];
+        / tracker methods like "setCustomDimension" should be called before "trackPageView" /
+        _paq.push(['trackPageView']);
+        _paq.push(['enableLinkTracking']);
+        (function () {
+            var u = "//matomo.iltaccodibacco.it/";
+            _paq.push(['setTrackerUrl', u + 'matomo.php']);
+            _paq.push(['setSiteId', '1']);
+            _paq.push(['enableLinkTracking']);
+            _paq.push(['trackPageView']);
+            // _paq.push(['trackAllContentImpressions']);
+            _paq.push(['trackVisibleContentImpressions']);
+            var d = document, g = d.createElement('script'), s = d.getElementsByTagName('script')[0];
+            g.type = 'text/javascript';
+            g.async = true;
+            g.src = u + 'matomo.js';
+            s.parentNode.insertBefore(g, s);
+        })();
+    </script>
+    <!-- End Matomo Code -->
+
+    
+</head>
+
+
+
+
+
+
+
+
+
+
+
+
+<body  lang="it">
+
+<input type="hidden" id="sitepath" value="https://iltaccodibacco.it" />
+    <div class="logo-stampa"><img src="https://iltaccodibacco.it/i/tdb-logo-home.png" alt="il Tacco di Bacco"/></div>
+
+<div id="top-bar">
+  <div id="top-bar1">
+    <div id="top-logo">
+        <a href="https://iltaccodibacco.it"><!-- <span class="only_print">il Tacco di Bacco</span> --></a>
+
+    </div>
+
+    
+
+    <div id="top-destra">
+    <div id="top-campi">
+
+        <form name="form_ricerca" action="https://iltaccodibacco.it/" method="get">
+            <input type="hidden" name="reg" value=""/>
+            <input type="hidden" name="lang" value="it"/>
+            <input type="hidden" name="id_localita" value="13109"/>
+            <input type="hidden" name="md" value="Ricerca"/>
+
+                            <input id="top_bar_des_ricerca" name="des_ricerca" type="text" placeholder="Cerca sul TdB!"/>
+                <input name="vai" type="button" value="Vai!" class="button" onclick="document.form_ricerca.submit();"/>
+            
+            <input type="hidden" name="c_all" value="1"/>
+            <input type="hidden" name="src" value="basic"/>
+        </form>
+
+        </div>
+
+        <div id="language-selector">
+                                  <button id="language-toggle" onclick="toggleLanguageDropdown()">It</button>
+    <div id="language-dropdown" style="display: none;">
+        <a href="#" onclick="switchLanguage('it', 'It')">Italiano</a>
+        <a href="#" onclick="switchLanguage('en', 'En')">English</a>
+    </div>
+</div>
+
+
+<!-- JavaScript per la gestione del selettore di lingua -->
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        var currentUrl = window.location.href;
+        var langCode = 'it';
+        var langText = 'It';
+
+        if (currentUrl.includes('/en/')) {
+            langCode = 'en';
+            langText = 'En';
+        } else if (currentUrl.includes('/it/')) {
+            langCode = 'it';
+            langText = 'It';
+        }
+
+        document.getElementById('language-toggle').textContent = langText;
+
+        sessionStorage.setItem('selectedLangCode', langCode);
+        sessionStorage.setItem('selectedLangText', langText);
+    });
+
+    function toggleLanguageDropdown() {
+        var dropdown = document.getElementById('language-dropdown');
+        if (dropdown.style.display === 'none') {
+            dropdown.style.display = 'block';
+        } else {
+            dropdown.style.display = 'none';
+        }
+    }
+
+    function switchLanguage(langCode, langText) {
+        var currentUrl = window.location.href;
+        var baseUrl = "https://iltaccodibacco.it";
+
+        sessionStorage.setItem('selectedLangCode', langCode);
+        sessionStorage.setItem('selectedLangText', langText);
+
+        document.getElementById('language-toggle').textContent = langText;
+
+        event.preventDefault();
+
+        var newUrl;
+        if (currentUrl.includes('/en/')) {
+            if(langCode === 'it') newUrl = currentUrl.replace('/en/', '/');
+            else newUrl = currentUrl.replace('/en/', '/' + langCode + '/');
+        } else {
+            if(langCode === 'it') newUrl = baseUrl + currentUrl.substring(baseUrl.length);
+            else newUrl = baseUrl + '/' + langCode + currentUrl.substring(baseUrl.length);
+        }
+
+        setTimeout(function() {
+            window.location.href = newUrl;
+        }, 100);
+    }
+</script>
+
+        <div id="tdb-login">
+
+
+
+                <a href="https://iltaccodibacco.it/login">Accedi</a>
+    &nbsp;
+
+        <a href="https://iltaccodibacco.it/registrati">Registrati</a>
+    &nbsp;
+</div>
+
+  </div></div>
+  <div id="top-bar2"></div>
+</div>
+
+
+<script type="text/javascript">
+
+    var desRicerca = document.getElementById('top_bar_des_ricerca');
+    desRicerca.addEventListener('focusout', function () {
+        desRicerca.value = ToRegular(desRicerca.value);
+    });
+</script>
+
+
+<script src="https://iltaccodibacco.it/js/chars_cleaner.js"></script>
+
+
+
+
+
+
+
+<div align="center" >
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="cornice"  >
+
+
+
+
+    <div class="tdb-top-path">
+
+
+
+        <div class="tdb-top-path-left">
+<div id="tdb-path">
+    <ul>
+        
+        
+        
+        
+        
+                    <li><a href="https://iltaccodibacco.it/piemonte/" title="eventi in  Piemonte">Piemonte</a></li>
+        
+        
+        
+                    <li>&rsaquo; <a href="https://iltaccodibacco.it/torino/" title="eventi a Torino">Torino</a>
+            </li>
+        
+        
+                    <li> e dintorni </a>
+            </li>
+        
+                    <li>&rsaquo; Arte e fotografia</li>
+            </ul>
+    &nbsp;
+</div>
+</div>
+
+
+<div class="tdb-top-path-right">
+
+    Oggi &egrave; gioved&igrave; 15 ottobre 2026!
+
+    
+
+</div>
+</div>
+<div style="clear:both;"></div>
+
+
+<div id="tdb_sinistra">
+
+
+
+
+    
+
+
+    			
+<script type="text/javascript" language="javascript">
+/* <![CDATA[ */
+
+
+function set_mean(mean)
+{
+    $.get(document.getElementById("sitepath").value+"/"+"index.php?md=Gateway&az=setMean&set_mean="+mean, function(data) {
+        if (data) {
+            //var dati = data.split('|');
+            //window.alert(position.coords.latitude);
+            //window.alert(dati[2]);
+            //window.alert(document.getElementById("sitepath").value+"/"+"ric_loc.php?lat="+position.coords.latitude+'&amp;long='+position.coords.longitude);
+        	document.location.reload();
+
+
+        }
+    });
+}
+
+
+
+
+/* ]]> */
+
+
+</script>
+
+
+
+
+
+
+
+<input type="hidden" id="reg" value="piemonte" />
+<input type="hidden" id="localita" value="localita" />
+
+
+<p><strong>Sfoglia le citt&agrave;</strong></p>
+
+<table cellpadding="0"  >
+    <!--
+	<tr>
+		<td class="testa_box">
+			<a href="#" onclick="geolocalizzazione(); return false;">Lasciami indovinare!</a>
+		</td>
+	</tr>
+		-->
+
+		<tr>
+		<td >
+                            <a href="https://iltaccodibacco.it/alessandria/mostre/" title="eventi, concerti e spettacoli a Alessandria" >Alessandria</a>
+            	  	</td>
+	  </tr>
+		<tr>
+		<td >
+                            <a href="https://iltaccodibacco.it/asti/mostre/" title="eventi, concerti e spettacoli a Asti" >Asti</a>
+            	  	</td>
+	  </tr>
+		<tr>
+		<td >
+                            <a href="https://iltaccodibacco.it/biella/mostre/" title="eventi, concerti e spettacoli a Biella" >Biella</a>
+            	  	</td>
+	  </tr>
+		<tr>
+		<td >
+                            <a href="https://iltaccodibacco.it/novara/mostre/" title="eventi, concerti e spettacoli a Novara" >Novara</a>
+            	  	</td>
+	  </tr>
+		<tr>
+		<td >
+                            <a href="https://iltaccodibacco.it/rivoli/mostre/" title="eventi, concerti e spettacoli a Rivoli" >Rivoli</a>
+            	  	</td>
+	  </tr>
+		<tr>
+		<td class="testa">
+                            <a href="https://iltaccodibacco.it/torino/mostre/" title="eventi, concerti e spettacoli a Torino" >Torino</a>
+            	  	</td>
+	  </tr>
+		<tr>
+		<td >
+                            <a href="https://iltaccodibacco.it/vercelli/mostre/" title="eventi, concerti e spettacoli a Vercelli" >Vercelli</a>
+            	  	</td>
+	  </tr>
+	
+
+</table>
+
+
+
+
+
+<a href="#" onclick="return false;" id="link_cambia_localita" class="titolo-widget"><img src="https://iltaccodibacco.it/i/freccia.png" width="11" height="10" alt="freccia" />
+   Torino
+
+</a>
+
+
+<div id="cambia_localita">
+
+   <p>
+   <a href="https://iltaccodibacco.it/piemonte/">Sfoglia la regione Piemonte</a>
+   </p>
+
+   <p>
+
+  <strong> Sfoglia le citt&agrave;</strong>
+</p>
+
+<table cellpadding="0" cellspacing="6" >
+    <!--
+<tr>
+        <td class="testa_box">
+            <a href="#" onclick="geolocalizzazione(); return false;">Lasciami indovinare!</a>
+        </td>
+    </tr>
+      -->
+
+    <tr>
+        <td >
+            <a href="https://iltaccodibacco.it/alessandria/" title="eventi, concerti e spettacoli a Alessandria" >Alessandria</a>
+        </td>
+      </tr>
+        <tr>
+        <td >
+            <a href="https://iltaccodibacco.it/asti/" title="eventi, concerti e spettacoli a Asti" >Asti</a>
+        </td>
+      </tr>
+        <tr>
+        <td >
+            <a href="https://iltaccodibacco.it/biella/" title="eventi, concerti e spettacoli a Biella" >Biella</a>
+        </td>
+      </tr>
+        <tr>
+        <td >
+            <a href="https://iltaccodibacco.it/novara/" title="eventi, concerti e spettacoli a Novara" >Novara</a>
+        </td>
+      </tr>
+        <tr>
+        <td >
+            <a href="https://iltaccodibacco.it/rivoli/" title="eventi, concerti e spettacoli a Rivoli" >Rivoli</a>
+        </td>
+      </tr>
+        <tr>
+        <td class="testa">
+            <a href="https://iltaccodibacco.it/torino/" title="eventi, concerti e spettacoli a Torino" >Torino</a>
+        </td>
+      </tr>
+        <tr>
+        <td >
+            <a href="https://iltaccodibacco.it/vercelli/" title="eventi, concerti e spettacoli a Vercelli" >Vercelli</a>
+        </td>
+      </tr>
+    
+</table>
+</div>
+
+<br />
+
+
+
+
+
+
+
+<script type="text/javascript" language="javascript">
+
+$("#cambia_localita").hide();
+
+$("#link_cambia_localita").click(function() {
+
+    if ($("#cambia_localita").is(':hidden')) {
+           $("#cambia_localita").show('fast');
+        //   $("#link_cambia_localita").text('Nascondi');
+    } else {
+        $("#cambia_localita").hide('fast');
+
+       // $("#link_cambia_localita").text('Dove ti trovi?');
+    }
+});
+
+</script>
+
+
+
+        <div style="clear:both;"></div>
+
+
+   <div class="tdb-attributi">
+   
+         <div class="tdb-attributo-sidebar">
+
+
+            <a href="https://iltaccodibacco.it/torino/">
+                  
+              <img src="https://iltaccodibacco.it/i/eventi.png" border="0" alt="eventi a Torino"/>              
+    <span>     Agenda eventi </span>
+            </a>
+
+            </div>
+  
+    <!-- attributi eventi -->
+
+                
+                    <div class="tdb-attributo-sidebar" >
+
+             <a href="https://iltaccodibacco.it/torino/mostre/" title="Arte e fotografia Torino">
+
+        
+       <img src="https://iltaccodibacco.it/i/arte-e-fotografia.png"  border="0" alt="Arte e fotografia" >
+                  <span>
+             Arte e fotografia
+                 </span></a>
+             </div>
+
+                 
+
+
+
+                        <div class="tdb-attributo-sidebar" >
+
+             <a href="https://iltaccodibacco.it/torino/beneficenza/" title="Beneficenza Torino">
+
+        
+       <img src="https://iltaccodibacco.it/i/beneficenza.png"  border="0" alt="Beneficenza" >
+                  <span>
+             Beneficenza
+                 </span></a>
+             </div>
+
+                 
+
+
+
+                        <div class="tdb-attributo-sidebar" >
+
+             <a href="https://iltaccodibacco.it/torino/cabaret/" title="Cabaret & Comedy Torino">
+
+        
+       <img src="https://iltaccodibacco.it/i/cabaret.png"  border="0" alt="Cabaret & Comedy" >
+                  <span>
+             Cabaret & Comedy
+                 </span></a>
+             </div>
+
+                 
+
+
+
+                        <div class="tdb-attributo-sidebar" >
+
+             <a href="https://iltaccodibacco.it/torino/cinema/" title="Cinema Torino">
+
+        
+       <img src="https://iltaccodibacco.it/i/cinema.png"  border="0" alt="Cinema" >
+                  <span>
+             Cinema
+                 </span></a>
+             </div>
+
+                 
+
+
+
+                        <div class="tdb-attributo-sidebar" >
+
+             <a href="https://iltaccodibacco.it/torino/classica-lirica-sinfonica/" title="Classica e Lirica Torino">
+
+        
+       <img src="https://iltaccodibacco.it/i/musica-classica.png"  border="0" alt="Classica e Lirica" >
+                  <span>
+             Classica e Lirica
+                 </span></a>
+             </div>
+
+                 
+
+
+
+                        <div class="tdb-attributo-sidebar" >
+
+             <a href="https://iltaccodibacco.it/torino/concerti/" title="Concerti Torino">
+
+        
+       <img src="https://iltaccodibacco.it/i/musica-e-concerti.png"  border="0" alt="Concerti" >
+                  <span>
+             Concerti
+                 </span></a>
+             </div>
+
+                 
+
+
+
+                        <div class="tdb-attributo-sidebar" >
+
+             <a href="https://iltaccodibacco.it/torino/danza/" title="Danza e balletto Torino">
+
+        
+       <img src="https://iltaccodibacco.it/i/danza.png"  border="0" alt="Danza e balletto" >
+                  <span>
+             Danza e balletto
+                 </span></a>
+             </div>
+
+                 
+
+
+
+                        <div class="tdb-attributo-sidebar" >
+
+             <a href="https://iltaccodibacco.it/torino/enogastronomia/" title="Enogastronomia Torino">
+
+        
+       <img src="https://iltaccodibacco.it/i/enogastronomia.png"  border="0" alt="Enogastronomia" >
+                  <span>
+             Enogastronomia
+                 </span></a>
+             </div>
+
+                 
+
+
+
+                        <div class="tdb-attributo-sidebar" >
+
+             <a href="https://iltaccodibacco.it/torino/avventure/" title="Escursioni Torino">
+
+        
+       <img src="https://iltaccodibacco.it/i/avventura.png"  border="0" alt="Escursioni" >
+                  <span>
+             Escursioni
+                 </span></a>
+             </div>
+
+                 
+
+
+
+                        <div class="tdb-attributo-sidebar" >
+
+             <a href="https://iltaccodibacco.it/torino/geek/" title="Eventi geek Torino">
+
+        
+       <img src="https://iltaccodibacco.it/i/eventi-geek.png"  border="0" alt="Eventi geek" >
+                  <span>
+             Eventi geek
+                 </span></a>
+             </div>
+
+                 
+
+
+
+                        <div class="tdb-attributo-sidebar" >
+
+             <a href="https://iltaccodibacco.it/torino/forkids/" title="Eventi per bambini Torino">
+
+        
+       <img src="https://iltaccodibacco.it/i/eventi-per-bambini.png"  border="0" alt="Eventi per bambini" >
+                  <span>
+             Eventi per bambini
+                 </span></a>
+             </div>
+
+                 
+
+
+
+                        <div class="tdb-attributo-sidebar" >
+
+             <a href="https://iltaccodibacco.it/torino/sport/" title="Eventi sportivi Torino">
+
+        
+       <img src="https://iltaccodibacco.it/i/sport.png"  border="0" alt="Eventi sportivi" >
+                  <span>
+             Eventi sportivi
+                 </span></a>
+             </div>
+
+                 
+
+
+
+                        <div class="tdb-attributo-sidebar" >
+
+             <a href="https://iltaccodibacco.it/torino/incontri/" title="Incontri culturali Torino">
+
+        
+       <img src="https://iltaccodibacco.it/i/incontri-culturali.png"  border="0" alt="Incontri culturali" >
+                  <span>
+             Incontri culturali
+                 </span></a>
+             </div>
+
+                 
+
+
+
+                        <div class="tdb-attributo-sidebar" >
+
+             <a href="https://iltaccodibacco.it/torino/jazz/" title="Jazz e dintorni Torino">
+
+        
+       <img src="https://iltaccodibacco.it/i/jazz.png"  border="0" alt="Jazz e dintorni" >
+                  <span>
+             Jazz e dintorni
+                 </span></a>
+             </div>
+
+                 
+
+
+
+                        <div class="tdb-attributo-sidebar" >
+
+             <a href="https://iltaccodibacco.it/torino/laboratori/" title="Laboratori e workshop Torino">
+
+        
+       <img src="https://iltaccodibacco.it/i/laboratori.png"  border="0" alt="Laboratori e workshop" >
+                  <span>
+             Laboratori e workshop
+                 </span></a>
+             </div>
+
+                 
+
+
+
+                        <div class="tdb-attributo-sidebar" >
+
+             <a href="https://iltaccodibacco.it/torino/libri/" title="Libri Torino">
+
+        
+       <img src="https://iltaccodibacco.it/i/libri.png"  border="0" alt="Libri" >
+                  <span>
+             Libri
+                 </span></a>
+             </div>
+
+                 
+
+
+
+                        <div class="tdb-attributo-sidebar" >
+
+             <a href="https://iltaccodibacco.it/torino/mercatini/" title="Mercatini Torino">
+
+        
+       <img src="https://iltaccodibacco.it/i/mercatini.png"  border="0" alt="Mercatini" >
+                  <span>
+             Mercatini
+                 </span></a>
+             </div>
+
+                 
+
+
+
+                        <div class="tdb-attributo-sidebar" >
+
+             <a href="https://iltaccodibacco.it/torino/musical/" title="Musical Torino">
+
+        
+       <img src="https://iltaccodibacco.it/i/musical.png"  border="0" alt="Musical" >
+                  <span>
+             Musical
+                 </span></a>
+             </div>
+
+                 
+
+
+
+                        <div class="tdb-attributo-sidebar" >
+
+             <a href="https://iltaccodibacco.it/torino/pet-friendly/" title="Pet friendly Torino">
+
+        
+       <img src="https://iltaccodibacco.it/i/cani.png"  border="0" alt="Pet friendly" >
+                  <span>
+             Pet friendly
+                 </span></a>
+             </div>
+
+                 
+
+
+
+                        <div class="tdb-attributo-sidebar" >
+
+             <a href="https://iltaccodibacco.it/torino/spettacoli/" title="Teatro Torino">
+
+        
+       <img src="https://iltaccodibacco.it/i/teatro-e-danza.png"  border="0" alt="Teatro" >
+                  <span>
+             Teatro
+                 </span></a>
+             </div>
+
+                 
+
+
+
+                        <div class="tdb-attributo-sidebar" >
+
+             <a href="https://iltaccodibacco.it/torino/nightlife/" title="Vita notturna Torino">
+
+        
+       <img src="https://iltaccodibacco.it/i/vita-notturna.png"  border="0" alt="Vita notturna" >
+                  <span>
+             Vita notturna
+                 </span></a>
+             </div>
+
+                 
+
+
+
+        
+
+ 	   </div>
+
+
+
+
+
+
+
+
+
+            <!-- attributi location -->
+
+
+
+
+<script type="text/javascript" language="javascript">
+
+
+
+$("#specifica_indirizzo").click(function () {
+
+	$(this).hide();
+	$("#box_indirizzo").show();
+    $("#ok_indirizzo").show();
+
+
+});
+
+
+</script>
+
+
+
+
+
+
+
+
+            <p><br /><br />
+            </p>
+
+            
+            
+
+
+
+
+<!-- banner di sinistra (google o pubblicita) -->
+
+<!-- fine banner di sinistra -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- banner di sinistra (google o pubblicita) -->
+
+
+        
+
+<!-- fine banner di sinistra -->
+
+
+
+
+
+
+
+
+<!-- fine blocco eventi settimanali -->
+        
+
+
+
+        </div>
+
+
+
+        <div id="tdb_centrale">
+
+            
+
+
+
+                     <!-- blocco eventi -->
+         
+
+            
+
+            
+ 
+            <!--blocco_centrale-->
+            
+
+
+
+                    
+    
+    
+                    <h1>Arte e fotografia a Torino e dintorni</h1>
+            <h2 class="h2testata">Mostra d'arte, estemporanee, mostre fotografiche e arte digitale.</h2>
+        
+    
+
+            <div class="sceglirubriche"><div><a href="https://iltaccodibacco.it/torino/">Arte e fotografia  <img src="https://iltaccodibacco.it/i/xblu.png" alt="Tutte le rubriche"/></a></div></div>
+                <div class="sceglirubriche"> <div id="trigger-dintorni"><a href="#" onclick="return false;">
+                        Nei dintorni di 20km <img src="https://iltaccodibacco.it/i/lentina.png" alt="Tutte le rubriche"/>            </a></div>
+        </div>
+    
+
+    <ul id="menu-rubriche">
+        <div>
+            <a href="#" class="close" onclick="closeRubrica(); return false;"><img src="https://iltaccodibacco.it/i/xgrigia.png" class="chiudi" alt="X"></a>
+
+            <p class="testa">Scegli la rubrica</p>
+            
+
+            
+                <li class="rub15"><a href="https://iltaccodibacco.it/torino/mostre/">
+
+
+                        <img src="https://iltaccodibacco.it/i/arte-e-fotografia.png" alt="Arte e fotografia" />
+                        Arte e fotografia 
+
+                                                
+                    </a></li>
+            
+                <li class="rub48"><a href="https://iltaccodibacco.it/torino/beneficenza/">
+
+
+                        <img src="https://iltaccodibacco.it/i/beneficenza.png" alt="Beneficenza" />
+                        Beneficenza 
+
+                                                
+                    </a></li>
+            
+                <li class="rub41"><a href="https://iltaccodibacco.it/torino/cabaret/">
+
+
+                        <img src="https://iltaccodibacco.it/i/cabaret.png" alt="Cabaret & Comedy" />
+                        Cabaret & Comedy 
+
+                                                
+                    </a></li>
+            
+                <li class="rub16"><a href="https://iltaccodibacco.it/torino/cinema/">
+
+
+                        <img src="https://iltaccodibacco.it/i/cinema.png" alt="Cinema" />
+                        Cinema 
+
+                                                
+                    </a></li>
+            
+                <li class="rub6"><a href="https://iltaccodibacco.it/torino/classica-lirica-sinfonica/">
+
+
+                        <img src="https://iltaccodibacco.it/i/musica-classica.png" alt="Classica e Lirica" />
+                        Classica e Lirica 
+
+                                                
+                    </a></li>
+            
+                <li class="rub7"><a href="https://iltaccodibacco.it/torino/concerti/">
+
+
+                        <img src="https://iltaccodibacco.it/i/musica-e-concerti.png" alt="Concerti" />
+                        Concerti 
+
+                                                
+                    </a></li>
+            
+                <li class="rub44"><a href="https://iltaccodibacco.it/torino/danza/">
+
+
+                        <img src="https://iltaccodibacco.it/i/danza.png" alt="Danza e balletto" />
+                        Danza e balletto 
+
+                                                
+                    </a></li>
+            
+                <li class="rub37"><a href="https://iltaccodibacco.it/torino/enogastronomia/">
+
+
+                        <img src="https://iltaccodibacco.it/i/enogastronomia.png" alt="Enogastronomia" />
+                        Enogastronomia 
+
+                                                
+                    </a></li>
+            
+                <li class="rub35"><a href="https://iltaccodibacco.it/torino/avventure/">
+
+
+                        <img src="https://iltaccodibacco.it/i/avventura.png" alt="Escursioni" />
+                        Escursioni 
+
+                                                
+                    </a></li>
+            
+                <li class="rub34"><a href="https://iltaccodibacco.it/torino/geek/">
+
+
+                        <img src="https://iltaccodibacco.it/i/eventi-geek.png" alt="Eventi geek" />
+                        Eventi geek 
+
+                                                
+                    </a></li>
+            
+                <li class="rub31"><a href="https://iltaccodibacco.it/torino/forkids/">
+
+
+                        <img src="https://iltaccodibacco.it/i/eventi-per-bambini.png" alt="Eventi per bambini" />
+                        Eventi per bambini 
+
+                                                
+                    </a></li>
+            
+                <li class="rub45"><a href="https://iltaccodibacco.it/torino/sport/">
+
+
+                        <img src="https://iltaccodibacco.it/i/sport.png" alt="Eventi sportivi" />
+                        Eventi sportivi 
+
+                                                
+                    </a></li>
+            
+                <li class="rub10"><a href="https://iltaccodibacco.it/torino/incontri/">
+
+
+                        <img src="https://iltaccodibacco.it/i/incontri-culturali.png" alt="Incontri culturali" />
+                        Incontri culturali 
+
+                                                
+                    </a></li>
+            
+                <li class="rub36"><a href="https://iltaccodibacco.it/torino/jazz/">
+
+
+                        <img src="https://iltaccodibacco.it/i/jazz.png" alt="Jazz e dintorni" />
+                        Jazz e dintorni 
+
+                                                
+                    </a></li>
+            
+                <li class="rub49"><a href="https://iltaccodibacco.it/torino/laboratori/">
+
+
+                        <img src="https://iltaccodibacco.it/i/laboratori.png" alt="Laboratori e workshop" />
+                        Laboratori e workshop 
+
+                                                
+                    </a></li>
+            
+                <li class="rub51"><a href="https://iltaccodibacco.it/torino/libri/">
+
+
+                        <img src="https://iltaccodibacco.it/i/libri.png" alt="Libri" />
+                        Libri 
+
+                                                
+                    </a></li>
+            
+                <li class="rub46"><a href="https://iltaccodibacco.it/torino/mercatini/">
+
+
+                        <img src="https://iltaccodibacco.it/i/mercatini.png" alt="Mercatini" />
+                        Mercatini 
+
+                                                
+                    </a></li>
+            
+                <li class="rub50"><a href="https://iltaccodibacco.it/torino/musical/">
+
+
+                        <img src="https://iltaccodibacco.it/i/musical.png" alt="Musical" />
+                        Musical 
+
+                                                
+                    </a></li>
+            
+                <li class="rub47"><a href="https://iltaccodibacco.it/torino/pet-friendly/">
+
+
+                        <img src="https://iltaccodibacco.it/i/cani.png" alt="Pet friendly" />
+                        Pet friendly 
+
+                                                
+                    </a></li>
+            
+                <li class="rub29"><a href="https://iltaccodibacco.it/torino/spettacoli/">
+
+
+                        <img src="https://iltaccodibacco.it/i/teatro-e-danza.png" alt="Teatro" />
+                        Teatro 
+
+                                                
+                    </a></li>
+            
+                <li class="rub8"><a href="https://iltaccodibacco.it/torino/nightlife/">
+
+
+                        <img src="https://iltaccodibacco.it/i/vita-notturna.png" alt="Vita notturna" />
+                        Vita notturna 
+
+                                                
+                    </a></li>
+                    </div>
+    </ul>
+<div id="menu-calendario" >
+
+    Calendario
+    
+
+</div>
+<div id="menu-dintorni">
+        <div>
+            <a href="#" class="close" onclick="closeDintorni(); return false;"><img src="https://iltaccodibacco.it/i/xgrigia.png" class="chiudi" alt="X"></a>
+
+            <p class="testa">Scegli il raggio desiderato</p>
+
+            <ul>
+
+                <div id="search"></div>
+
+                <div id="default">
+
+                    <li><a href="#" onclick="set_dintorni(20)">Nei dintorni di 20 km</a></li>
+
+                    <li><a href="#" onclick="set_dintorni(50)">Nei dintorni di 50 km</a></li>
+
+                    <li><a href="#" onclick="set_dintorni(0)">Solo a Torino</a></li>
+
+                    <li>                        <a href="https://iltaccodibacco.it/piemonte/">Tutta la Piemonte</a>
+                                        </li>
+
+                </div>
+
+
+
+                <li class="cerca">
+                    <form method="get" id="form_ricerca" action='https://iltaccodibacco.it/'>
+                        <input type="hidden" name="md" value="Gateway">
+                        <input type="hidden" name="az" value="cercaLocalita">
+                        <input type="text" name="term" placeholder="Digita il nome della tua citt&agrave;">
+                        <input name="vai" type="submit" value="Vai!" class="button" onclick='resetCerca(); cerca(); return false;' />
+                    </form>
+                </li>
+
+            </ul>
+        </div>
+    </div>
+
+    <div id="menu-citta">
+        <div>
+            <a href="#" class="close" onclick="closeCitta(); return false;"><img src="https://iltaccodibacco.it/i/xgrigia.png" class="chiudi" alt="X"></a>
+
+            <p class="testa">Seleziona la tua citt&agrave;</p>
+
+
+            <ul>
+
+                <div id="search2"></div>
+
+                <div id="default2">
+                                                                        <li>   <a href="https://iltaccodibacco.it/alessandria/" title="eventi, concerti e spettacoli a Alessandria" >
+
+                                    Alessandria
+
+                                </a> </li>
+                                                    <li>   <a href="https://iltaccodibacco.it/asti/" title="eventi, concerti e spettacoli a Asti" >
+
+                                    Asti
+
+                                </a> </li>
+                                                    <li>   <a href="https://iltaccodibacco.it/biella/" title="eventi, concerti e spettacoli a Biella" >
+
+                                    Biella
+
+                                </a> </li>
+                                                    <li>   <a href="https://iltaccodibacco.it/novara/" title="eventi, concerti e spettacoli a Novara" >
+
+                                    Novara
+
+                                </a> </li>
+                                                    <li>   <a href="https://iltaccodibacco.it/rivoli/" title="eventi, concerti e spettacoli a Rivoli" >
+
+                                    Rivoli
+
+                                </a> </li>
+                                                    <li>   <a href="https://iltaccodibacco.it/torino/" title="eventi, concerti e spettacoli a Torino" >
+
+                                    Torino
+
+                                </a> </li>
+                                                    <li>   <a href="https://iltaccodibacco.it/vercelli/" title="eventi, concerti e spettacoli a Vercelli" >
+
+                                    Vercelli
+
+                                </a> </li>
+                                                            </div>
+
+                <li class="cerca">
+                    <form method="get" id="form_ricerca" action='https://iltaccodibacco.it/'>
+                        <input type="hidden" name="md" value="Gateway">
+                        <input type="hidden" name="az" value="cercaLocalita">
+                        <input type="text" name="term" placeholder="Digita il nome della tua citt&agrave;">
+                        <input name="vai" type="submit" value="Vai!" class="button" onclick='resetCerca(); cerca(); return false;' />
+                    </form>
+                </li>
+            </ul>
+
+
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<p>
+
+</p>
+
+<script type="text/javascript">
+
+    window.onload = function checkEnter(){
+        var forms = document.querySelectorAll("#form_ricerca");
+        forms.forEach(function(form){
+            form.addEventListener("keydown",event => {
+                if(event.keyCode === 13){
+                    event.preventDefault();
+                    cerca();
+                }
+            });
+        });
+    }
+
+    function cerca(){
+        let terms=document.getElementsByName("term");
+        let term,results;
+        if(terms[0].value!="")
+        {
+            term=terms[0].value;
+        }
+        else
+        {
+            term=terms[1].value;
+        }
+        const url="https://iltaccodibacco.it/?md=Gateway&az=cercaLocalita&term="+term;
+        fetch(url)
+            .then((resp) => resp.json())
+            .then(function(data){
+                console.log(data);
+                var position=new Array();
+                position[0]=document.getElementById("search");
+                position[1]=document.getElementById("search2");
+                document.getElementById("default").style.display="none";
+                document.getElementById("default2").style.display="none";
+                for(let j = 0; j<=1; j++){
+                    position[j].style.display="initial";
+                    for(let i = 0; i <= data.length-1; i++){
+                        var newLi = document.createElement("li");
+                        var newA = document.createElement("a");
+                        newA.setAttribute("href", "https://iltaccodibacco.it/"+data[i].url+"/");
+                        var newContent=document.createTextNode(data[i].label);
+                        newA.appendChild(newContent);
+                        newLi.appendChild(newA);
+                        position[j].appendChild(newLi);
+                    }
+                }
+            })
+            .catch(function(error) {
+                console.log(error);
+            });
+    }
+
+    // forse da integrare in cerca, temporaneamente chiamata manualmente
+    function resetCerca() {
+        // document.getElementById("search").innerHTML = '';
+        document.getElementById("search2").innerHTML = '';
+        // document.getElementById("default2").innerHTML = '';
+    }
+
+    function closeDintorni(){
+        var container = $("#menu-dintorni");
+        container.removeClass('open');
+        return;
+    }
+
+    function closeCitta(){
+        var container = $("#menu-citta");
+        container.removeClass('open');
+        return;
+    }
+
+    function closeRubrica(){
+        var container = $("#menu-rubriche");
+        container.removeClass('open');
+        return;
+    }
+
+    function closeQuartieri(){
+        // var container = $("#menu-quartieri");
+        // container.removeClass('open');
+        // return;
+    }
+
+    window.onload = function checkdivQuartieri(){
+        // let flag=false;
+        // if(document.getElementById("trigger-quartieri")!=null){
+        //     let divs=document.getElementsByClassName("sceglirubriche");
+        //     for(i in divs){
+        //         divs[i].className="sceglirubriche2";
+        //     }
+        // }
+    }
+
+</script>
+
+<script type="text/javascript">
+
+    
+    function set_dintorni(distanza)
+    {
+        $.get(document.getElementById("sitepath").value+"/"+"index.php?md=Gateway&az=setDintorni&val="+distanza, function(data) {
+            if (data) {
+                document.location.reload();
+            }
+        });
+    }
+
+    function toggleSfogliaRubriche() {
+
+    }
+
+    $(document).ready( function () {
+
+        $('#trigger-rubriche').on('click', function () {
+            $('#menu-rubriche').toggleClass('open');
+        })
+
+        $('#trigger-calendario').on('click', function () {
+            $('#menu-calendario').toggleClass('open');
+        })
+
+    });
+
+    $(document).ready( function () {
+
+        $('#trigger-dintorni').on('click', function () {
+            $('#menu-dintorni').toggleClass('open');
+            document.getElementById("default").style.display="initial";
+            document.getElementById("search").style.display="none";
+            document.getElementsByName("term")[0].value="";
+        })
+
+
+    });
+
+    $(document).ready( function () {
+
+        $('#trigger-citta').on('click', function () {
+            $('#menu-citta').toggleClass('open');
+            document.getElementById("default2").style.display="initial";
+            document.getElementById("search2").style.display="none";
+            document.getElementsByName("term")[1].value="";
+        })
+
+
+    });
+
+    $(document).ready( function () {
+        // $('#trigger-quartieri').on('click', function () {
+        //     $('#menu-quartieri').toggleClass('open');
+        //     /*document.getElementById("default2").style.display="initial";
+        //     document.getElementById("search2").style.display="none";
+        //     document.getElementsByName("term")[1].value="";*/
+        // })
+    });
+
+    $(document).mouseup(function(e)
+    {
+        var container = $("#menu-rubriche");
+
+        // if the target of the click isn't the container nor a descendant of the container
+        if (!container.is(e.target) && container.has(e.target).length === 0 && container.css('display') == 'block')
+        {
+            container.removeClass('open');
+        }
+    });
+
+    $(document).mouseup(function(e)
+    {
+        var container = $("#menu-dintorni");
+
+        // if the target of the click isn't the container nor a descendant of the container
+        if (!container.is(e.target) && container.has(e.target).length === 0 && container.css('display') == 'block')
+        {
+            container.removeClass('open');
+        }
+    });
+
+    $(document).mouseup(function(e)
+    {
+        var container = $("#menu-citta");
+
+        // if the target of the click isn't the container nor a descendant of the container
+        if (!container.is(e.target) && container.has(e.target).length === 0 && container.css('display') == 'block')
+        {
+            container.removeClass('open');
+        }
+    });
+
+    // $(document).mouseup(function(e)
+    // {
+    //     var container = $("#menu-quartieri");
+    //
+    //     // if the target of the click isn't the container nor a descendant of the container
+    //     if (!container.is(e.target) && container.has(e.target).length === 0 && container.css('display') == 'block')
+    //     {
+    //         container.removeClass('open');
+    //     }
+    // });
+
+
+</script>
+                
+            <div class="link-eventi-regione">
+
+            <a href="https://iltaccodibacco.it/torino/mostre/" style="color: #cbe7fa">
+                Tutte le mostre in corso</a>
+        </div>
+        <div class="link-eventi-regione">
+
+            <a href="https://iltaccodibacco.it/torino/vernissage/" >Solo i prossimi vernissage</a>
+        </div>
+
+
+        <div style="clear:both;"></div>
+    
+
+    <div id="blocco_eventi">
+
+    <style>
+    .mostre-in-corso-wrapper {
+        overflow-x: auto;
+        white-space: nowrap;
+        padding: 10px 0;
+    }
+
+    .mostre-in-corso-scroll {
+        display: flex;
+        gap: 20px;
+    }
+
+    .mostra-item {
+        width: 180px;
+        height: 265px;
+        flex: 0 0 auto;
+        border-radius: 5px;
+        overflow: hidden;
+    }
+
+    .mostra-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+</style>
+
+
+
+
+
+    
+
+    
+    
+
+                        <h3 class="h3date">Oggi</h3>
+                    
+    
+    
+
+
+    
+
+<script type="application/ld+json">
+        {"@context":"http:\/\/schema.org","@type":"Event","name":"Venaria | Atelier dei Moderni. Matisse, Braque, Picasso, Bacon","startDate":"2026-10-02","endDate":"2027-02-14","description":"Alla Reggia di Venaria, nelle Sale delle Arti, \u00e8 in programma Atelier dei Moderni. Matisse, Braque, Picasso, Bacon, una mostra dedicata alle molteplici espressioni della pittura del Novecento. L\u2019esposizione, realizzata dal Consorzio delle ...","url":"https:\/\/iltaccodibacco.it\/piemonte\/eventi\/332213.html","image":"https:\/\/iltaccodibacco.it\/img_eventi\/2026\/10\/332213_20261001_162421.jpg","eventAttendanceMode":"https:\/\/schema.org\/OfflineEventAttendanceMode","eventStatus":"https:\/\/schema.org\/EventScheduled","location":{"@type":"Place","sameAs":"https:\/\/iltaccodibacco.it\/venaria\/reggia-di-venaria","name":"Reggia di Venaria","address":{"@type":"PostalAddress","addressCountry":"IT","addressLocality":"Venaria","streetAddress":"Piazza della Repubblica, 4, 10078 Venaria Reale TO, Italia"}}}
+ </script>
+
+
+    <div class="evento-featured">
+
+
+            <div class="regular-center">
+                <div class="label-container">
+                                    </div>
+                
+    
+
+<div class="testa">         dal 2 ottobre 2026 al 14 febbraio 2027 in mostra</div>
+
+
+    <div class="evento-data">
+        <a href="https://iltaccodibacco.it/venaria/reggia-di-venaria">Reggia di Venaria</a> Venaria <span style="color: grey">Torino</span>
+
+    </div>
+
+
+
+
+
+
+    <div class="titolo blocco-locali">
+
+        
+            <h2>
+                <a name="332213" href="https://iltaccodibacco.it/piemonte/eventi/332213.html" itemprop="url">
+                    Atelier dei Moderni. Matisse, Braque, Picasso, Bacon
+                </a>
+
+            </h2>
+
+        
+
+
+    </div>
+                
+<div style="clear:both;"></div>
+
+        <div class="evento-img" >
+        <a name="332213" href="https://iltaccodibacco.it/piemonte/eventi/332213.html" >
+        <img src="https://iltaccodibacco.it/img_eventi/2026/10/332213_20261001_162421.jpg"
+             srcset="https://iltaccodibacco.it/img_eventi/2026/10/332213_20261001_162421.jpg 1x,https://iltaccodibacco.it/img_eventi/2026/10/332213_20261001_162421.jpg-2.jpg 2x,https://iltaccodibacco.it/img_eventi/2026/10/332213_20261001_162421.jpg-3.jpg 3x"
+             class="evento-tagimg" alt="Atelier dei Moderni. Matisse, Braque, Picasso, Bacon" itemprop="photo" width='180px'/></a>
+    </div>
+        
+<div class="tdb-attributi">
+    <!--  normali -->
+                        <div class="tdb-attributo">
+                                    <img
+                            src="https://iltaccodibacco.it/i/arte-e-fotografia.png"
+                            alt="Arte e fotografia" title="Arte e fotografia" />
+                
+                <span>Arte e fotografia</strong></span>
+            </div>
+        
+    </div>
+<br>
+
+<div class="evento-corpo">
+        Alla Reggia di Venaria, nelle Sale delle Arti, è in programma <b>Atelier dei Moderni. Matisse, Braque, Picasso, Bacon</b>, una mostra dedicata alle molteplici espressioni della pittura del Novece... <a class='tdb-continua' href='https://iltaccodibacco.it/piemonte/eventi/332213.html'>continua</a>
+
+    
+    
+
+    </div>
+
+
+
+
+
+</div>
+
+    </div>
+
+
+
+
+<div class="separatore-eventi" ></div>
+
+        
+
+        
+
+
+
+    
+
+    
+    
+
+
+    
+
+
+
+    
+
+<script type="application/ld+json">
+        {"@context":"http:\/\/schema.org","@type":"Event","name":"Torino | Graphic Days  Il primo festival dedicato al visual e al social design","startDate":"2026-10-15","endDate":"2026-10-25","description":"Dal 15 al 25 ottobre, Torino ospiter\u00e0 l&apos;undicesima edizione dei Graphic Days, il primo festival dedicato al visual e al social design italiano e internazionale, che si terr\u00e0 per la prima volta nei Cantieri Gruppo Building.Questo event...","url":"https:\/\/iltaccodibacco.it\/piemonte\/eventi\/326035.html","image":"https:\/\/iltaccodibacco.it\/img_eventi\/2026\/10\/326035_20260729_180411.jpg","eventAttendanceMode":"https:\/\/schema.org\/OfflineEventAttendanceMode","eventStatus":"https:\/\/schema.org\/EventScheduled","location":{"@type":"Place","name":"Cantieri Gruppo Building Torino","address":{"@type":"PostalAddress","addressCountry":"IT","addressLocality":"Torino","streetAddress":"Cantieri Gruppo Building"}}}
+ </script>
+
+
+    <div class="evento-featured">
+
+
+            <div class="regular-center">
+                <div class="label-container">
+                                            <div class="free-label">Ingresso libero</div>
+                                    </div>
+                
+    
+
+<div class="testa">         dal 15 al 25 ottobre 2026 </div>
+
+
+    <div class="evento-data">
+        <a href=""></a> Torino 
+
+    </div>
+
+
+
+
+
+
+    <div class="titolo blocco-locali">
+
+        
+            <h2>
+                <a name="326035" href="https://iltaccodibacco.it/piemonte/eventi/326035.html" itemprop="url">
+                    Graphic Days  Il primo festival dedicato al visual e al social design
+                </a>
+
+            </h2>
+
+        
+
+
+    </div>
+                
+<div style="clear:both;"></div>
+
+        <div class="evento-img" >
+        <a name="326035" href="https://iltaccodibacco.it/piemonte/eventi/326035.html" >
+        <img src="https://iltaccodibacco.it/img_eventi/2026/10/326035_20260729_180411.jpg"
+             srcset="https://iltaccodibacco.it/img_eventi/2026/10/326035_20260729_180411.jpg 1x"
+             class="evento-tagimg" alt="Graphic Days  Il primo festival dedicato al visual e al social design" itemprop="photo" width='180px'/></a>
+    </div>
+        
+<div class="tdb-attributi">
+    <!--  normali -->
+                        <div class="tdb-attributo">
+                                    <img
+                            src="https://iltaccodibacco.it/i/arte-e-fotografia.png"
+                            alt="Arte e fotografia" title="Arte e fotografia" />
+                
+                <span>Arte e fotografia</strong></span>
+            </div>
+        
+                        <div class="tdb-attributo">
+                                    <img
+                            src="https://iltaccodibacco.it/i/incontri-culturali.png"
+                            alt="Incontri culturali" title="Incontri culturali" />
+                
+                <span>Incontri culturali</strong></span>
+            </div>
+        
+    </div>
+<br>
+
+<div class="evento-corpo">
+        <p>Dal 15 al 25 ottobre, Torino ospiterà l'undicesima edizione dei Graphic Days, il primo festival dedicato al visual e al social design italiano e internazionale, che si terrà per la prima v... <a class='tdb-continua' href='https://iltaccodibacco.it/piemonte/eventi/326035.html'>continua</a></p>
+
+    
+    
+
+    </div>
+
+
+
+
+
+</div>
+
+    </div>
+
+
+
+
+<div class="separatore-eventi" ></div>
+
+        
+
+    
+    
+
+
+    
+
+    
+    
+
+
+    
+
+
+
+            <h3 class="h3date">Nei prossimi giorni</h3>
+        
+
+<script type="application/ld+json">
+        {"@context":"http:\/\/schema.org","@type":"Event","name":"Torino | Notturno a Palazzo Madama Speciale Halloween a Torino","startDate":"2026-10-31","endDate":"2026-10-31","description":"Una notte tra storia e mistero\r\nQuando la sera avvolge Piazza Castello, Palazzo Madama cambia volto e apre le sue porte per una visita fuori dall\u2019ordinario.\r\n\r\nIn occasione del weekend di Halloween, gli eleganti saloni, gli ambienti settec...","url":"https:\/\/iltaccodibacco.it\/piemonte\/eventi\/332742.html","image":"https:\/\/iltaccodibacco.it\/img_eventi\/2026\/10\/332742_20261007_150034.jpg","eventAttendanceMode":"https:\/\/schema.org\/OfflineEventAttendanceMode","eventStatus":"https:\/\/schema.org\/EventScheduled","location":{"@type":"Place","sameAs":"https:\/\/iltaccodibacco.it\/torino\/palazzo-madama","name":"Palazzo Madama","address":{"@type":"PostalAddress","addressCountry":"IT","addressLocality":"Torino","streetAddress":"Piazza Castello, 10"}}}
+ </script>
+
+
+    <div class="evento-featured">
+
+
+            <div class="regular-center">
+                <div class="label-container">
+                                    </div>
+                
+    
+
+<div class="testa">         Sabato 31 ottobre 2026 </div>
+
+
+    <div class="evento-data">
+        <a href="https://iltaccodibacco.it/torino/palazzo-madama">Palazzo Madama</a> Torino 
+
+    </div>
+
+
+
+
+
+
+    <div class="titolo blocco-locali">
+
+        
+            <h2>
+                <a name="332742" href="https://iltaccodibacco.it/piemonte/eventi/332742.html" itemprop="url">
+                    Notturno a Palazzo Madama Speciale Halloween a Torino
+                </a>
+
+            </h2>
+
+        
+
+
+    </div>
+                
+<div style="clear:both;"></div>
+
+        <div class="evento-img" >
+        <a name="332742" href="https://iltaccodibacco.it/piemonte/eventi/332742.html" >
+        <img src="https://iltaccodibacco.it/img_eventi/2026/10/332742_20261007_150034.jpg"
+             srcset="https://iltaccodibacco.it/img_eventi/2026/10/332742_20261007_150034.jpg 1x,https://iltaccodibacco.it/img_eventi/2026/10/332742_20261007_150034.jpg-2.jpg 2x,https://iltaccodibacco.it/img_eventi/2026/10/332742_20261007_150034.jpg-3.jpg 3x"
+             class="evento-tagimg" alt="Notturno a Palazzo Madama Speciale Halloween a Torino" itemprop="photo" width='180px'/></a>
+    </div>
+        
+<div class="tdb-attributi">
+    <!--  normali -->
+                        <div class="tdb-attributo">
+                                    <img
+                            src="https://iltaccodibacco.it/i/arte-e-fotografia.png"
+                            alt="Arte e fotografia" title="Arte e fotografia" />
+                
+                <span>Arte e fotografia</strong></span>
+            </div>
+        
+    </div>
+<br>
+
+<div class="evento-corpo">
+        <b>Una notte tra storia e mistero
+</b>Quando la sera avvolge Piazza Castello, Palazzo Madama cambia volto e apre le sue porte per una visita fuori dall’ordinario.
+
+In occasione del weekend di ... <a class='tdb-continua' href='https://iltaccodibacco.it/piemonte/eventi/332742.html'>continua</a>
+
+    
+    
+
+            <div class="link_segnalato_da" style="color: black"><i>Con video trailer</i></div>
+    </div>
+
+
+
+
+
+</div>
+
+    </div>
+
+
+
+
+<div class="separatore-eventi" ></div>
+
+        
+
+
+
+                
+
+    
+    
+
+
+    
+
+
+
+
+
+<script type="application/ld+json">
+        {"@context":"http:\/\/schema.org","@type":"Event","name":"Torino | Torino Horror Story","startDate":"2026-10-31","endDate":"2026-10-31","description":"La Bottega dell&apos;Antiquario\r\nUna serata &quot;da brivido&quot;!\r\n\r\nVi porteremo alla scoperta di una antica bottega che sembra uscita direttamente dallo studio di Cesare Lombroso, il fondatore dell&apos;Antropologia criminale.\r\n\r\nEntre...","url":"https:\/\/iltaccodibacco.it\/piemonte\/eventi\/332751.html","image":"https:\/\/iltaccodibacco.it\/img_eventi\/2026\/10\/332751_20261007_154459.jpg","eventAttendanceMode":"https:\/\/schema.org\/OfflineEventAttendanceMode","eventStatus":"https:\/\/schema.org\/EventScheduled","location":{"@type":"Place","name":"Piazza Palazzo di Citt\u00e0  Torino","address":{"@type":"PostalAddress","addressCountry":"IT","addressLocality":"Torino","streetAddress":"Piazza Palazzo di Citt\u00e0 "}}}
+ </script>
+
+
+    <div class="evento-featured">
+
+
+            <div class="regular-center">
+                <div class="label-container">
+                                    </div>
+                
+    
+
+<div class="testa">         Sabato 31 ottobre 2026 </div>
+
+
+    <div class="evento-data">
+        <a href=""></a> Torino 
+
+    </div>
+
+
+
+
+
+
+    <div class="titolo blocco-locali">
+
+        
+            <h2>
+                <a name="332751" href="https://iltaccodibacco.it/piemonte/eventi/332751.html" itemprop="url">
+                    Torino Horror Story
+                </a>
+
+            </h2>
+
+        
+
+
+    </div>
+                
+<div style="clear:both;"></div>
+
+        <div class="evento-img" >
+        <a name="332751" href="https://iltaccodibacco.it/piemonte/eventi/332751.html" >
+        <img src="https://iltaccodibacco.it/img_eventi/2026/10/332751_20261007_154459.jpg"
+             srcset="https://iltaccodibacco.it/img_eventi/2026/10/332751_20261007_154459.jpg 1x,https://iltaccodibacco.it/img_eventi/2026/10/332751_20261007_154459.jpg-2.jpg 2x,https://iltaccodibacco.it/img_eventi/2026/10/332751_20261007_154459.jpg-3.jpg 3x"
+             class="evento-tagimg" alt="Torino Horror Story" itemprop="photo" width='180px'/></a>
+    </div>
+        
+<div class="tdb-attributi">
+    <!--  normali -->
+                        <div class="tdb-attributo">
+                                    <img
+                            src="https://iltaccodibacco.it/i/arte-e-fotografia.png"
+                            alt="Arte e fotografia" title="Arte e fotografia" />
+                
+                <span>Arte e fotografia</strong></span>
+            </div>
+        
+                        <div class="tdb-attributo">
+                                    <img
+                            src="https://iltaccodibacco.it/i/folklore-e-tradizioni.png"
+                            alt="Folklore e tradizioni" title="Folklore e tradizioni" />
+                
+                <span>Folklore e tradizioni</strong></span>
+            </div>
+        
+    </div>
+<br>
+
+<div class="evento-corpo">
+        <b>La Bottega dell'Antiquario
+</b>Una serata "da brivido"!
+
+Vi porteremo alla scoperta di una antica bottega che sembra uscita direttamente dallo studio di Cesare Lombroso, il fondatore dell'A... <a class='tdb-continua' href='https://iltaccodibacco.it/piemonte/eventi/332751.html'>continua</a>
+
+    
+    
+
+    </div>
+
+
+
+
+
+</div>
+
+    </div>
+
+
+
+
+<div class="separatore-eventi" ></div>
+
+        
+
+
+
+    
+
+    
+    
+
+
+    
+
+
+
+
+
+<script type="application/ld+json">
+        {"@context":"http:\/\/schema.org","@type":"Event","name":"Torino | Torino Magica\u00ae Speciale Halloween","startDate":"2026-10-31","endDate":"2026-10-31","description":"Tutta la magia di Torino nella Notte pi\u00f9 Stregata dell&apos;anno.\r\nCi sono notti in cui Torino sembra raccontare i suoi segreti pi\u00f9 volentieri. Halloween \u00e8 una di queste.\r\n\r\nPer l\u2019occasione, Torino Magica\u00ae, il tour originale e ufficiale de...","url":"https:\/\/iltaccodibacco.it\/piemonte\/eventi\/332740.html","image":"https:\/\/iltaccodibacco.it\/img_eventi\/2026\/10\/332740_20261007_145455.jpg","eventAttendanceMode":"https:\/\/schema.org\/OfflineEventAttendanceMode","eventStatus":"https:\/\/schema.org\/EventScheduled","location":{"@type":"Place","name":"Piazza Statuto, 15 Torino","address":{"@type":"PostalAddress","addressCountry":"IT","addressLocality":"Torino","streetAddress":"Piazza Statuto, 15"}}}
+ </script>
+
+
+    <div class="evento-featured">
+
+
+            <div class="regular-center">
+                <div class="label-container">
+                                    </div>
+                
+    
+
+<div class="testa">         Sabato 31 ottobre 2026 </div>
+
+
+    <div class="evento-data">
+        <a href=""></a> Torino 
+
+    </div>
+
+
+
+
+
+
+    <div class="titolo blocco-locali">
+
+        
+            <h2>
+                <a name="332740" href="https://iltaccodibacco.it/piemonte/eventi/332740.html" itemprop="url">
+                    Torino Magica® Speciale Halloween
+                </a>
+
+            </h2>
+
+        
+
+
+    </div>
+                
+<div style="clear:both;"></div>
+
+        <div class="evento-img" >
+        <a name="332740" href="https://iltaccodibacco.it/piemonte/eventi/332740.html" >
+        <img src="https://iltaccodibacco.it/img_eventi/2026/10/332740_20261007_145455.jpg"
+             srcset="https://iltaccodibacco.it/img_eventi/2026/10/332740_20261007_145455.jpg 1x,https://iltaccodibacco.it/img_eventi/2026/10/332740_20261007_145455.jpg-2.jpg 2x,https://iltaccodibacco.it/img_eventi/2026/10/332740_20261007_145455.jpg-3.jpg 3x"
+             class="evento-tagimg" alt="Torino Magica® Speciale Halloween" itemprop="photo" width='180px'/></a>
+    </div>
+        
+<div class="tdb-attributi">
+    <!--  normali -->
+                        <div class="tdb-attributo">
+                                    <img
+                            src="https://iltaccodibacco.it/i/arte-e-fotografia.png"
+                            alt="Arte e fotografia" title="Arte e fotografia" />
+                
+                <span>Arte e fotografia</strong></span>
+            </div>
+        
+                        <div class="tdb-attributo">
+                                    <img
+                            src="https://iltaccodibacco.it/i/folklore-e-tradizioni.png"
+                            alt="Folklore e tradizioni" title="Folklore e tradizioni" />
+                
+                <span>Folklore e tradizioni</strong></span>
+            </div>
+        
+    </div>
+<br>
+
+<div class="evento-corpo">
+        <b>Tutta la magia di Torino nella Notte più Stregata dell'anno.
+</b>Ci sono notti in cui Torino sembra raccontare i suoi segreti più volentieri. Halloween è una di queste.
+
+Per l’occasione, To... <a class='tdb-continua' href='https://iltaccodibacco.it/piemonte/eventi/332740.html'>continua</a>
+
+    
+    
+
+            <div class="link_segnalato_da" style="color: black"><i>Con video trailer</i></div>
+    </div>
+
+
+
+
+
+</div>
+
+    </div>
+
+
+
+
+<div class="separatore-eventi" ></div>
+
+        
+
+
+
+    
+
+    
+        
+    
+    
+
+
+    
+
+
+
+
+
+<script type="application/ld+json">
+        {"@context":"http:\/\/schema.org","@type":"Event","name":"Torino | Torino Magica\u00ae Speciale Halloween per famiglie!","startDate":"2026-10-31","endDate":"2026-10-31","description":"Tutta la magia di Torino nella Notte pi\u00f9 Stregata dell&apos;anno\r\nUn percorso intrigante e curioso tra volti inquietanti, enigmi e simboli attraverso il mistero del Portone del Diavolo, gli spettrali dragoni, la leggenda delle grotte alche...","url":"https:\/\/iltaccodibacco.it\/piemonte\/eventi\/332739.html","image":"https:\/\/iltaccodibacco.it\/img_eventi\/2026\/10\/332739_20261007_144810.jpg","eventAttendanceMode":"https:\/\/schema.org\/OfflineEventAttendanceMode","eventStatus":"https:\/\/schema.org\/EventScheduled","location":{"@type":"Place","name":"Piazza CLN  Torino","address":{"@type":"PostalAddress","addressCountry":"IT","addressLocality":"Torino","streetAddress":"Piazza CLN "}}}
+ </script>
+
+
+    <div class="evento-featured">
+
+
+            <div class="regular-center">
+                <div class="label-container">
+                                    </div>
+                
+    
+
+<div class="testa">         Sabato 31 ottobre 2026 </div>
+
+
+    <div class="evento-data">
+        <a href=""></a> Torino 
+
+    </div>
+
+
+
+
+
+
+    <div class="titolo blocco-locali">
+
+        
+            <h2>
+                <a name="332739" href="https://iltaccodibacco.it/piemonte/eventi/332739.html" itemprop="url">
+                    Torino Magica® Speciale Halloween per famiglie!
+                </a>
+
+            </h2>
+
+        
+
+
+    </div>
+                
+<div style="clear:both;"></div>
+
+        <div class="evento-img" >
+        <a name="332739" href="https://iltaccodibacco.it/piemonte/eventi/332739.html" >
+        <img src="https://iltaccodibacco.it/img_eventi/2026/10/332739_20261007_144810.jpg"
+             srcset="https://iltaccodibacco.it/img_eventi/2026/10/332739_20261007_144810.jpg 1x,https://iltaccodibacco.it/img_eventi/2026/10/332739_20261007_144810.jpg-2.jpg 2x,https://iltaccodibacco.it/img_eventi/2026/10/332739_20261007_144810.jpg-3.jpg 3x"
+             class="evento-tagimg" alt="Torino Magica® Speciale Halloween per famiglie!" itemprop="photo" width='180px'/></a>
+    </div>
+        
+<div class="tdb-attributi">
+    <!--  normali -->
+                        <div class="tdb-attributo">
+                                    <img
+                            src="https://iltaccodibacco.it/i/arte-e-fotografia.png"
+                            alt="Arte e fotografia" title="Arte e fotografia" />
+                
+                <span>Arte e fotografia</strong></span>
+            </div>
+        
+                        <div class="tdb-attributo">
+                                    <img
+                            src="https://iltaccodibacco.it/i/eventi-per-bambini.png"
+                            alt="Eventi per bambini" title="Eventi per bambini" />
+                
+                <span>Eventi per bambini</strong></span>
+            </div>
+        
+    </div>
+<br>
+
+<div class="evento-corpo">
+        Tutta la magia di Torino nella Notte più Stregata dell'anno
+Un percorso intrigante e curioso tra volti inquietanti, enigmi e simboli attraverso il mistero del Portone del Diavolo, gli spe... <a class='tdb-continua' href='https://iltaccodibacco.it/piemonte/eventi/332739.html'>continua</a>
+
+    
+    
+
+    </div>
+
+
+
+
+
+</div>
+
+    </div>
+
+
+
+
+<div class="separatore-eventi" ></div>
+
+        
+
+
+
+    
+
+    
+            
+    
+
+
+    
+
+
+
+
+
+<script type="application/ld+json">
+        {"@context":"http:\/\/schema.org","@type":"Event","name":"Torino | Torino Rosso Porpora Speciale Halloween","startDate":"2026-10-31","endDate":"2026-10-31","description":"Un bagliore rosso porpora nel centro storico della citt\u00e0\u2026 Da qui ha inizio una misteriosa sequenza di delitti senza nome.\r\nUn commissario indaga... Personaggi del passato e del presente si muovono sulla scena del crimine con i loro alibi, ...","url":"https:\/\/iltaccodibacco.it\/piemonte\/eventi\/332753.html","image":"https:\/\/iltaccodibacco.it\/img_eventi\/2026\/10\/332753_20261007_155022.jpg","eventAttendanceMode":"https:\/\/schema.org\/OfflineEventAttendanceMode","eventStatus":"https:\/\/schema.org\/EventScheduled","location":{"@type":"Place","name":"Via Santa Chiara, 20  Torino","address":{"@type":"PostalAddress","addressCountry":"IT","addressLocality":"Torino","streetAddress":"Via Santa Chiara, 20 "}}}
+ </script>
+
+
+    <div class="evento-featured">
+
+
+            <div class="regular-center">
+                <div class="label-container">
+                                    </div>
+                
+    
+
+<div class="testa">         Sabato 31 ottobre 2026 </div>
+
+
+    <div class="evento-data">
+        <a href=""></a> Torino 
+
+    </div>
+
+
+
+
+
+
+    <div class="titolo blocco-locali">
+
+        
+            <h2>
+                <a name="332753" href="https://iltaccodibacco.it/piemonte/eventi/332753.html" itemprop="url">
+                    Torino Rosso Porpora Speciale Halloween
+                </a>
+
+            </h2>
+
+        
+
+
+    </div>
+                
+<div style="clear:both;"></div>
+
+        <div class="evento-img" >
+        <a name="332753" href="https://iltaccodibacco.it/piemonte/eventi/332753.html" >
+        <img src="https://iltaccodibacco.it/img_eventi/2026/10/332753_20261007_155022.jpg"
+             srcset="https://iltaccodibacco.it/img_eventi/2026/10/332753_20261007_155022.jpg 1x,https://iltaccodibacco.it/img_eventi/2026/10/332753_20261007_155022.jpg-2.jpg 2x,https://iltaccodibacco.it/img_eventi/2026/10/332753_20261007_155022.jpg-3.jpg 3x"
+             class="evento-tagimg" alt="Torino Rosso Porpora Speciale Halloween" itemprop="photo" width='180px'/></a>
+    </div>
+        
+<div class="tdb-attributi">
+    <!--  normali -->
+                        <div class="tdb-attributo">
+                                    <img
+                            src="https://iltaccodibacco.it/i/arte-e-fotografia.png"
+                            alt="Arte e fotografia" title="Arte e fotografia" />
+                
+                <span>Arte e fotografia</strong></span>
+            </div>
+        
+                        <div class="tdb-attributo">
+                                    <img
+                            src="https://iltaccodibacco.it/i/folklore-e-tradizioni.png"
+                            alt="Folklore e tradizioni" title="Folklore e tradizioni" />
+                
+                <span>Folklore e tradizioni</strong></span>
+            </div>
+        
+    </div>
+<br>
+
+<div class="evento-corpo">
+        <b>Un bagliore rosso porpora nel centro storico della città… Da qui ha inizio una misteriosa sequenza di delitti senza nome.</b>
+Un commissario indaga... Personaggi del passato e del presente si... <a class='tdb-continua' href='https://iltaccodibacco.it/piemonte/eventi/332753.html'>continua</a>
+
+    
+    
+
+    </div>
+
+
+
+
+
+</div>
+
+    </div>
+
+
+
+
+<div class="separatore-eventi" ></div>
+
+        
+
+
+
+    
+
+    
+    
+
+
+    
+
+
+
+
+
+<script type="application/ld+json">
+        {"@context":"http:\/\/schema.org","@type":"Event","name":"Venaria | Bull Brigade \u2013 20 Years Party con Maur\u00e0s, Quarantena, Gavroche, Inoki, Kina ed Elephant Brain","startDate":"2026-11-06","endDate":"2026-11-07","description":"I Bull Brigade celebrano nel 2026 vent\u2019anni di attivit\u00e0 con \u201c20 Years Party\u201d, una grande serata dedicata alla storia della band e alla scena punk italiana. L\u2019appuntamento \u00e8 in programma sabato 7 novembre 2026 al Teatro della Concordia di V...","url":"https:\/\/iltaccodibacco.it\/piemonte\/eventi\/332813.html","image":"https:\/\/iltaccodibacco.it\/img_eventi\/2026\/11\/332813_20261008_114159.jpg","eventAttendanceMode":"https:\/\/schema.org\/OfflineEventAttendanceMode","eventStatus":"https:\/\/schema.org\/EventScheduled","location":{"@type":"Place","sameAs":"https:\/\/iltaccodibacco.it\/venaria\/teatro-della-concordia","name":"Teatro della Concordia","address":{"@type":"PostalAddress","addressCountry":"IT","addressLocality":"Venaria","streetAddress":"Corso Giacomo Puccini "}}}
+ </script>
+
+
+    <div class="evento-featured">
+
+
+            <div class="regular-center">
+                <div class="label-container">
+                                    </div>
+                
+    
+
+<div class="testa">         dal 6 al 7 novembre 2026 </div>
+
+
+    <div class="evento-data">
+        <a href="https://iltaccodibacco.it/venaria/teatro-della-concordia">Teatro della Concordia</a> Venaria <span style="color: grey">Torino</span>
+
+    </div>
+
+
+
+
+
+
+    <div class="titolo blocco-locali">
+
+        
+            <h2>
+                <a name="332813" href="https://iltaccodibacco.it/piemonte/eventi/332813.html" itemprop="url">
+                    Bull Brigade – 20 Years Party con Mauràs, Quarantena, Gavroche, Inoki, Kina ed Elephant Brain
+                </a>
+
+            </h2>
+
+        
+
+
+    </div>
+                
+<div style="clear:both;"></div>
+
+        <div class="evento-img" >
+        <a name="332813" href="https://iltaccodibacco.it/piemonte/eventi/332813.html" >
+        <img src="https://iltaccodibacco.it/img_eventi/2026/11/332813_20261008_114159.jpg"
+             srcset="https://iltaccodibacco.it/img_eventi/2026/11/332813_20261008_114159.jpg 1x,https://iltaccodibacco.it/img_eventi/2026/11/332813_20261008_114159.jpg-2.jpg 2x,https://iltaccodibacco.it/img_eventi/2026/11/332813_20261008_114159.jpg-3.jpg 3x"
+             class="evento-tagimg" alt="Bull Brigade – 20 Years Party con Mauràs, Quarantena, Gavroche, Inoki, Kina ed Elephant Brain" itemprop="photo" width='180px'/></a>
+    </div>
+        
+<div class="tdb-attributi">
+    <!--  normali -->
+                        <div class="tdb-attributo">
+                                    <img
+                            src="https://iltaccodibacco.it/i/arte-e-fotografia.png"
+                            alt="Arte e fotografia" title="Arte e fotografia" />
+                
+                <span>Arte e fotografia</strong></span>
+            </div>
+        
+                        <div class="tdb-attributo">
+                                    <img
+                            src="https://iltaccodibacco.it/i/musica-e-concerti.png"
+                            alt="Concerti" title="Concerti" />
+                
+                <span>Concerti</strong></span>
+            </div>
+        
+    </div>
+<br>
+
+<div class="evento-corpo">
+        I Bull Brigade celebrano nel 2026 vent’anni di attività con <b>“20 Years Party”</b>, una grande serata dedicata alla storia della band e alla scena punk italiana. L’appuntamento è in programma <b>sa... <a class='tdb-continua' href='https://iltaccodibacco.it/piemonte/eventi/332813.html'>continua</a></b>
+
+    
+    
+
+    </div>
+
+
+
+
+
+</div>
+
+    </div>
+
+
+
+
+<div class="separatore-eventi" ></div>
+
+        
+
+    </div>
+
+    <div id="more"></div>
+
+
+    
+    
+
+    
+    
+
+    
+
+
+    <script>
+        
+</script>
+
+ 		
+        
+        
+        </div>
+
+
+
+        <div id="tdb_destra">
+
+  
+
+
+          <style>
+    #search-results img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+    }
+
+    #search-results .evento-img {
+        margin-bottom: 15px;
+    }
+
+    #search-results .tdb-attributo{
+        margin-bottom: 10px;
+    }
+    #search-results .evento-corpo{
+        clear: both;
+    }
+</style>
+
+
+
+
+<p>
+	<br/>
+</p>
+
+        
+
+
+        <p></p>
+
+
+
+              
+
+
+                <p style="line-height: 180%;">
+                  <a href="https://iltaccodibacco.it/piemonte/danonperdere/" class="titolo-widget" title="Eventi da non perdere in Piemonte">Da non perdere</a>
+                  </p>
+                  <p>
+                 <span  style="line-height: 130%;">
+   Gli spettacoli e i concerti da non perdere.</span>
+                  </p>
+
+
+          
+    <p style="line-height: 180%;">
+    <a href="https://iltaccodibacco.it/piemonte/sponsored/" class="titolo-widget"
+       title="Eventi sponsor in Piemonte">Sponsor</a>
+</p>
+
+<p>
+    <span style="line-height: 130%;">Spettacoli e concerti in promozione.</span>
+</p>
+
+    <p  style="line-height: 180%;"><a href="https://iltaccodibacco.it/piemonte/free/" class="titolo-widget" title="Free Entry Piemonte">Free Entry</a>
+
+</p><p>
+    <span >Tutti gli eventi a ingresso gratuito.</span>
+</p>
+
+
+    <p  style="line-height: 180%;"><a href="https://iltaccodibacco.it/piemonte/mostre/" class="titolo-widget" title="Arte e fotografia Piemonte">Arte e fotografia</a>
+
+</p><p>
+      <span >Tutte le mostre in corso.</span>
+   </p>
+
+       
+
+        
+
+
+ 
+ <p id="pdf-widget-title" style="line-height: 180%;">
+    <a data-track-content data-content-name="pdf-desktop-oggi" href="https://iltaccodibacco.it/torino/pdf/" target="_blank" class="titolo-widget"
+       title="Eventi di oggi in PDF">Stampa gli eventi di oggi</a>
+</p>
+
+<p id="pdf-widget-desc">
+        <span style="line-height: 130%;">Eventi di oggi a Torino in formato PDF.</span>
+    </p>
+
+
+<!--  eventi futuri -->
+
+
+
+
+
+
+		<p></p>
+
+
+             
+
+
+       
+
+<!--  blocco annunci [inizio] -->
+<!-- blocco annunci [fine] -->
+
+
+</div>
+
+
+<div style="clear:both;"></div>
+
+</div>
+</div>
+<div style="clear:both;"></div>
+
+
+
+
+<div id="foot-bar">
+
+<div id="foot-bar2">
+
+    
+
+  <div style="clear:both;"></div>
+
+
+<div class="vivi-offline">
+<img src="https://iltaccodibacco.it/i/vivioffline.png" alt="Vivi offline"/>
+<p>Cerca gli spettacoli online e vivili offline: il Tacco di Bacco è uno strumento pensato per migliorare la qualità della nostra vita. Un'esistenza piena si basa su connessioni autentiche, che crediamo nascano solo nel mondo reale.Per questo abbiamo creato un'agenda che orienta, non una app che trattiene. Noi vi diamo il mezzo, voi trovate il fine.</p>
+
+</div>
+
+<hr />
+
+    
+<div id="foot-bar2a">
+<ul>
+       <li>Riferimenti</li>
+        <li><a href="https://iltaccodibacco.it/domande-frequenti/">Domande frequenti</a></li>
+        <li><a href="https://iltaccodibacco.it/adv/">Pubblicit&agrave;</a></li>
+       <li><a href="https://iltaccodibacco.it/servizi-comuni/index.html">Servizi per i Comuni</a></li>
+       <li><a href="https://iltaccodibacco.it/printable/">Versione stampabile pdf</a></li>
+        <li><a href="https://iltaccodibacco.it/social/">Media</a></li>
+     <!--   <li><a href="https://iltaccodibacco.it/jobs/">Lavora con noi</a></li> -->
+    <li> <a href="https://www.spreadshirt.it/shop/design/il+tacco+di+bacco+bambini+sacca+sportiva-D66e3f9e508188e2f1c7188f3?sellable=9OXpvYr5NQfJz8lejJxz-1155-33" target="_blank">Gadget</a></li>
+    <li><a href="https://iltaccodibacco.it/contatti/" >Contatti</a></li>
+
+
+ </ul>
+</div>
+
+  <div id="foot-bar2b">
+  <ul>
+      <li>Informazioni</li>
+      <li><a href="https://iltaccodibacco.it/rubriche/">Rubriche</a></li>
+      <li><a href="https://iltaccodibacco.it/ricorrenze/">Ricorrenze</a></li>
+      <li><a href="https://iltaccodibacco.it/blog/">Blog</a></li>
+      <li><a href="https://iltaccodibacco.it/greetings/">Chi siamo</a></li>
+      <li><a href="https://iltaccodibacco.it/partner/">Partner</a></li>
+      <li><a href="https://iltaccodibacco.it/dicono-di-noi/">Dicono di noi</a></li>
+      <li><a href="https://instagram.com/iltaccodibacco.it/" target="_blank">Instagram</a></li>
+      <li><a href="https://t.me/iltaccodibacco" target="_blank">Telegram</a></li>
+
+
+  </ul>
+  </div>
+
+
+
+
+    <div id="foot-bar2c">
+  <ul>
+      <li>Note legali</li>
+      <li><a href="https://iltaccodibacco.it/condizioni/">Condizioni di utilizzo</a></li>
+      <li> <a href="https://iltaccodibacco.it/privacy/">Privacy</a></li>
+      <li> <a href="https://iltaccodibacco.it/cookie/">Cookie</a></li>
+      <li> <a href="https://iltaccodibacco.it/contatti/">Segnala abusi</a></li>
+
+
+  </ul>
+  </div>
+
+
+<div id="foot-bar2d">
+<ul>
+       <li>Sviluppatori</li>
+
+    <li> <a href="https://iltaccodibacco.it/developers/">OpenApi doc beta</a></li>
+              <li><a href="https://github.com/cognitasrl/cityevents" target="_blank">CityEvents GitHub</a></li>
+              <li><a href="https://wordpress.org/plugins/cityevents/" target="_blank">CityEvents WordPress</a></li>
+
+ </ul>
+</div>
+  <div id="foot-ad1"><a href="https://iltaccodibacco.it?lang=it&amp;view=mobile" title="Versione Mobile"><img src="https://iltaccodibacco.it/i/mobile.png" alt="Versione Mobile"/><br />Versione Mobile</a></div>
+  <div id="foot-ad2"><a href="https://iltaccodibacco.it/registrati/#eventi" title="Registrati"><img src="https://iltaccodibacco.it/i/eventi.png" alt="Pubblica il tuo evento"/><br />Pubblica il tuo evento</a></div>
+
+    
+
+
+
+
+  <div class="foottextcopy">
+
+ <p class="tdb-copyright">
+     La redazione declina ogni responsabilit&agrave; nel caso in cui le informazioni fornite su iltaccodibacco.it siano errate, mancanti o incomplete.
+     <br  />
+   Progettato e realizzato in Italia  - 2026 &copy; - il Tacco di Bacco</p>
+    </div>
+</div>
+
+</div>
+<p class="only_print" style="color: green; text-align:center">
+  <b><i>
+  Se hai stampato queste pagine, ricordati di cestinarle nel raccoglitore della carta.</i></b>
+  <br />
+  If you print these pages don't forget to trash them in a recycle bin.
+  </p>
+
+
+
+</body>
+</html>

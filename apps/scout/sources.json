@@ -311,24 +311,41 @@
     "notes": "Da catalogo agente (homepage, non calendario): Cinema listing and film guide. Movies, showtimes, locations."
   },
   {
-    "id": "iltaccodibacco-torino",
-    "name": "Il Tacco di Bacco – Torino",
-    "url": "https://iltaccodibacco.it/torino/",
+    "id": "tacco-teatro",
+    "name": "Il Tacco di Bacco – Teatro Torino",
+    "url": "https://iltaccodibacco.it/torino/spettacoli/",
     "format": "jsonld",
-    "status": "unverified",
+    "status": "active",
     "phase": 2,
-    "detail": {
-      "max": 40
-    },
     "area": "Torino",
-    "notes": "Da docs/research/agentceck.txt (sonda agente 2026-10-15), ricontrollata 2026-10-15. Lista: 54 JSON-LD Event (solo data, luogo con via). Dettaglio: JSON-LD ancora senza ora, ora solo nel testo («ore 20.30»). Aggregatore: include il Teatro Regio (scartato da exclude.json). robots.txt senza divieti. /torino/events.json = 404."
+    "notes": "Attivata 2026-10-15. Lista /torino/spettacoli/: JSON-LD Event (solo date), ora dalla descrizione («alle ore 20.00»). Solo comune di Torino (cities). Include il Teatro Regio: lo scarta exclude.json. Titoli «Torino | …» ripuliti dall adapter.",
+    "adapter": "tacco",
+    "category": "teatro",
+    "cities": [
+      "Torino"
+    ]
+  },
+  {
+    "id": "tacco-mostre",
+    "name": "Il Tacco di Bacco – Mostre Torino",
+    "url": "https://iltaccodibacco.it/torino/mostre/",
+    "format": "jsonld",
+    "adapter": "tacco",
+    "status": "active",
+    "phase": 2,
+    "category": "mostre",
+    "cities": [
+      "Torino"
+    ],
+    "area": "Torino",
+    "notes": "Attivata 2026-10-15. Lista /torino/mostre/: JSON-LD Event (solo date), stesso adapter di tacco-teatro. Pochi eventi (8 alla sonda, anche visite guidate di Halloween). Solo comune di Torino."
   },
   {
     "id": "imbarchino",
     "name": "Imbarchino",
     "url": "https://www.imbarchino.space/events",
     "format": "jsonld",
-    "status": "unverified",
+    "status": "active",
     "phase": 2,
     "detail": {
       "linkPattern": "/events/[a-z0-9-]+$",
@@ -336,7 +353,12 @@
     },
     "category": "musica",
     "area": "Torino",
-    "notes": "Da docs/research/agentceck.txt (sonda agente 2026-10-15), ricontrollata 2026-10-15. Squarespace. JSON-LD Event solo nel dettaglio (startDate con ora e offset), location vuota: sede viale Cagni 37. robots.txt vieta ?format=json/ical e i crawler AI per nome; pagine evento consentite a User-agent *."
+    "notes": "Attivata 2026-10-15. Da docs/research/agentceck.txt (sonda agente 2026-10-15), ricontrollata 2026-10-15. Squarespace. JSON-LD Event solo nel dettaglio (startDate con ora e offset), location vuota: sede viale Cagni 37. robots.txt vieta ?format=json/ical e i crawler AI per nome; pagine evento consentite a User-agent *.",
+    "defaultVenue": {
+      "venueName": "Imbarchino",
+      "address": "Viale Umberto Cagni 37, Torino",
+      "city": "Torino"
+    }
   },
   {
     "id": "blah-blah",
@@ -344,11 +366,17 @@
     "url": "https://www.blahblahtorino.com/eventi/",
     "format": "api",
     "feedUrl": "https://www.blahblahtorino.com/wp-json/tribe/events/v1/events?per_page=50",
-    "status": "unverified",
+    "status": "active",
     "phase": 2,
     "category": "musica",
     "area": "Torino",
-    "notes": "Da docs/research/agentceck.txt (sonda agente 2026-10-15), ricontrollata 2026-10-15. API The Events Calendar (tribe/events/v1): 16 eventi futuri, start_date con ora, timezone Europe/Rome, cost. Venue vuoto: sede via Po 21. Serve adapter (riusabile per altri siti con The Events Calendar)."
+    "notes": "Attivata 2026-10-15. Da docs/research/agentceck.txt (sonda agente 2026-10-15), ricontrollata 2026-10-15. API The Events Calendar (tribe/events/v1): 16 eventi futuri, start_date con ora, timezone Europe/Rome, cost. Venue vuoto: sede via Po 21. Serve adapter (riusabile per altri siti con The Events Calendar).",
+    "adapter": "tribe",
+    "defaultVenue": {
+      "venueName": "Blah Blah",
+      "address": "Via Po 21, Torino",
+      "city": "Torino"
+    }
   },
   {
     "id": "hiroshima",
@@ -366,11 +394,17 @@
     "name": "Magazzino sul Po",
     "url": "https://www.magazzinosulpo.com/eventi/",
     "format": "html",
-    "status": "unverified",
+    "status": "active",
     "phase": 2,
     "category": "musica",
     "area": "Torino",
-    "notes": "Da docs/research/agentceck.txt (sonda agente 2026-10-15), ricontrollata 2026-10-15. 28 .wpcp-single-item per pagina, paginazione ?paged320=N; eventi come prodotti WooCommerce (API senza date). Serve adapter. Sede Murazzi del Po."
+    "notes": "Attivata 2026-10-15. Da docs/research/agentceck.txt (sonda agente 2026-10-15), ricontrollata 2026-10-15. 28 .wpcp-single-item per pagina, paginazione ?paged320=N; eventi come prodotti WooCommerce (API senza date). Serve adapter. Sede Murazzi del Po.",
+    "adapter": "magazzino",
+    "defaultVenue": {
+      "venueName": "Magazzino sul Po",
+      "address": "Murazzi del Po Ferdinando Buscaglione 18, Torino",
+      "city": "Torino"
+    }
   },
   {
     "id": "suoneria-settimo",
@@ -388,11 +422,12 @@
     "name": "MAO – Museo d’Arte Orientale",
     "url": "https://www.maotorino.it/it/mostre-eventi/in-programma/",
     "format": "html",
-    "status": "unverified",
+    "status": "active",
     "phase": 3,
     "category": "mostre",
     "area": "Torino",
-    "notes": "Da docs/research/agentceck.txt (sonda agente 2026-10-15), ricontrollata 2026-10-15. Circa 19 URL (.text-content h3 a, .the-labels-date), niente JSON-LD Event né API; ora nel testo libero. Sede via San Domenico 11. Serve adapter."
+    "notes": "Attivata 2026-10-15. Da docs/research/agentceck.txt (sonda agente 2026-10-15), ricontrollata 2026-10-15. Circa 19 URL (.text-content h3 a, .the-labels-date), niente JSON-LD Event né API; ora nel testo libero. Sede via San Domenico 11. Serve adapter.",
+    "adapter": "mao"
   },
   {
     "id": "unito-eventi",

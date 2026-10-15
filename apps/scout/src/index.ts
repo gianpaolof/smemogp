@@ -3,6 +3,7 @@ import { and, eq, isNull, lt, notExists, or } from "drizzle-orm";
 import { createDb, eventSources, events, sourceRuns, type Db } from "@smemogp/db";
 import { adapterFor } from "./adapters";
 import { followDetails } from "./lib/detail";
+import { withDefaultVenue } from "./lib/venue";
 import { sha1 } from "./lib/html";
 import { fetchText, renderPage } from "./lib/http";
 import { persistEvents } from "./lib/persist";
@@ -53,6 +54,7 @@ async function runSource(db: Db, source: Source) {
   const adapter = adapterFor(source);
   let raw = (await Promise.all(pages.map((p) => adapter.extract(source, p)))).flat();
   if (source.detail) raw = await followDetails(source, pages, raw);
+  if (source.defaultVenue) raw = raw.map((e) => withDefaultVenue(e, source.defaultVenue!));
 
   const { rows, stats } = await persistEvents(db, source, raw, { dryRun: args["dry-run"] });
   console.log(`  ${source.id}: salvati ${stats.saved}, fusi ${stats.merged}, esclusi ${stats.excluded}, passati ${stats.past}`);

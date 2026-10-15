@@ -29,6 +29,10 @@ export type Source = {
   llm?: boolean;
   category?: string;
   area?: string;
+  /** Aggregatori regionali: tiene solo gli eventi di questi comuni (adapter che lo supportano) */
+  cities?: string[];
+  /** Sede unica del locale: completa gli eventi che non dicono dove sono (JSON-LD senza location) */
+  defaultVenue?: { venueName: string; address: string; city: string };
   notes?: string;
 };
 

@@ -1,6 +1,10 @@
 import type { Adapter, Source } from "../types";
 import { circoloAdapter } from "./custom/circolo";
 import { egizioAdapter } from "./custom/egizio";
+import { magazzinoAdapter } from "./custom/magazzino";
+import { maoAdapter } from "./custom/mao";
+import { taccoAdapter } from "./custom/tacco";
+import { tribeAdapter } from "./custom/tribe";
 import { zeroAdapter } from "./custom/zero";
 import { icalAdapter } from "./ical";
 import { extractJsonLd } from "./jsonld";
@@ -9,6 +13,10 @@ import { llmAdapter } from "./llm";
 const custom: Record<string, Adapter> = {
   circolo: circoloAdapter,
   egizio: egizioAdapter,
+  magazzino: magazzinoAdapter,
+  mao: maoAdapter,
+  tacco: taccoAdapter,
+  tribe: tribeAdapter,
   zero: zeroAdapter,
 };
 
