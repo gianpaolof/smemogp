@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "npm run dev -w web",
     "build": "npm run build -w web",
-    "scout": "npm run start -w scout",
+    "scout": "npm run start -w scout --",
     "scout:ingest": "npm run ingest -w scout --",
     "scout:verify": "npm run verify -w scout --",
     "scout:search": "npm run search -w scout --",

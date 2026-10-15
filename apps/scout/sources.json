@@ -309,5 +309,143 @@
     "category": "cinema",
     "area": "Torino",
     "notes": "Da catalogo agente (homepage, non calendario): Cinema listing and film guide. Movies, showtimes, locations."
+  },
+  {
+    "id": "iltaccodibacco-torino",
+    "name": "Il Tacco di Bacco – Torino",
+    "url": "https://iltaccodibacco.it/torino/",
+    "format": "jsonld",
+    "status": "unverified",
+    "phase": 2,
+    "detail": {
+      "max": 40
+    },
+    "area": "Torino",
+    "notes": "Da docs/research/agentceck.txt (sonda agente 2026-10-15), ricontrollata 2026-10-15. Lista: 54 JSON-LD Event (solo data, luogo con via). Dettaglio: JSON-LD ancora senza ora, ora solo nel testo («ore 20.30»). Aggregatore: include il Teatro Regio (scartato da exclude.json). robots.txt senza divieti. /torino/events.json = 404."
+  },
+  {
+    "id": "imbarchino",
+    "name": "Imbarchino",
+    "url": "https://www.imbarchino.space/events",
+    "format": "jsonld",
+    "status": "unverified",
+    "phase": 2,
+    "detail": {
+      "linkPattern": "/events/[a-z0-9-]+$",
+      "max": 30
+    },
+    "category": "musica",
+    "area": "Torino",
+    "notes": "Da docs/research/agentceck.txt (sonda agente 2026-10-15), ricontrollata 2026-10-15. Squarespace. JSON-LD Event solo nel dettaglio (startDate con ora e offset), location vuota: sede viale Cagni 37. robots.txt vieta ?format=json/ical e i crawler AI per nome; pagine evento consentite a User-agent *."
+  },
+  {
+    "id": "blah-blah",
+    "name": "Blah Blah",
+    "url": "https://www.blahblahtorino.com/eventi/",
+    "format": "api",
+    "feedUrl": "https://www.blahblahtorino.com/wp-json/tribe/events/v1/events?per_page=50",
+    "status": "unverified",
+    "phase": 2,
+    "category": "musica",
+    "area": "Torino",
+    "notes": "Da docs/research/agentceck.txt (sonda agente 2026-10-15), ricontrollata 2026-10-15. API The Events Calendar (tribe/events/v1): 16 eventi futuri, start_date con ora, timezone Europe/Rome, cost. Venue vuoto: sede via Po 21. Serve adapter (riusabile per altri siti con The Events Calendar)."
+  },
+  {
+    "id": "hiroshima",
+    "name": "Hiroshima Mon Amour",
+    "url": "https://hiroshimamonamour.org/eventi/",
+    "format": "html",
+    "status": "unverified",
+    "phase": 2,
+    "category": "musica",
+    "area": "Torino",
+    "notes": "Da docs/research/agentceck.txt (sonda agente 2026-10-15), ricontrollata 2026-10-15. 60 blocchi .evl-item nella lista, niente JSON-LD Event né API. Serve adapter a selettori."
+  },
+  {
+    "id": "magazzino-po",
+    "name": "Magazzino sul Po",
+    "url": "https://www.magazzinosulpo.com/eventi/",
+    "format": "html",
+    "status": "unverified",
+    "phase": 2,
+    "category": "musica",
+    "area": "Torino",
+    "notes": "Da docs/research/agentceck.txt (sonda agente 2026-10-15), ricontrollata 2026-10-15. 28 .wpcp-single-item per pagina, paginazione ?paged320=N; eventi come prodotti WooCommerce (API senza date). Serve adapter. Sede Murazzi del Po."
+  },
+  {
+    "id": "suoneria-settimo",
+    "name": "Suoneria Settimo",
+    "url": "https://www.suoneriasettimo.it/stagione-teatrale-suoneria-settimo-2026-2027/",
+    "format": "html",
+    "status": "unverified",
+    "phase": 3,
+    "category": "teatro",
+    "area": "Settimo Torinese",
+    "notes": "Da docs/research/agentceck.txt (sonda agente 2026-10-15), ricontrollata 2026-10-15. 35 date in lista (.numberorder = YYYYMMDD, .titolo, .newsdatainizioorario, .indirizzo). Più orari per data = più occorrenze. Serve adapter."
+  },
+  {
+    "id": "mao",
+    "name": "MAO – Museo d’Arte Orientale",
+    "url": "https://www.maotorino.it/it/mostre-eventi/in-programma/",
+    "format": "html",
+    "status": "unverified",
+    "phase": 3,
+    "category": "mostre",
+    "area": "Torino",
+    "notes": "Da docs/research/agentceck.txt (sonda agente 2026-10-15), ricontrollata 2026-10-15. Circa 19 URL (.text-content h3 a, .the-labels-date), niente JSON-LD Event né API; ora nel testo libero. Sede via San Domenico 11. Serve adapter."
+  },
+  {
+    "id": "unito-eventi",
+    "name": "Università di Torino – Eventi",
+    "url": "https://www.unito.it/eventi",
+    "format": "rss",
+    "feedUrl": "https://www.unito.it/feeds-eventi-futurostudente.xml",
+    "status": "unverified",
+    "phase": 3,
+    "category": "altro",
+    "area": "Torino",
+    "notes": "Da docs/research/agentceck.txt (sonda agente 2026-10-15), ricontrollata 2026-10-15. Feed RSS con 7 item (mostre documentarie, orientamento). Interesse basso."
+  },
+  {
+    "id": "lavanderia-vapore",
+    "name": "Lavanderia a Vapore",
+    "url": "https://www.lavanderiaavapore.eu/pubblico/",
+    "format": "jsonld",
+    "status": "skill",
+    "phase": 3,
+    "category": "teatro",
+    "area": "Collegno",
+    "notes": "Da docs/research/agentceck.txt (sonda agente 2026-10-15), ricontrollata 2026-10-15. JSON-LD Event in lista (14), ma orari con offset +00:00 errato (ora locale scritta come UTC). Pochi eventi futuri."
+  },
+  {
+    "id": "concordia",
+    "name": "Teatro della Concordia",
+    "url": "https://www.teatrodellaconcordia.it/programma-prossimi-eventi/programma-stagione-teatrale-2026-2027/",
+    "format": "html",
+    "status": "skill",
+    "phase": 3,
+    "category": "teatro",
+    "area": "Venaria Reale",
+    "notes": "Da docs/research/agentceck.txt (sonda agente 2026-10-15), ricontrollata 2026-10-15. 68 link /eventi/ misti a stagioni passate, niente JSON-LD Event. Da delimitare la stagione corrente."
+  },
+  {
+    "id": "off-topic",
+    "name": "OFF TOPIC",
+    "url": "https://offtopictorino.it/eventi/",
+    "format": "html",
+    "status": "skill",
+    "phase": 3,
+    "area": "Torino",
+    "notes": "Da docs/research/agentceck.txt (sonda agente 2026-10-15), ricontrollata 2026-10-15. Secondo l'agente calendario a volte 503 e dettaglio 403; API WordPress senza data evento."
+  },
+  {
+    "id": "cap10100",
+    "name": "CAP10100",
+    "url": "https://www.cap10100.com/eventi-2",
+    "format": "jsonld",
+    "status": "skill",
+    "phase": 3,
+    "area": "Torino",
+    "notes": "Da docs/research/agentceck.txt (sonda agente 2026-10-15), ricontrollata 2026-10-15. Squarespace, nessun evento futuro alla sonda (ultimo luglio 2026). robots vieta format=json."
   }
 ]
