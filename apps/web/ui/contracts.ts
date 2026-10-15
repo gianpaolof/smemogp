@@ -78,7 +78,13 @@ export type FilterPanelVM = {
 
 export type BottomBarVM = { quickCategories: NavItem[]; panel: FilterPanelVM };
 
-export type MapRowVM = EventRowVM & { dayNum: string; dayLabel: string };
+export type MapRowVM = EventRowVM & {
+  dayNum: string;
+  dayLabel: string;
+  /** Per il callout sul marker selezionato: indirizzo senza il nome del luogo ripetuto */
+  venue: string | null;
+  address: string | null;
+};
 
 export type MapVM = {
   origin: { lat: number; lng: number };

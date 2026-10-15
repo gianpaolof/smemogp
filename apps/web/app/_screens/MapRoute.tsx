@@ -25,7 +25,8 @@ async function Count({ f }: { f: Filters }) {
 }
 
 async function MapData({ f, selectedId }: { f: Filters; selectedId: string | null }) {
-  return <MapScreen vm={await load(f, selectedId)} />;
+  // Key: un nuovo ?evento= (navigazione, non il replaceState dei tap) riparte con selezione e avviso puliti
+  return <MapScreen key={selectedId ?? ""} vm={await load(f, selectedId)} />;
 }
 
 export async function MapRoute({ searchParams }: { searchParams: SearchParams }) {

@@ -24,9 +24,12 @@ const placeKey = (r: { lat: number; lng: number }) => `${r.lat.toFixed(5)},${r.l
 const SWIPE_PX = 56;
 
 export function MapScreen({ vm }: { vm: MapVM }) {
-  const [selectedId, setSelectedId] = useState<string | null>(vm.selectedId);
+  // ?evento= fuori dai filtri (raggio, periodo): niente fallback silenzioso su un altro evento
+  const known = vm.rows.some((r) => r.id === vm.selectedId);
+  const [missing, setMissing] = useState(vm.selectedId !== null && !known);
+  const [selectedId, setSelectedId] = useState<string | null>(known ? vm.selectedId : null);
   // La mappa si sposta sul marker solo se la scelta è dell'utente (tap o ?evento=), non all'apertura
-  const [focusSelected, setFocusSelected] = useState(vm.selectedId !== null);
+  const [focusSelected, setFocusSelected] = useState(known);
   const [place, setPlace] = useState<string | null>(null);
   const placeRows = place ? vm.rows.filter((r) => placeKey(r) === place) : [];
   const rows = placeRows.length ? placeRows : vm.rows;
@@ -38,6 +41,7 @@ export function MapScreen({ vm }: { vm: MapVM }) {
     setSelectedId(id);
     setPlace(key);
     setFocusSelected(true);
+    setMissing(false);
     // La selezione sta nell'URL (condivisibile, sopravvive al ricaricamento) senza rifare la richiesta
     const url = new URL(window.location.href);
     url.searchParams.set("evento", id);
@@ -86,7 +90,14 @@ export function MapScreen({ vm }: { vm: MapVM }) {
       <div className="relative isolate min-h-[260px] flex-1">
         {/* Altezza esplicita: Leaflet non segue il flex del contenitore */}
         <div className="absolute inset-0">
-          <LeafletMap vm={vm} selectedId={row?.id ?? null} focusSelected={focusSelected} onSelect={onMarker} fitKey={fitKey} />
+          <LeafletMap
+            vm={vm}
+            selectedId={row?.id ?? null}
+            focusSelected={focusSelected}
+            onSelect={onMarker}
+            fitKey={fitKey}
+            arriveZoomed
+          />
         </div>
         <div className="absolute top-3 right-0 z-[500] flex flex-col border border-r-0 border-line">
           <button
@@ -109,6 +120,11 @@ export function MapScreen({ vm }: { vm: MapVM }) {
           onTouchEnd={onTouchEnd}
           className="border-t border-line bg-bg pb-[env(safe-area-inset-bottom)]"
         >
+          {missing && (
+            <p role="status" className="border-b border-line px-3 py-2 text-xs font-semibold">
+              L’evento cercato non rientra nei filtri attuali (raggio o periodo).
+            </p>
+          )}
           {placeRows.length > 0 && (
             <>
               <div className="flex min-h-11 items-center justify-between gap-2 border-b border-line px-3 text-xs font-semibold">
