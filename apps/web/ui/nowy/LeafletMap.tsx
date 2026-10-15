@@ -3,8 +3,8 @@
 import "leaflet/dist/leaflet.css";
 import "leaflet.markercluster/dist/MarkerCluster.css";
 import { divIcon, latLng, point, type MarkerCluster, type Marker as LMarker, type MarkerClusterGroup as LGroup } from "leaflet";
-import { useEffect, useMemo, useRef, useState, type RefObject } from "react";
-import { Circle, MapContainer, Marker, TileLayer, useMap } from "react-leaflet";
+import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from "react";
+import { Circle, MapContainer, Marker, TileLayer, Tooltip, useMap, useMapEvent } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import { useReducedMotion } from "@/hooks/useMotion";
 import { useResolvedTheme } from "@/hooks/useTheme";
@@ -23,16 +23,34 @@ const ATTRIBUTION = 'Tiles &copy; Esri &mdash; Esri, HERE, Garmin, &copy; <a hre
 
 type Row = MapVM["rows"][number];
 
-/** Un solo linguaggio: quadrati. Più eventi nello stesso luogo = quadrato col numero e ombra "a pila". */
-const icon = (selected: boolean, count: number) =>
-  divIcon({
+/** Zoom d'arrivo dal dettaglio: l'ultimo con tile native, strade e nomi leggibili. */
+const ARRIVAL_ZOOM = 16;
+/** Sotto questo zoom il callout coprirebbe i marker vicini: si nasconde (CSS). */
+const CALLOUT_MIN_ZOOM = 13;
+/** Asta del pin selezionato: la punta è il punto esatto dell'evento. */
+const STEM = 14;
+/** Metà larghezza massima del callout + margine: il pin non va più vicino di così al bordo. */
+const CALLOUT_HALF_W = 136;
+
+/**
+ * Un solo linguaggio: quadrati. Più eventi nello stesso luogo = quadrato col numero e ombra "a pila".
+ * Il selezionato è un pin: quadrato più grande su un'asta, ancorato alla punta.
+ */
+function icon(selected: boolean, count: number) {
+  const box = count > 1 ? (selected ? 36 : 28) : selected ? 32 : 28;
+  const height = selected ? box + STEM : box;
+  return divIcon({
     className: `nowy-marker${selected ? " is-selected" : ""}${count > 1 ? " has-count" : ""}`,
     html: count > 1 ? `<span>${count}</span>` : "",
     // Area di tocco ≥ 28px: il quadrato visibile è disegnato dentro (::before)
-    iconSize: count > 1 ? (selected ? [34, 34] : [28, 28]) : (selected ? [32, 32] : [28, 28]),
+    iconSize: [box, height],
+    iconAnchor: [box / 2, selected ? height : box / 2],
+    // Il callout sta sopra il quadrato, non sopra la punta
+    tooltipAnchor: [0, selected ? -height : -box / 2],
     // Opzione extra: Leaflet copia tutte le opzioni dell'icona, la rilegge clusterIcon
     ...({ count } as object),
   });
+}
 
 const eventsIn = (cluster: MarkerCluster) =>
   cluster
@@ -60,19 +78,33 @@ const radiusLabel = (km: number) =>
 const radiusBounds = (origin: MapVM["origin"], radiusKm: number) =>
   latLng(origin.lat, origin.lng).toBounds(radiusKm * 2000);
 
-function FitRadius({ origin, radiusKm, animate }: Pick<MapVM, "origin" | "radiusKm"> & { animate: boolean }) {
+type FitArgs = { lat: number; lng: number; radiusKm: number; fitKey: number };
+const sameFit = (a: FitArgs, b: FitArgs) =>
+  a.lat === b.lat && a.lng === b.lng && a.radiusKm === b.radiusKm && a.fitKey === b.fitKey;
+
+/**
+ * Inquadra il raggio all'apertura, quando cambiano origine o raggio e con «Inquadra raggio» (fitKey).
+ * Arrivando su un evento la mappa nasce già zoomata lì: finché i parametri sono quelli dell'arrivo
+ * non si inquadra (confronto di valori, non "primo run": in sviluppo gli effetti girano due volte).
+ */
+function FitRadius({ origin, radiusKm, fitKey, animate, keepFrom }: Pick<MapVM, "origin" | "radiusKm"> & {
+  fitKey: number;
+  animate: boolean;
+  keepFrom: FitArgs | null;
+}) {
   const map = useMap();
   useEffect(() => {
     // Anche al ritorno da <Activity> nascosta: il contenitore era display:none
     map.invalidateSize();
-    map.fitBounds(radiusBounds(origin, radiusKm), { padding: [12, 12], animate });
+    const args = { lat: origin.lat, lng: origin.lng, radiusKm, fitKey };
+    if (!keepFrom || !sameFit(keepFrom, args)) map.fitBounds(radiusBounds(origin, radiusKm), { padding: [12, 12], animate });
     // Il pannello del luogo cambia altezza senza ridimensionare finestra.
     const resize = new ResizeObserver(() => map.invalidateSize({ animate: false }));
     resize.observe(map.getContainer());
     return () => resize.disconnect();
-    // `animate` non deve rifare il fit
+    // `animate` e `keepFrom` (fisso dal mount) non devono rifare il fit
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [map, origin.lat, origin.lng, radiusKm]);
+  }, [map, origin.lat, origin.lng, radiusKm, fitKey]);
   return null;
 }
 
@@ -85,11 +117,13 @@ function ShowSelected({
   markers,
   group,
   animate,
+  coverRight,
 }: {
   id: string | undefined;
   markers: RefObject<Map<string, LMarker>>;
   group: RefObject<LGroup | null>;
   animate: boolean;
+  coverRight: number;
 }) {
   const map = useMap();
   useEffect(() => {
@@ -101,17 +135,36 @@ function ShowSelected({
       if (!marker) return;
       const g = group.current;
       // Dentro un cluster chiuso: il "genitore visibile" è il cluster, non il marker
-      if (g?.hasLayer(marker) && g.getVisibleParent(marker) !== marker) {
-        g.zoomToShowLayer(marker);
-      } else if (!map.getBounds().pad(-0.15).contains(marker.getLatLng())) {
-        map.panTo(marker.getLatLng(), { animate });
-      }
+      // Margini per il callout (centrato sul pin, largo fino a ~240px, alto ~60px) e per l'eventuale
+      // pannello che copre il lato destro della mappa
+      const pan = () =>
+        !cancelled &&
+        map.panInside(marker.getLatLng(), {
+          paddingTopLeft: [CALLOUT_HALF_W, 96],
+          paddingBottomRight: [coverRight + CALLOUT_HALF_W, 32],
+          animate,
+        });
+      if (g?.hasLayer(marker) && g.getVisibleParent(marker) !== marker) g.zoomToShowLayer(marker, pan);
+      else pan();
     });
     return () => {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [map, id, markers, group]);
+  }, [map, id, markers, group, coverRight]);
+  return null;
+}
+
+/** Callout nascosto da lontano: classe sul contenitore, aggiornata a ogni zoom. */
+function CalloutZoom() {
+  const map = useMap();
+  // Stabile: useMapEvent riaggancia il listener a ogni nuova funzione, e nel frattempo lo zoomend del
+  // fitBounds di FitRadius (stesso commit) andrebbe perso
+  const sync = useCallback(() => {
+    map.getContainer().classList.toggle("callout-far", map.getZoom() < CALLOUT_MIN_ZOOM);
+  }, [map]);
+  useMapEvent("zoomend", sync);
+  useEffect(sync, [sync]);
   return null;
 }
 
@@ -123,6 +176,10 @@ type Props = {
   onSelect: (id: string, place: string) => void;
   /** Incrementato dal pulsante "Inquadra raggio" */
   fitKey: number;
+  /** Arrivo dal dettaglio (solo mobile): la mappa nasce zoomata sul selezionato invece che sul raggio */
+  arriveZoomed?: boolean;
+  /** Px a destra coperti da un pannello sopra la mappa: il selezionato va tenuto fuori */
+  coverRight?: number;
 };
 
 let mapGeneration = 0;
@@ -145,11 +202,18 @@ export default function LeafletMap(props: Props) {
   return <LiveMap key={generation} {...props} />;
 }
 
-function LiveMap({ vm, selectedId, focusSelected, onSelect, fitKey }: Props) {
+function LiveMap({ vm, selectedId, focusSelected, onSelect, fitKey, arriveZoomed = false, coverRight = 0 }: Props) {
   const theme = useResolvedTheme();
   const reducedMotion = useReducedMotion();
   const groupRef = useRef<LGroup | null>(null);
   const markerRefs = useRef(new Map<string, LMarker>());
+  // Fissati al mount (anche dopo Indietro, che rimonta la mappa): dove nasce e cosa non va reinquadrato
+  const [arrival] = useState(() => {
+    const row = arriveZoomed && focusSelected ? vm.rows.find((r) => r.id === selectedId) : undefined;
+    return row
+      ? { center: [row.lat, row.lng] as [number, number], keep: { ...vm.origin, radiusKm: vm.radiusKm, fitKey } }
+      : null;
+  });
 
   // Più eventi nello stesso luogo: un solo marker (il selezionato o il primo), gli altri si scorrono nella card
   const markers = useMemo(() => {
@@ -171,7 +235,7 @@ function LiveMap({ vm, selectedId, focusSelected, onSelect, fitKey }: Props) {
 
   return (
     <MapContainer
-      bounds={radiusBounds(vm.origin, vm.radiusKm)}
+      {...(arrival ? { center: arrival.center, zoom: ARRIVAL_ZOOM } : { bounds: radiusBounds(vm.origin, vm.radiusKm) })}
       zoomControl={false}
       className={`h-full w-full ${theme === "dark" ? "is-dark" : ""}`}
       attributionControl
@@ -184,7 +248,14 @@ function LiveMap({ vm, selectedId, focusSelected, onSelect, fitKey }: Props) {
     >
       {/* key: cambiando tema si ricrea il layer, senza tile del vecchio tema in cache sullo schermo */}
       <TileLayer key={theme} url={TILES[theme]} attribution={ATTRIBUTION} maxNativeZoom={16} maxZoom={18} />
-      <FitRadius key={fitKey} origin={vm.origin} radiusKm={vm.radiusKm} animate={!reducedMotion} />
+      <FitRadius
+        origin={vm.origin}
+        radiusKm={vm.radiusKm}
+        fitKey={fitKey}
+        animate={!reducedMotion}
+        keepFrom={arrival?.keep ?? null}
+      />
+      <CalloutZoom />
       <Circle
         center={[vm.origin.lat, vm.origin.lng]}
         radius={vm.radiusKm * 1000}
@@ -214,7 +285,8 @@ function LiveMap({ vm, selectedId, focusSelected, onSelect, fitKey }: Props) {
         spiderLegPolylineOptions={{ className: "leaflet-cluster-spider-leg", weight: 1.5, opacity: 1 }}
         zoomToBoundsOnClick
         animate={!reducedMotion}
-        chunkedLoading
+        // Niente caricamento a blocchi: all'arrivo il marker selezionato dev'essere già nel gruppo
+        // (ShowSelected apre il suo cluster). Le righe sono al massimo qualche centinaio.
       >
         {markers.map(({ key, row, count }) => (
           <Marker
@@ -229,11 +301,28 @@ function LiveMap({ vm, selectedId, focusSelected, onSelect, fitKey }: Props) {
             alt={row.title}
             zIndexOffset={row.id === selectedId ? 1000 : 0}
             eventHandlers={{ click: () => onSelect(row.id, key) }}
-          />
+          >
+            {/* Solo per una scelta dell'utente: all'apertura il selezionato è il primo evento, nessuno l'ha scelto */}
+            {focusSelected && row.id === selectedId && (
+              <Tooltip permanent direction="top" className="nowy-callout">
+                {/* Ripete la card sotto la mappa: nascosto agli screen reader */}
+                <span aria-hidden="true">
+                  <b>{row.venue ?? row.title}</b>
+                  {row.address && <span>{row.address}</span>}
+                </span>
+              </Tooltip>
+            )}
+          </Marker>
         ))}
       </MarkerClusterGroup>
       {focusSelected && (
-        <ShowSelected id={selectedMarkerId} markers={markerRefs} group={groupRef} animate={!reducedMotion} />
+        <ShowSelected
+          id={selectedMarkerId}
+          markers={markerRefs}
+          group={groupRef}
+          animate={!reducedMotion}
+          coverRight={coverRight}
+        />
       )}
     </MapContainer>
   );

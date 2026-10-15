@@ -30,6 +30,7 @@ import type {
   EventDetailVM,
   EventRowVM,
   HeaderVM,
+  MapRowVM,
   MapVM,
   RowGroupVM,
   SavedVM,
@@ -214,6 +215,17 @@ export function presentSaved(events: EventItem[], missingIds: readonly string[],
   };
 }
 
+/** Luogo e indirizzo: il nome del luogo spesso è ripetuto all'inizio dell'indirizzo. */
+function placeLines(e: EventItem): Pick<MapRowVM, "venue" | "address"> {
+  const venue = e.venueName;
+  const address = joinAddress(e.address, e.city);
+  return {
+    venue,
+    address:
+      venue && address?.toLowerCase().startsWith(venue.toLowerCase()) ? joinAddress(address.slice(venue.length)) : address,
+  };
+}
+
 export function presentMap(
   events: EventItem[],
   f: Filters,
@@ -223,6 +235,7 @@ export function presentMap(
   selectedId: string | null,
 ): MapVM {
   const agenda = presentAgenda(events, f, firstDay, now);
+  const byId = new Map(events.map((e) => [e.id, e]));
   return {
     origin,
     selectedId,
@@ -230,7 +243,7 @@ export function presentMap(
     countLabel: agenda.countLabel,
     empty: agenda.empty ? presentEmpty(f, "mappa") : null,
     rows: agenda.days.flatMap((d) =>
-      [...(d.ongoing?.rows ?? []), ...d.groups.flatMap((g) => g.rows)].map((r) => ({ ...r, dayNum: d.num, dayLabel: d.label })),
+      [...(d.ongoing?.rows ?? []), ...d.groups.flatMap((g) => g.rows)].map((r) => ({ ...r, ...placeLines(byId.get(r.id)!), dayNum: d.num, dayLabel: d.label })),
     ),
   };
 }
@@ -276,8 +289,7 @@ export function presentDetail(e: EventItem, f: Filters, now: Date): EventDetailV
   const shownDay = ongoing ? new Date(Math.max(now.getTime(), periodStart.getTime())).toISOString() : e.startsAt;
   const { num, label } = formatDayHeading(shownDay);
   const external = safeExternalUrl(e.url);
-  const venue = e.venueName;
-  const address = joinAddress(e.address, e.city);
+  const { venue, address } = placeLines(e);
   return {
     id: e.id,
     title: e.title,
@@ -296,10 +308,7 @@ export function presentDetail(e: EventItem, f: Filters, now: Date): EventDetailV
         ? `${formatTime(e.startsAt)} – ${formatTime(e.endsAt)}`
         : formatTime(e.startsAt),
     venue,
-    // Il nome del luogo spesso è ripetuto all'inizio dell'indirizzo
-    address: venue && address?.toLowerCase().startsWith(venue.toLowerCase())
-      ? joinAddress(address.slice(venue.length))
-      : address,
+    address,
     distanceLabel: e.distanceKm != null
       ? `${formatKm(e.distanceKm)} da ${f.origin ? "te" : "Torino centro"}, in linea d'aria`
       : null,

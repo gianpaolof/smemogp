@@ -5,6 +5,9 @@ import { usePathname, useRouter } from "next/navigation";
 import { DESKTOP_QUERY, useMediaQuery } from "@/hooks/useMediaQuery";
 import type { MapVM } from "@/ui/contracts";
 
+/** Il pannello dettaglio copre il lato destro della mappa (DetailPanel, `lg:w-[440px]`). */
+const DETAIL_PANEL_PX = 440;
+
 const LeafletMap = dynamic(() => import("./LeafletMap"), {
   ssr: false,
   loading: () => <div className="hatch h-full w-full" />,
@@ -29,5 +32,14 @@ export function DesktopMap({ vm }: { vm: MapVM }) {
     else router.push(row.href, { scroll: false });
   };
 
-  return <LeafletMap vm={vm} selectedId={selectedId} focusSelected={selectedId !== null} onSelect={open} fitKey={0} />;
+  return (
+    <LeafletMap
+      vm={vm}
+      selectedId={selectedId}
+      focusSelected={selectedId !== null}
+      onSelect={open}
+      fitKey={0}
+      coverRight={selectedId ? DETAIL_PANEL_PX : 0}
+    />
+  );
 }
