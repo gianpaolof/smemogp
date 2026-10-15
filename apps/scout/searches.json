@@ -28,5 +28,11 @@
     "query": "eventi per bambini e famiglie a Torino: laboratori, spettacoli, visite",
     "category": "famiglie",
     "maxPages": 5
+  },
+  {
+    "id": "trekking",
+    "query": "trekking ed escursioni guidate di gruppo con data fissa a Torino e nelle valli vicine (Val di Susa, Valli di Lanzo, Pinerolese, Canavese, colline torinesi): uscite CAI, guide escursionistiche, camminate e passeggiate naturalistiche",
+    "category": "outdoor",
+    "maxPages": 6
   }
 ]
