@@ -136,19 +136,34 @@ export async function persistEvents(
   const final = [...unique.values()];
   if (dryRun) return { rows: final, stats: { ...stats, saved: final.length } };
 
-  // Batch atomici a blocchi: una transazione interattiva fa un giro di rete per istruzione
-  // e su Turso scade con lotti grandi (Vivaticket: ~800 eventi); un batch unico da ~1600
-  // istruzioni viene rifiutato («other side closed»). Upsert idempotenti: un blocco fallito
-  // si recupera al run successivo.
-  for (let i = 0; i < final.length; i += WRITE_CHUNK) await writeChunk(db, source.id, final.slice(i, i + WRITE_CHUNK));
+  // Batch atomici a blocchi da 100: un giro di rete per blocco invece che per istruzione.
+  for (let i = 0; i < final.length; i += WRITE_CHUNK)
+    await writeChunk(db, source.id, final.slice(i, i + WRITE_CHUNK), i / WRITE_CHUNK);
 
   return { rows: final, stats: { ...stats, saved: final.length } };
 }
 
 const WRITE_CHUNK = 100;
 
-/** Evento + provenienza nello stesso batch: mai un evento senza la sua `event_sources`. */
-async function writeChunk(db: Db, sourceId: string, chunk: NewEvent[]) {
+/** Connessione chiusa dal server (undici `UND_ERR_SOCKET`), cercata lungo tutta la catena `cause`. */
+export function isClosedSocket(err: unknown) {
+  for (let e = err, depth = 0; e && depth < 8; e = (e as { cause?: unknown }).cause, depth++)
+    if ((e as { code?: unknown }).code === "UND_ERR_SOCKET") return true;
+  return false;
+}
+
+/**
+ * Evento + provenienza nello stesso batch: mai un evento senza la sua `event_sources`.
+ *
+ * Un solo nuovo tentativo se il server ha chiuso la connessione: dopo una pausa lunga senza
+ * traffico (Vivaticket: ~107 s di dedup su ~900 eventi) Turso chiude la connessione inattiva e
+ * il client la riusa (run 38962271756: fallito in 70 ms, stesso blocco riuscito subito dopo).
+ * undici scarta il socket guasto, quindi il nuovo tentativo ne apre uno nuovo. È sicuro anche se
+ * il primo batch fosse stato applicato con risposta persa: stesse istruzioni (dati, id e
+ * timestamp calcolati una volta sola) e upsert che riapplicati danno lo stesso stato; nessun trigger.
+ */
+async function writeChunk(db: Db, sourceId: string, chunk: NewEvent[], index: number) {
+  const now = new Date();
   const writes = chunk.flatMap((row) => [
     db
       .insert(events)
@@ -170,7 +185,7 @@ async function writeChunk(db: Db, sourceId: string, chunk: NewEvent[]) {
           lng: sql`coalesce(${events.lng}, excluded.lng)`,
           imageUrl: sql`coalesce(excluded.image_url, ${events.imageUrl})`,
           priceText: sql`coalesce(excluded.price_text, ${events.priceText})`,
-          updatedAt: new Date(),
+          updatedAt: now,
         },
       }),
     db
@@ -178,8 +193,16 @@ async function writeChunk(db: Db, sourceId: string, chunk: NewEvent[]) {
       .values({ eventId: row.id!, sourceId, url: row.url })
       .onConflictDoUpdate({
         target: [eventSources.eventId, eventSources.sourceId],
-        set: { url: row.url, lastSeenAt: new Date() },
+        set: { url: row.url, lastSeenAt: now },
       }),
   ]);
-  if (writes.length) await db.batch(writes as [(typeof writes)[number], ...typeof writes]);
+  if (!writes.length) return;
+  const batch = writes as [(typeof writes)[number], ...typeof writes];
+  try {
+    await db.batch(batch);
+  } catch (err) {
+    if (!isClosedSocket(err)) throw err;
+    console.warn(`  [persist] ${sourceId} blocco ${index}: connessione chiusa dal server, nuovo tentativo`);
+    await db.batch(batch);
+  }
 }

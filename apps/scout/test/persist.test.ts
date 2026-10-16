@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import { migrate } from "drizzle-orm/libsql/migrator";
 import { createDb, deletedEvents, eventSources, events } from "@smemogp/db";
 import { restoreArchived, snapshot } from "../src/lib/archive.ts";
-import { persistEvents } from "../src/lib/persist.ts";
+import { isClosedSocket, persistEvents } from "../src/lib/persist.ts";
 import type { RawEvent } from "../src/types.ts";
 
 const migrationsFolder = fileURLToPath(new URL("../../../packages/db/migrations", import.meta.url));
@@ -78,6 +78,46 @@ test("mostra aperta da mesi e ancora in corso → fusa, non duplicata", async ()
   ]);
   assert.equal(stats.merged, 1);
   assert.equal((await db.select().from(events).all()).length, 1);
+});
+
+const closedSocket = () => new TypeError("fetch failed", { cause: Object.assign(new Error("other side closed"), { code: "UND_ERR_SOCKET" }) });
+
+test("connessione chiusa: riconosciuta lungo la catena cause, non altri errori", () => {
+  assert.ok(isClosedSocket(closedSocket()));
+  assert.ok(isClosedSocket(new Error("Failed query", { cause: closedSocket() })));
+  assert.ok(!isClosedSocket(new Error("SQLITE_CONSTRAINT")));
+  assert.ok(!isClosedSocket(undefined));
+});
+
+test("blocco su connessione chiusa: un nuovo tentativo con le stesse istruzioni", async (t) => {
+  const db = await freshDb();
+  const batch = db.batch.bind(db);
+  const calls: unknown[] = [];
+  t.mock.method(console, "warn", () => {});
+  t.mock.method(db, "batch", async (queries: Parameters<typeof db.batch>[0]) => {
+    calls.push(queries);
+    if (calls.length === 1) throw closedSocket();
+    return batch(queries);
+  });
+  const event = { title: "Concerto", startsAt: new Date(`${nextSaturday()}T21:00:00+01:00`), allDay: false, url: "https://a.it/1" };
+  await persistEvents(db, { id: "a" }, [event]);
+  assert.equal(calls.length, 2);
+  assert.equal(calls[0], calls[1], "stesso batch: dati, id e timestamp identici");
+  assert.equal((await db.select().from(events).all()).length, 1);
+  assert.equal((await db.select().from(eventSources).all()).length, 1);
+});
+
+test("blocco: secondo fallimento o errore diverso si propagano", async (t) => {
+  const db = await freshDb();
+  t.mock.method(console, "warn", () => {});
+  const event = { title: "Concerto", startsAt: new Date(`${nextSaturday()}T21:00:00+01:00`), allDay: false, url: "https://a.it/1" };
+  const always = t.mock.method(db, "batch", async () => { throw closedSocket(); });
+  await assert.rejects(persistEvents(db, { id: "a" }, [event]), /fetch failed/);
+  assert.equal(always.mock.callCount(), 2);
+  always.mock.restore();
+  const other = t.mock.method(db, "batch", async () => { throw new Error("SQLITE_CONSTRAINT"); });
+  await assert.rejects(persistEvents(db, { id: "a" }, [event]), /SQLITE_CONSTRAINT/);
+  assert.equal(other.mock.callCount(), 1);
 });
 
 test("esclusi e passati non vengono salvati; dry-run non scrive", async () => {

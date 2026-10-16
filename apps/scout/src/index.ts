@@ -86,6 +86,24 @@ async function pruneOldEvents(db: Db) {
     .where(notExists(db.select().from(events).where(eq(events.id, eventSources.eventId))));
 }
 
+/**
+ * Diagnostica: catena completa delle cause, senza la query (lunga e già nota). Per gli errori
+ * di rete di undici (`SocketError`) il socket dice se la richiesta è partita e se è arrivata risposta.
+ */
+function logErrorChain(err: unknown) {
+  let level = 0;
+  for (let e: unknown = err; e && level < 6; e = (e as { cause?: unknown }).cause, level++) {
+    if (!(e instanceof Error)) {
+      console.error(`  [${level}] ${String(e)}`);
+      break;
+    }
+    const { code, socket } = e as Error & { code?: string; socket?: Record<string, unknown> };
+    console.error(`  [${level}] ${e.name}${code ? ` (${code})` : ""}: ${e.message.split("\n")[0].slice(0, 200)}`);
+    if (socket) console.error(`      socket: ${JSON.stringify(socket)}`);
+  }
+  if (err instanceof Error && err.stack) console.error(err.stack.split("\n").slice(1, 12).join("\n"));
+}
+
 async function main() {
   const db = createDb();
   const sources = await loadSources(args.only);
@@ -103,6 +121,7 @@ async function main() {
       const cause = err instanceof Error && err.cause instanceof Error ? ` (causa: ${err.cause.message})` : "";
       const message = (err instanceof Error ? err.message : String(err)) + cause;
       console.error(`✗ ${source.id}: ${message}`);
+      logErrorChain(err);
       if (!args["dry-run"]) {
         const run = { lastRunAt: new Date(), lastStatus: "error" as const, lastError: message };
         await db.insert(sourceRuns).values({ sourceId: source.id, ...run }).onConflictDoUpdate({ target: sourceRuns.sourceId, set: run });
