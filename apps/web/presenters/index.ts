@@ -105,6 +105,7 @@ function presentRow(e: EventItem, f: Filters, day: string, highlight: boolean): 
     href: hrefWith(`/evento/${encodeURIComponent(e.id)}`, f),
     title: e.title,
     kicker: `${when} — ${CATEGORY_LABELS[e.category]}`,
+    category: e.category,
     // Il dominio dice dove porta il link ↗ prima di aprirlo
     meta: [place, e.priceText, external?.host].filter(Boolean).join(" · "),
     imageUrl: e.imageUrl,
@@ -281,6 +282,7 @@ export function presentBottomBar(f: Filters, view: View): BottomBarVM {
   const isWeekendDisabled = f.period === "stasera" || f.period === "oggi";
   const catItem = (c: Category) => ({
     label: CATEGORY_LABELS[c],
+    category: c,
     href: hrefWith(path, toggleCategory(f, c)),
     active: f.categories.includes(c),
   });
@@ -335,6 +337,7 @@ export function presentDetail(e: EventItem, f: Filters, now: Date): EventDetailV
     title: e.title,
     longTitle: e.title.length > 60,
     categoryLabel: CATEGORY_LABELS[e.category],
+    category: e.category,
     dayKey: dayKey(shownDay),
     dayNum: num,
     dayLabel: label,
