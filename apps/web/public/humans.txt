@@ -1,0 +1,16 @@
+/* TEAM */
+Autore: gianpaolof
+GitHub: https://github.com/gianpaolof
+Da: Torino, Italia
+
+/* THANKS */
+Le fonti degli eventi: elenco su /info
+Mappe: Esri. Dati geografici: OpenStreetMap contributors (Nominatim)
+Scritto insieme ad agenti AI (Claude Code)
+
+/* SITE */
+Inizio: 2026-10-11
+Lingua: italiano
+Strumenti: Next.js, Tailwind, Turso, Drizzle, Leaflet, GitHub Actions, Vercel
+Codice: https://github.com/gianpaolof/smemogp
+Gusti: niente lirica, più sentieri.
