@@ -8,8 +8,9 @@ const API = "https://apigatewayb2cstore.vivaticket.com/api";
 const itemSchema = z.object({ id: z.string().regex(/^\d+$/), slug: z.string().min(1), typology: z.string(), ticketTypeId: z.string() });
 const searchSchema = z.object({ items: z.array(itemSchema), totalItems: z.number().int().nonnegative() });
 const text = z.string().nullish();
+const LONG_RUN_MS = 60 * 24 * 60 * 60 * 1000;
 const detailSchema = z.object({
-  infoPerformance: z.object({ performances: z.array(z.object({ datetime: z.string(), title: text })) }),
+  infoPerformance: z.object({ performances: z.array(z.object({ datetime: z.string() })) }),
   infoEvent: z.object({
     venueDetail: z.object({ name: text, city: text, provinceCode: z.string(), address: text,
       latitude: z.number().min(-90).max(90).nullish(), longitude: z.number().min(-180).max(180).nullish() }),
@@ -34,7 +35,6 @@ export function vivaticketEvents(detail: unknown, url: string): RawEvent[] {
   const venue = infoEvent.venueDetail;
   if (venue.provinceCode !== "TO") return [];
   const event = infoEvent.eventDetail;
-  if (event.ticketTypeId !== "0") return [];
   if (["Sport", "Opera e balletto", "Musica"].includes(event.categoryName ?? "")) return [];
   const description = htmlToText([event.categoryName, event.subCategoryName, event.subTitle,
     event.description, event.note, event.shout, event.sellShout].filter(Boolean).join("\n"), url);
@@ -45,17 +45,20 @@ export function vivaticketEvents(detail: unknown, url: string): RawEvent[] {
   const rows: RawEvent[] = infoPerformance.performances.flatMap((performance) => {
     if (!performance.datetime) return []; // Pagine generali e biglietti senza appuntamento datato.
     const startsAt = localDate(performance.datetime);
-    const title = performance.title || event.title;
-    const key = `${title}|${startsAt.toISOString()}`;
+    const key = startsAt.toISOString();
     if (seen.has(key)) return [];
     seen.add(key);
-    return [{ title, startsAt, allDay: false, description, category,
+    return [{ title: event.title, startsAt, allDay: false, description, category,
       venueName: venue.name, address: venue.address, city: venue.city,
       lat: venue.latitude === 0 && venue.longitude === 0 ? null : venue.latitude,
       lng: venue.latitude === 0 && venue.longitude === 0 ? null : venue.longitude,
       imageUrl: event.image, url }];
   });
-  if (!rows.length || !["Mostre", "Musei"].includes(event.subCategoryName ?? "")) return rows;
+  if (!rows.length) return rows;
+  const exhibition = ["Mostre", "Musei"].includes(event.subCategoryName ?? "");
+  // Programmazione oltre due mesi = visita o luogo aperto, non spettacolo: un solo evento a intervallo.
+  const longRun = rows.at(-1)!.startsAt.getTime() - rows[0].startsAt.getTime() > LONG_RUN_MS;
+  if (!exhibition && !longRun) return rows;
   const dates = infoPerformance.performances.map(p => p.datetime).filter(Boolean).sort();
   const first = event.startDate || dates[0];
   const last = event.endDate || dates.at(-1)!;
@@ -68,7 +71,7 @@ export function vivaticketEvents(detail: unknown, url: string): RawEvent[] {
   const startsAt = day(first, 0, 0);
   const endsAt = day(last, 23, 59);
   if (endsAt < startsAt) throw new Error("Vivaticket: intervallo mostra non valido");
-  return [{ ...rows[0], title: event.title, startsAt, endsAt, allDay: true, category: "mostre" }];
+  return [{ ...rows[0], startsAt, endsAt, allDay: true, category: exhibition ? "mostre" : rows[0].category }];
 }
 
 export const vivaticketAdapter: Adapter = {
@@ -101,6 +104,14 @@ export const vivaticketAdapter: Adapter = {
   },
   extract: async (_source, content) => {
     const details = z.array(z.object({ url: z.string().url(), detail: detailSchema })).parse(JSON.parse(content.body));
-    return details.flatMap(({ url, detail }) => vivaticketEvents(detail, url));
+    // Una scheda con date anomale non deve far perdere le altre.
+    return details.flatMap(({ url, detail }) => {
+      try {
+        return vivaticketEvents(detail, url);
+      } catch (error) {
+        console.warn(`[vivaticket] ${url} scartato: ${error instanceof Error ? error.message : error}`);
+        return [];
+      }
+    });
   },
 };

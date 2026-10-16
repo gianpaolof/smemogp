@@ -48,10 +48,6 @@ test("Vivaticket: non inventa repliche, rifiuta payload e date invalidi, elimina
   assert.equal(vivaticketEvents(data, url).length, 9);
   data.infoPerformance.performances[0].datetime = "2026-02-30T20:45:00";
   assert.throws(() => vivaticketEvents(data, url), /data non valida/);
-  data.infoPerformance.performances[0].datetime = "2026-10-16T20:45:00";
-  data.infoEvent.eventDetail.ticketTypeId = "1";
-  assert.deepEqual(vivaticketEvents(data, url), []);
-  data.infoEvent.eventDetail.ticketTypeId = "0";
   data.infoPerformance.performances = [{ datetime: "", title: "Pagina generale" }];
   assert.deepEqual(vivaticketEvents(data, url), []);
   data.infoPerformance.performances = [];
@@ -104,6 +100,19 @@ test("Vivaticket: una scheda guasta non perde gli altri eventi", async (t) => {
   assert.equal(warnings.length, 1);
 });
 
+test("Vivaticket: una data anomala scarta solo la sua scheda", async (t) => {
+  const source = (await readCatalog()).find(s => s.id === "vivaticket-torino")!;
+  const warnings: unknown[] = [];
+  t.mock.method(console, "warn", (message: unknown) => warnings.push(message));
+  const broken = fixture();
+  broken.infoPerformance.performances[0].datetime = "2026-10-16T20:45:00.000Z";
+  const body = JSON.stringify([{ url: `${url}?rotta`, detail: broken }, { url, detail: fixture() }]);
+  const events = await vivaticketAdapter.extract(source, { url: source.url, body });
+  assert.equal(events.length, 9);
+  assert.ok(events.every(e => e.url === url));
+  assert.equal(warnings.length, 1);
+});
+
 test("Vivaticket: mostra di ottobre = un evento in corso il 16, non uno per ingresso", () => {
   const data = fixture();
   Object.assign(data.infoEvent.eventDetail, { categoryName: "Arte", subCategoryName: "Mostre",
@@ -130,6 +139,19 @@ test("Vivaticket: museo senza intervallo dichiarato usa i giorni degli ingressi;
   assert.equal(vivaticketEvents(data, url).length, 1);
   data.infoPerformance.performances = [{ datetime: "", title: "Museo" }];
   assert.deepEqual(vivaticketEvents(data, url), []);
+});
+
+test("Vivaticket: visita ogni giorno per tre mesi = un evento a intervallo, non una riga per ingresso", () => {
+  const data = fixture();
+  data.infoPerformance.performances = Array.from({ length: 80 }, (_, i) =>
+    ({ datetime: new Date(Date.UTC(2026, 9, 17 + i, 9, 30)).toISOString().slice(0, 19) }));
+  Object.assign(data.infoEvent.eventDetail, { categoryName: "Altri eventi", subCategoryName: "Altri eventi",
+    startDate: "2026-10-17T09:30:00", endDate: "2027-01-04T09:30:00" });
+  const events = vivaticketEvents(data, url);
+  assert.equal(events.length, 1);
+  assert.equal(events[0].allDay, true);
+  assert.equal(events[0].category, "altro");
+  assert.equal(events[0].endsAt?.toISOString(), "2027-01-04T22:59:00.000Z");
 });
 
 test("Vivaticket: esclude Sport, Opera e balletto, Musica tramite categoria della fonte", () => {

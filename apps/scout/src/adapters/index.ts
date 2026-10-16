@@ -20,8 +20,8 @@ const custom: Record<string, Adapter> = {
   mao: maoAdapter,
   tacco: taccoAdapter,
   tribe: tribeAdapter,
-  zero: zeroAdapter,
   vivaticket: vivaticketAdapter,
+  zero: zeroAdapter,
 };
 
 /** HTML: JSON-LD (gratis). LLM solo se la fonte lo chiede (`llm: true`): costa a ogni run. */

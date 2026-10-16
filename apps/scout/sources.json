@@ -8,7 +8,7 @@
     "status": "active",
     "phase": 1,
     "area": "Torino e provincia",
-    "notes": "API del sito: ricerca paginata provincia TO e dettagli con singole repliche, orari Europe/Rome, coordinate e descrizione. Mostre e musei: un solo evento con intervallo. Escluse le categorie Vivaticket Sport, Opera e balletto, Musica. Esclude abbonamenti e biglietti open (ticketTypeId diverso da 0). Prezzi non disponibili nel dettaglio. Sonda 2026-10-16."
+    "notes": "API del sito: ricerca paginata provincia TO e dettagli con singole repliche, orari Europe/Rome, coordinate e descrizione. Mostre, musei e programmazioni oltre 60 giorni (visite, attività fisse): un solo evento con intervallo; spettacoli a repliche separate. Escluse le categorie Vivaticket Sport, Opera e balletto, Musica. Esclude abbonamenti e biglietti open (ticketTypeId diverso da 0). Prezzi non disponibili nel dettaglio. Sonda 2026-10-16."
   },
   {
     "id": "eventbrite-torino",
