@@ -5,6 +5,7 @@ import type { Filters } from "@/domain/types";
 import { presentAgenda, presentBottomBar, presentHeader } from "@/presenters";
 import { Agenda } from "@/ui/nowy/Agenda";
 import { BottomBar } from "@/ui/nowy/BottomBar";
+import { Colophon } from "@/ui/nowy/Colophon";
 import { Header } from "@/ui/nowy/Header";
 import { RestoreFilters } from "@/ui/nowy/RestoreFilters";
 import { AgendaSkeleton } from "@/ui/nowy/Skeletons";
@@ -48,6 +49,7 @@ export async function ListScreen({ searchParams }: { searchParams: SearchParams 
         >
           <AgendaData f={f} />
         </Suspense>
+        <Colophon />
       </main>
       <BottomBar vm={presentBottomBar(f, "lista")} count={<Suspense fallback="gli eventi"><Count f={f} /></Suspense>} />
       <RestoreFilters path="/" query={serializeFilters(f)} />

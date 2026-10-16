@@ -307,6 +307,17 @@ export function FiltersSheet({
           </div>
         </fieldset>
 
+        <Link
+          href="/info"
+          transitionTypes={["nav-forward"]}
+          // Il dialog modale sta nel top layer: chiuderlo prima che la rotta resti nascosta dietro /info
+          onClick={() => dialog.current?.close()}
+          className="press mx-3 mb-3 flex h-12 items-center justify-between border-y border-line text-xs font-semibold hover:bg-line-soft"
+        >
+          Info e colophon
+          <Icon name="right" />
+        </Link>
+
         <div className="sticky bottom-0 border-t border-line bg-bg pb-[env(safe-area-inset-bottom)]">
           <button
             type="button"
