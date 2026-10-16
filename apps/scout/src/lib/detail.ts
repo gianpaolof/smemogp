@@ -7,6 +7,7 @@ import { romeDay } from "./normalize";
 
 const DEFAULT_MAX = 30;
 const PAUSE_MS = 1000; // stesso host: 1 req/s
+const BUDGET_MS = 5 * 60_000; // per fonte: un sito lento (timeout 20 s a scheda) non deve sforare il job da 45 min
 
 const withoutQuery = (u: string) => u.split(/[?#]/)[0].replace(/\/$/, "");
 
@@ -54,7 +55,12 @@ export async function followDetails(
   const byUrl = new Map(listEvents.map((e) => [withoutQuery(e.url), e]));
   const links = detailLinks(source, pages, listEvents);
   let failed = 0;
+  const deadline = Date.now() + BUDGET_MS;
   for (const [i, link] of links.entries()) {
+    if (Date.now() > deadline) {
+      console.warn(`[detail] ${source.id}: tempo esaurito, letti ${i}/${links.length} dettagli`);
+      break;
+    }
     if (i) await new Promise((r) => setTimeout(r, PAUSE_MS));
     try {
       const html = await fetchText(link);

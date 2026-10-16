@@ -1,5 +1,5 @@
 {
-  "reason": "Gusti utente: niente lirica né opera (2026-10-11). «Opera» da sola NON va filtrata: è anche l'opera d'arte delle mostre.",
+  "reason": "Gusti utente (docs/scouting/feedback.md): niente lirica né opera (2026-10-11), niente corsi per neogenitori e attività per neonati (2026-10-15). «Opera» da sola NON va filtrata: è anche l'opera d'arte delle mostre.",
   "venues": ["teatro regio"],
   "patterns": [
     "\\blirica\\b",
@@ -11,6 +11,21 @@
     "\\bbel canto\\b",
     "\\bopera (buffa|seria|in (un|due|tre|quattro|cinque) att[oi])\\b",
     "\\b(la traviata|rigoletto|aida|nabucco|il trovatore|tosca|la boh[eè]me|madama butterfly|turandot|don giovanni|le nozze di figaro|il barbiere di siviglia|cavalleria rusticana|lucia di lammermoor)\\b",
-    "\\b(carmen|norma|pagliacci)\\b[\\s\\S]*\\b(bizet|bellini|leoncavallo)\\b"
+    "\\b(carmen|norma|pagliacci)\\b[\\s\\S]*\\b(bizet|bellini|leoncavallo)\\b",
+    "\\b(gestanti|neo-?mamm[ae]|neo-?genitori|future mamme)\\b",
+    "\\bneo-?pap[àa]",
+    "\\b(in|della|dopo la) gravidanza\\b",
+    "\\bpost-? ?parto\\b",
+    "\\b(allattamento|svezzamento|massaggio infantile|primo soccorso pediatrico|consulenza educativa)\\b",
+    "\\bgenitorialit[àa]",
+    "\\bgenitorial[ei]\\b",
+    "\\b(sportello|consulenza) ostetric",
+    "\\b[12] ?(-|–) ?3 anni\\b",
+    "\\b(incontr[oi]|gruppo|sportello) (di gruppo |di confronto )?per genitori\\b",
+    "\\bincontro tra mamme\\b",
+    "\\bbibliobeb[eè]",
+    "\\b0 ?(-|–|a) ?\\d{1,2} mesi\\b",
+    "\\b0 ?(-|–|a) ?[1-6] ann[oi]\\b",
+    "\\b(da|dai) \\d{1,2} (a|ai) \\d{1,2} mesi\\b"
   ]
 }

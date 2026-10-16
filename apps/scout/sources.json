@@ -126,11 +126,11 @@
   {
     "id": "visit-cuneese",
     "name": "Visit Cuneese",
-    "url": "https://www.visitcuneese.it/",
+    "url": "https://www.visitcuneese.it/ricerca-eventi",
     "format": "html",
     "status": "unverified",
     "area": "Provincia di Cuneo",
-    "notes": "Trovare pagina eventi"
+    "notes": "Sonda 2026-10-15: ricerca eventi dinamica, niente JSON-LD in pagina. Backend D40: nel template c'è solo api-visitcuneese.d40.it/v1/search_accommodation/ (strutture ricettive), nessuna API eventi provata."
   },
   {
     "id": "turismo-torino",
@@ -233,12 +233,12 @@
   {
     "id": "comune-asti",
     "name": "Comune di Asti - Calendario Culturale",
-    "url": "https://www.comune.asti.it",
+    "url": "https://www.comune.asti.it/vivere-comune/eventi",
     "format": "html",
-    "status": "unverified",
+    "status": "skill",
     "phase": 2,
     "area": "Asti",
-    "notes": "Da catalogo agente (homepage, non calendario): Hosts theatrical season 2026/2027 and cultural events. Events calendar with detailed schedule."
+    "notes": "Sonda 2026-10-15: schede HTML con data e categoria, niente JSON-LD né API/ICS. Stagione Teatro Alfieri (via al Teatro 2) fino al 2027. Anche su Visit LMR e DAOP: attenzione ai duplicati."
   },
   {
     "id": "comune-alessandria",
@@ -483,5 +483,38 @@
     "phase": 3,
     "area": "Torino",
     "notes": "Da docs/research/agentceck.txt (sonda agente 2026-10-15), ricontrollata 2026-10-15. Squarespace, nessun evento futuro alla sonda (ultimo luglio 2026). robots vieta format=json."
+  },
+  {
+    "id": "daop-asti",
+    "name": "DAOP – Provincia di Asti",
+    "url": "https://www.daop.it/eventi-provincia-asti.html",
+    "format": "jsonld",
+    "status": "active",
+    "phase": 2,
+    "detail": { "linkPattern": "^/eventi/[a-z0-9-]+\\.html$", "max": 50 },
+    "area": "Provincia di Asti",
+    "notes": "Sonda 2026-10-15. Lista: ItemList JSON-LD (solo url/nome, non Event). Dettaglio: Event JSON-LD con ora, sede, indirizzo e geo. sagre-provincia-asti.html ha gli stessi link (anche di altre province), quindi una sola fonte. Aggregatore: sagre e attività famiglie."
+  },
+  {
+    "id": "daop-cuneo",
+    "name": "DAOP – Provincia di Cuneo",
+    "url": "https://www.daop.it/eventi-provincia-cuneo.html",
+    "format": "jsonld",
+    "status": "active",
+    "phase": 2,
+    "detail": { "linkPattern": "^/eventi/[a-z0-9-]+\\.html$", "max": 80 },
+    "area": "Provincia di Cuneo",
+    "notes": "Sonda 2026-10-15. Come daop-asti: ItemList in lista, Event JSON-LD con geo nel dettaglio. Circa 120 link per pagina, il raggio dell'app filtra quelli lontani."
+  },
+  {
+    "id": "daop-alessandria",
+    "name": "DAOP – Provincia di Alessandria",
+    "url": "https://www.daop.it/eventi-provincia-alessandria.html",
+    "format": "jsonld",
+    "status": "active",
+    "phase": 2,
+    "detail": { "linkPattern": "^/eventi/[a-z0-9-]+\\.html$", "max": 60 },
+    "area": "Provincia di Alessandria",
+    "notes": "Sonda 2026-10-15. Come daop-asti. Parte dell'Alessandrino (Novi, Tortona, Val Curone) supera i 100 km da Torino. Nessuna pagina DAOP per la provincia di Torino."
   }
 ]
