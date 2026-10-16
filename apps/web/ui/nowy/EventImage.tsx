@@ -2,21 +2,21 @@ import Image from "next/image";
 import { isOptimizableImage } from "@/domain/images";
 
 /**
- * Immagine evento in bicromia (nero + accento): poster eterogenei delle fonti diventano un
- * sistema coerente e la bassa risoluzione si nota meno. Host noti → next/image ridimensionata.
+ * Immagine evento, a colori originali. Con `tone="duo"` in bicromia (nero + accento): resa
+ * coerente fra poster eterogenei, ma poster pieni di testo diventano illeggibili.
+ * Host noti → next/image ridimensionata.
  */
 export function EventImage({
   src,
   sizes,
   className = "",
   priority = false,
-  tone = "duo",
+  tone = "color",
 }: {
   src: string;
   sizes: string;
   className?: string;
   priority?: boolean;
-  /** "color" nel dettaglio, dove l'immagine è grande */
   tone?: "duo" | "color";
 }) {
   const img = tone === "duo" ? "duotone-img" : "";
