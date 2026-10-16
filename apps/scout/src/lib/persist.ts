@@ -136,40 +136,41 @@ export async function persistEvents(
   const final = [...unique.values()];
   if (dryRun) return { rows: final, stats: { ...stats, saved: final.length } };
 
-  await db.transaction(async (tx) => {
-    for (const row of final) {
-      await tx
-        .insert(events)
-        .values(row)
-        .onConflictDoUpdate({
-          target: events.id,
-          // Non sovrascrivere campi già noti con null da una fonte più povera;
-          // l'orario vince sul «tutto il giorno»
-          set: {
-            title: row.title,
-            startsAt: sql`case when ${events.allDay} = 1 and excluded.all_day = 0 then excluded.starts_at else ${events.startsAt} end`,
-            allDay: sql`min(${events.allDay}, excluded.all_day)`,
-            endsAt: sql`coalesce(excluded.ends_at, ${events.endsAt})`,
-            description: sql`coalesce(excluded.description, ${events.description})`,
-            venueName: sql`coalesce(${events.venueName}, excluded.venue_name)`,
-            address: sql`coalesce(excluded.address, ${events.address})`,
-            city: sql`coalesce(${events.city}, excluded.city)`,
-            lat: sql`coalesce(${events.lat}, excluded.lat)`,
-            lng: sql`coalesce(${events.lng}, excluded.lng)`,
-            imageUrl: sql`coalesce(excluded.image_url, ${events.imageUrl})`,
-            priceText: sql`coalesce(excluded.price_text, ${events.priceText})`,
-            updatedAt: new Date(),
-          },
-        });
-      await tx
-        .insert(eventSources)
-        .values({ eventId: row.id!, sourceId: source.id, url: row.url })
-        .onConflictDoUpdate({
-          target: [eventSources.eventId, eventSources.sourceId],
-          set: { url: row.url, lastSeenAt: new Date() },
-        });
-    }
-  });
+  // Un solo batch atomico: una transazione interattiva fa un giro di rete per istruzione
+  // e su Turso scade con lotti grandi (Vivaticket: ~800 eventi).
+  const writes = final.flatMap((row) => [
+    db
+      .insert(events)
+      .values(row)
+      .onConflictDoUpdate({
+        target: events.id,
+        // Non sovrascrivere campi già noti con null da una fonte più povera;
+        // l'orario vince sul «tutto il giorno»
+        set: {
+          title: row.title,
+          startsAt: sql`case when ${events.allDay} = 1 and excluded.all_day = 0 then excluded.starts_at else ${events.startsAt} end`,
+          allDay: sql`min(${events.allDay}, excluded.all_day)`,
+          endsAt: sql`coalesce(excluded.ends_at, ${events.endsAt})`,
+          description: sql`coalesce(excluded.description, ${events.description})`,
+          venueName: sql`coalesce(${events.venueName}, excluded.venue_name)`,
+          address: sql`coalesce(excluded.address, ${events.address})`,
+          city: sql`coalesce(${events.city}, excluded.city)`,
+          lat: sql`coalesce(${events.lat}, excluded.lat)`,
+          lng: sql`coalesce(${events.lng}, excluded.lng)`,
+          imageUrl: sql`coalesce(excluded.image_url, ${events.imageUrl})`,
+          priceText: sql`coalesce(excluded.price_text, ${events.priceText})`,
+          updatedAt: new Date(),
+        },
+      }),
+    db
+      .insert(eventSources)
+      .values({ eventId: row.id!, sourceId: source.id, url: row.url })
+      .onConflictDoUpdate({
+        target: [eventSources.eventId, eventSources.sourceId],
+        set: { url: row.url, lastSeenAt: new Date() },
+      }),
+  ]);
+  if (writes.length) await db.batch(writes as [(typeof writes)[number], ...typeof writes]);
 
   return { rows: final, stats: { ...stats, saved: final.length } };
 }
