@@ -37,8 +37,21 @@ export function Header({ vm, count }: { vm: HeaderVM; count?: ReactNode }) {
       </nav>
       <div className="flex h-[38px] items-center justify-between border-b border-line px-3 text-xs font-semibold">
         <span>{vm.scopeLabel}</span>
-        <span className="tabular-nums" aria-live="polite">
-          {count}
+        <span className="flex items-center gap-2">
+          <span className="tabular-nums" aria-live="polite">
+            {count}
+          </span>
+          <Link
+            href="/info"
+            transitionTypes={["nav-forward"]}
+            aria-label="Info e colophon"
+            // Area di tocco 38px (altezza della riga), cerchio visibile più piccolo
+            className="press -mr-3 flex h-[38px] w-[38px] items-center justify-center"
+          >
+            <span className="flex size-[18px] items-center justify-center rounded-full border border-current font-serif text-[11px] leading-none italic">
+              i
+            </span>
+          </Link>
         </span>
       </div>
     </header>
