@@ -6,6 +6,7 @@ import { magazzinoAdapter } from "./custom/magazzino";
 import { maoAdapter } from "./custom/mao";
 import { taccoAdapter } from "./custom/tacco";
 import { tribeAdapter } from "./custom/tribe";
+import { vivaticketAdapter } from "./custom/vivaticket";
 import { zeroAdapter } from "./custom/zero";
 import { icalAdapter } from "./ical";
 import { extractJsonLd } from "./jsonld";
@@ -20,6 +21,7 @@ const custom: Record<string, Adapter> = {
   tacco: taccoAdapter,
   tribe: tribeAdapter,
   zero: zeroAdapter,
+  vivaticket: vivaticketAdapter,
 };
 
 /** HTML: JSON-LD (gratis). LLM solo se la fonte lo chiede (`llm: true`): costa a ogni run. */
