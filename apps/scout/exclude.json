@@ -1,8 +1,35 @@
 {
-  "reason": "Gusti utente (docs/scouting/feedback.md): niente lirica né opera (2026-10-11), niente corsi per neogenitori e attività per neonati (2026-10-15), niente eventi dedicati a famiglie e bambini (2026-10-16). «Opera» da sola NON va filtrata: è anche l'opera d'arte delle mostre. venues: esclude l'intero luogo (al Teatro Regio anche concerti e balletti, non solo l'opera), se il nome del luogo inizia così.",
+  "reason": "Gusti utente (docs/scouting/feedback.md): niente lirica né opera (2026-10-11), niente corsi per neogenitori e attività per neonati (2026-10-15), niente eventi dedicati a famiglie e bambini (2026-10-16), niente balletto, niente conferenze e talk salvo quelli a sfondo etico (2026-10-16). «Opera» da sola NON va filtrata: è anche l'opera d'arte delle mostre. venues: esclude l'intero luogo (al Teatro Regio anche concerti e balletti, non solo l'opera), se il nome del luogo inizia così. people: esclusi sempre, nel titolo o nella descrizione. talks: conferenze, cercate solo nel titolo (in descrizione «conferenza» e «dialoga con» compaiono anche in sagre e mostre), tenute se un pattern di unless compare nel testo.",
   "venues": ["teatro regio"],
   "audiences": ["famiglie", "bambini"],
+  "people": ["roberto saviano", "andrea scanzi", "roberta bruzzone", "gianluca gotto", "umberto galimberti"],
+  "talks": {
+    "patterns": [
+      "\\bconferenz[ae]\\b(?! stampa)",
+      "\\blectio( magistralis)?\\b",
+      "\\bincontro con l['’]autore\\b",
+      "\\bpresentazione (del|di un|dell['’]ultimo) (libro|romanzo|saggio)\\b",
+      "\\b(dialoga|in dialogo|conversa|due chiacchiere) con\\b"
+    ],
+    "unless": [
+      "\\bemergency\\b",
+      "\\bdon (luigi )?ciotti\\b",
+      "\\bgruppo abele\\b",
+      "\\b(associazione )?libera contro le mafie\\b",
+      "\\bgino strada\\b",
+      "\\bmedici senza frontiere\\b",
+      "\\bamnesty\\b",
+      "\\bsermig\\b",
+      "\\bcaritas\\b",
+      "\\bdiritti umani\\b",
+      "\\bnon ?violen",
+      "\\bcooperazione internazionale\\b",
+      "\\b(migranti|rifugiati|accoglienza)\\b"
+    ]
+  },
   "patterns": [
+    "\\bballett[oi]\\b(?! teatro di torino)",
+    "\\bballet\\b",
     "\\blirica\\b",
     "\\bliric[oi]\\b",
     "\\bopera lirica\\b",

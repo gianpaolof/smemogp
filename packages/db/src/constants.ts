@@ -7,7 +7,6 @@ export const CATEGORIES = [
   "teatro",
   "mostre",
   "cinema",
-  "sagre",
   "food",
   "outdoor",
   "famiglie",
