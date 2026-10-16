@@ -1,0 +1,82 @@
+{
+  "infoPerformance": {
+    "performances": [
+      {
+        "datetime": "2026-10-16T20:45:00",
+        "title": "UNA DELLE ULTIME SERE DI CARNEVALE"
+      },
+      {
+        "datetime": "2026-10-17T19:30:00",
+        "title": "UNA DELLE ULTIME SERE DI CARNEVALE"
+      },
+      {
+        "datetime": "2026-10-18T16:00:00",
+        "title": "UNA DELLE ULTIME SERE DI CARNEVALE"
+      },
+      {
+        "datetime": "2026-10-20T19:30:00",
+        "title": "UNA DELLE ULTIME SERE DI CARNEVALE"
+      },
+      {
+        "datetime": "2026-10-21T20:45:00",
+        "title": "UNA DELLE ULTIME SERE DI CARNEVALE"
+      },
+      {
+        "datetime": "2026-10-22T19:30:00",
+        "title": "UNA DELLE ULTIME SERE DI CARNEVALE"
+      },
+      {
+        "datetime": "2026-10-23T20:45:00",
+        "title": "UNA DELLE ULTIME SERE DI CARNEVALE"
+      },
+      {
+        "datetime": "2026-10-24T20:45:00",
+        "title": "UNA DELLE ULTIME SERE DI CARNEVALE"
+      },
+      {
+        "datetime": "2026-10-25T16:00:00",
+        "title": "UNA DELLE ULTIME SERE DI CARNEVALE"
+      }
+    ]
+  },
+  "infoEvent": {
+    "venueDetail": {
+      "name": "Teatro Carignano",
+      "city": "TORINO",
+      "longitude": 7.6846331,
+      "latitude": 45.0692786,
+      "id": "1246050",
+      "slug": "teatro-carignano",
+      "provinceCode": "TO",
+      "address": "piazza Carignano 6"
+    },
+    "eventDetail": {
+      "posterImage": "https://backendcdn.vivaticket.it/img_eventi_new/una_delle_ultime_sere_6a9aa403718c2.jpg",
+      "title": "UNA DELLE ULTIME SERE DI CARNEVALE",
+      "description": "",
+      "subTitle": "",
+      "startDate": "2026-10-16T20:45:00",
+      "endDate": "2026-10-25T16:00:00",
+      "note": "",
+      "shout": "",
+      "child": "",
+      "sellShout": "",
+      "disability": "",
+      "callCenter": "",
+      "group": "",
+      "image": "https://res.cloudinary.com/vivaticket/image/fetch/q_auto:eco,f_auto/https://shopcdn.vivaticket.com/shop/img_eventi_new/una_delle_ultime_sere_6a9aa403718c2.jpg",
+      "noSellPoint": false,
+      "callCenterStd": false,
+      "type": 0,
+      "subTicketEnable": false,
+      "resaleLink": "",
+      "hasCallAndBuy": false,
+      "ticketTypeId": "0",
+      "categoryId": "4",
+      "categoryName": "Teatro",
+      "subCategoryId": "5",
+      "subCategoryName": "Prosa",
+      "noIndex": false
+    }
+  }
+}

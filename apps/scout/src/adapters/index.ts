@@ -6,6 +6,7 @@ import { magazzinoAdapter } from "./custom/magazzino";
 import { maoAdapter } from "./custom/mao";
 import { taccoAdapter } from "./custom/tacco";
 import { tribeAdapter } from "./custom/tribe";
+import { vivaticketAdapter } from "./custom/vivaticket";
 import { zeroAdapter } from "./custom/zero";
 import { icalAdapter } from "./ical";
 import { extractJsonLd } from "./jsonld";
@@ -19,6 +20,7 @@ const custom: Record<string, Adapter> = {
   mao: maoAdapter,
   tacco: taccoAdapter,
   tribe: tribeAdapter,
+  vivaticket: vivaticketAdapter,
   zero: zeroAdapter,
 };
 
