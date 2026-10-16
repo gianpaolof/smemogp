@@ -1,15 +1,16 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import type { ReactNode } from "react";
 import { activeSources } from "@/data/sources";
-import { AUTHOR, buildInfo, REPO_URL } from "@/ui/nowy/Colophon";
-import { Icon } from "@/ui/nowy/icons";
+import { AUTHOR, AUTHOR_URL, buildInfo, CREATED, REPO_URL } from "@/ui/nowy/Colophon";
+import { SubHeader } from "@/ui/nowy/SubHeader";
 import { Screen } from "../_screens/Screen";
 
-export const metadata: Metadata = { title: "Info · Eventi Torino" };
+export const metadata: Metadata = {
+  title: "Info · Eventi Torino",
+  description: "Colophon: chi ha fatto Eventi Torino e perché, da quali fonti, con quali strumenti, cosa resta nel browser.",
+};
 
 const label = "mb-2 text-[11px] font-bold tracking-[0.12em] text-muted uppercase";
-const ext = "underline decoration-line underline-offset-2 hover:decoration-fg";
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -22,31 +23,21 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
 
 function A({ href, children }: { href: string; children: ReactNode }) {
   return (
-    <a href={href} target="_blank" rel="noopener noreferrer" className={ext}>
+    <a href={href} target="_blank" rel="noopener noreferrer" className="underline decoration-line underline-offset-2 hover:decoration-fg">
       {children}
     </a>
   );
 }
 
 export default function InfoPage() {
-  const { printed, sha, commitUrl } = buildInfo();
+  const { touched, commit } = buildInfo();
   return (
     <Screen>
-      <header className="sticky top-0 z-20 flex items-center justify-between border-b border-line bg-bg pt-[env(safe-area-inset-top)] [view-transition-name:app-header]">
-        <h1 className="display-title px-3 py-2 text-3xl">Colophon</h1>
-        <Link
-          href="/"
-          transitionTypes={["nav-back"]}
-          className="press flex h-12 items-center gap-1.5 border-l border-line px-4 text-xs font-semibold hover:bg-line-soft"
-        >
-          <Icon name="left" />
-          Eventi
-        </Link>
-      </header>
+      <SubHeader title="Colophon" />
       <main className="flex-1">
         <Section title="Chi e perché">
           <p>
-            Fatto da <A href="https://github.com/gianpaolof">{AUTHOR}</A>, a ottobre 2026, per avere un'agenda di eventi a Torino senza fronzoli, senza pubblicità, senza account, senza cookie. Solo eventi e mappe.
+            Fatto da <A href={AUTHOR_URL}>{AUTHOR}</A>, a ottobre 2026, per avere un&apos;agenda di eventi a Torino senza fronzoli, senza pubblicità, senza account, senza cookie. Solo eventi e mappe.
           </p>
           <p>
             Niente musicaccia commerciale: i suoni che mi piacciono li trovi su <A href="https://ipazia.fm">ipazia.fm</A>.
@@ -62,7 +53,7 @@ export default function InfoPage() {
             {activeSources.map((s) => (
               <li key={s.url} className="flex min-h-11 items-center justify-between gap-3 border-b border-line">
                 <A href={s.url}>{s.name}</A>
-                <span className="shrink-0 text-xs text-muted">{new URL(s.url).hostname.replace(/^www\./, "")}</span>
+                <span className="shrink-0 text-xs text-muted">{s.host}</span>
               </li>
             ))}
           </ul>
@@ -84,13 +75,15 @@ export default function InfoPage() {
           </p>
         </Section>
 
-        <Section title="Stampato il">
+        <Section title="Creato il">
           <p className="tabular-nums">
-            {printed ?? "in prova"}
-            {sha && commitUrl && (
+            <time dateTime={CREATED.iso}>{CREATED.label}</time>
+            {" · ultimo ritocco il "}
+            <time dateTime={touched.iso}>{touched.label}</time>
+            {commit && (
               <>
                 {" · "}
-                <A href={commitUrl}>{sha}</A>
+                <A href={commit.url}>versione {commit.short}</A>
               </>
             )}
             {" · "}

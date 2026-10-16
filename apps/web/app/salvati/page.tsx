@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { connection } from "next/server";
 import { cache, Suspense } from "react";
 import { getEventsByIds } from "@/data/events";
 import { isEventId, MAX_URL_IDS } from "@/domain/saved";
 import { presentSaved } from "@/presenters";
 import { Agenda, PastGroup } from "@/ui/nowy/Agenda";
-import { Icon } from "@/ui/nowy/icons";
+import { SubHeader } from "@/ui/nowy/SubHeader";
 import { SavedOrphans } from "@/ui/nowy/SavedOrphans";
 import { SavedSync } from "@/ui/nowy/SavedSync";
 import { AgendaSkeleton } from "@/ui/nowy/Skeletons";
@@ -64,22 +63,11 @@ async function SavedList({ searchParams }: { searchParams: SearchParams }) {
 export default function SavedPage({ searchParams }: PageProps<"/salvati">) {
   return (
     <Screen>
-      <header className="sticky top-0 z-20 flex items-center justify-between border-b border-line bg-bg pt-[env(safe-area-inset-top)] [view-transition-name:app-header]">
-        <div>
-          <h1 className="display-title px-3 py-2 text-3xl">Salvati</h1>
-          <Suspense fallback={null}>
-            <SavedCount searchParams={searchParams} />
-          </Suspense>
-        </div>
-        <Link
-          href="/"
-          transitionTypes={["nav-back"]}
-          className="press flex h-12 items-center gap-1.5 border-l border-line px-4 text-xs font-semibold hover:bg-line-soft"
-        >
-          <Icon name="left" />
-          Eventi
-        </Link>
-      </header>
+      <SubHeader title="Salvati">
+        <Suspense fallback={null}>
+          <SavedCount searchParams={searchParams} />
+        </Suspense>
+      </SubHeader>
       <main className="flex-1">
         <Suspense fallback={<AgendaSkeleton />}>
           <SavedList searchParams={searchParams} />

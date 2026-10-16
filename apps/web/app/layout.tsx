@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from "next";
 import { Archivo } from "next/font/google";
 import { Suspense } from "react";
 import { BG, THEME_INIT_SCRIPT } from "@/hooks/useTheme";
+import { AUTHOR } from "@/ui/nowy/Colophon";
 import { PwaBoot } from "@/ui/nowy/PwaBoot";
 import "./globals.css";
 
@@ -18,7 +19,7 @@ export const metadata: Metadata = {
   description: "Eventi a Torino e dintorni, su mappa o in lista, nel raggio che scegli.",
   applicationName: "Eventi Torino",
   // <link rel="author">: la firma leggibile anche fuori dall'app
-  authors: [{ name: "gianpaolof", url: "/humans.txt" }],
+  authors: [{ name: AUTHOR, url: "/humans.txt" }],
   appleWebApp: { capable: true, title: "Eventi", statusBarStyle: "black-translucent" },
   icons: { apple: "/pwa-icon/180" },
   openGraph: { title: "Eventi Torino", description: "Cosa succede a Torino, nel raggio che scegli.", locale: "it_IT", type: "website" },
