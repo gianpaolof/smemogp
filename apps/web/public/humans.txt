@@ -13,4 +13,4 @@ Inizio: 2026-10-11
 Lingua: italiano
 Strumenti: Next.js, Tailwind, Turso, Drizzle, Leaflet, GitHub Actions, Vercel
 Codice: https://github.com/gianpaolof/smemogp
-Gusti: niente lirica, più sentieri.
+Gusti: niente musicaccia commerciale. I suoni che mi piacciono: https://ipazia.fm

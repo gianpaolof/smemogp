@@ -46,10 +46,11 @@ export default function InfoPage() {
       <main className="flex-1">
         <Section title="Chi e perché">
           <p>
-            Fatto da <A href="https://github.com/gianpaolof">{AUTHOR}</A>, a Torino, da ottobre 2026, per sé: un solo
-            foglio con quello che mi interessa davvero, vicino a dove sono.
+            Fatto da <A href="https://github.com/gianpaolof">{AUTHOR}</A>, a ottobre 2026, per avere un'agenda di eventi a Torino senza fronzoli, senza pubblicità, senza account, senza cookie. Solo eventi e mappe.
           </p>
-          <p>Niente lirica, più sentieri.</p>
+          <p>
+            Niente musicaccia commerciale: i suoni che mi piacciono li trovi su <A href="https://ipazia.fm">ipazia.fm</A>.
+          </p>
         </Section>
 
         <Section title="Come funziona">
