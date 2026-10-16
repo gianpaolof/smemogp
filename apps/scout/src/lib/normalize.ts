@@ -10,7 +10,12 @@ export const slug = (s: string) =>
     .replace(/[^a-z0-9]+/g, " ")
     .trim();
 
-export const romeDay = (d: Date) => d.toLocaleDateString("sv-SE", { timeZone: "Europe/Rome" });
+// Un solo formatter: `toLocaleDateString` con `timeZone` ne crea uno a chiamata (~40 µs), e la
+// dedup chiama `romeDay` due volte per ogni coppia evento/candidato (Vivaticket: ~770k coppie)
+const ROME_DAY = new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Rome" });
+
+/** Giorno a Roma, «YYYY-MM-DD». */
+export const romeDay = (d: Date) => (Number.isNaN(d.getTime()) ? "Invalid Date" : ROME_DAY.format(d));
 
 const TITLE_NOISE = /^(concerto|mostra|spettacolo|evento|live|dj set|festival)\s+(di\s+|del\s+|della\s+)?|\s+(a\s+)?torino$/g;
 
