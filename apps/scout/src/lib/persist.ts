@@ -136,9 +136,20 @@ export async function persistEvents(
   const final = [...unique.values()];
   if (dryRun) return { rows: final, stats: { ...stats, saved: final.length } };
 
-  // Un solo batch atomico: una transazione interattiva fa un giro di rete per istruzione
-  // e su Turso scade con lotti grandi (Vivaticket: ~800 eventi).
-  const writes = final.flatMap((row) => [
+  // Batch atomici a blocchi: una transazione interattiva fa un giro di rete per istruzione
+  // e su Turso scade con lotti grandi (Vivaticket: ~800 eventi); un batch unico da ~1600
+  // istruzioni viene rifiutato («other side closed»). Upsert idempotenti: un blocco fallito
+  // si recupera al run successivo.
+  for (let i = 0; i < final.length; i += WRITE_CHUNK) await writeChunk(db, source.id, final.slice(i, i + WRITE_CHUNK));
+
+  return { rows: final, stats: { ...stats, saved: final.length } };
+}
+
+const WRITE_CHUNK = 100;
+
+/** Evento + provenienza nello stesso batch: mai un evento senza la sua `event_sources`. */
+async function writeChunk(db: Db, sourceId: string, chunk: NewEvent[]) {
+  const writes = chunk.flatMap((row) => [
     db
       .insert(events)
       .values(row)
@@ -164,13 +175,11 @@ export async function persistEvents(
       }),
     db
       .insert(eventSources)
-      .values({ eventId: row.id!, sourceId: source.id, url: row.url })
+      .values({ eventId: row.id!, sourceId, url: row.url })
       .onConflictDoUpdate({
         target: [eventSources.eventId, eventSources.sourceId],
         set: { url: row.url, lastSeenAt: new Date() },
       }),
   ]);
   if (writes.length) await db.batch(writes as [(typeof writes)[number], ...typeof writes]);
-
-  return { rows: final, stats: { ...stats, saved: final.length } };
 }
