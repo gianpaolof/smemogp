@@ -1,4 +1,4 @@
-import { and, gte, lte } from "drizzle-orm";
+import { and, gte, lte, or } from "drizzle-orm";
 import { events, haversineKm, type Db, type NewEvent } from "@smemogp/db";
 import { eventId, normTitle, romeDay, slug } from "./normalize";
 
@@ -85,12 +85,14 @@ export function chooseId(row: Comparable, candidates: Comparable[]): { id: strin
 
 const DAY_MS = 24 * 3600 * 1000;
 
-/** Candidati dal DB: eventi che iniziano entro ±1 giorno o in corso (mostre). */
-export async function loadCandidates(db: Db, rows: Pick<NewEvent, "startsAt">[]) {
+/**
+ * Candidati dal DB: eventi che si sovrappongono (±1 giorno) al periodo del lotto, comprese
+ * le mostre iniziate da mesi e ancora in corso, e gli eventi dentro un intervallo del lotto.
+ */
+export async function loadCandidates(db: Db, rows: Pick<NewEvent, "startsAt" | "endsAt">[]) {
   if (!rows.length) return [];
-  const times = rows.map((r) => r.startsAt.getTime());
-  const from = new Date(Math.min(...times) - 60 * DAY_MS); // mostre iniziate prima
-  const to = new Date(Math.max(...times) + DAY_MS);
+  const from = new Date(Math.min(...rows.map((r) => r.startsAt.getTime())) - DAY_MS);
+  const to = new Date(Math.max(...rows.map((r) => (r.endsAt ?? r.startsAt).getTime())) + DAY_MS);
   return db
     .select({
       id: events.id,
@@ -103,6 +105,6 @@ export async function loadCandidates(db: Db, rows: Pick<NewEvent, "startsAt">[])
       lng: events.lng,
     })
     .from(events)
-    .where(and(gte(events.startsAt, from), lte(events.startsAt, to)))
+    .where(and(lte(events.startsAt, to), or(gte(events.startsAt, from), gte(events.endsAt, from))))
     .all();
 }
