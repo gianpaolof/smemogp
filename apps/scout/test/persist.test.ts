@@ -66,6 +66,20 @@ test("titoli diversi ma stesso evento → fuso sull'id esistente", async () => {
   assert.equal((await db.select().from(eventSources).all()).length, 2);
 });
 
+test("mostra aperta da mesi e ancora in corso → fusa, non duplicata", async () => {
+  const db = await freshDb();
+  const day = (offset: number) => new Date(Date.now() + offset * 24 * 3600 * 1000);
+  const place = { venueName: "Camera", city: "Torino", lat: 45.07, lng: 7.68, allDay: true };
+  // Già in DB da un'altra fonte: aperta 120 giorni fa, chiude tra 90
+  await persistEvents(db, { id: "a" }, [{ ...place, title: "Letizia Battaglia", startsAt: day(-120), endsAt: day(90), url: "https://a.it/1" }]);
+  // La biglietteria la vende da oggi
+  const { stats } = await persistEvents(db, { id: "b" }, [
+    { ...place, title: "LETIZIA BATTAGLIA. L'OPERA: 1970-2020", startsAt: day(0), endsAt: day(90), url: "https://b.it/1" },
+  ]);
+  assert.equal(stats.merged, 1);
+  assert.equal((await db.select().from(events).all()).length, 1);
+});
+
 test("esclusi e passati non vengono salvati; dry-run non scrive", async () => {
   const db = await freshDb();
   const day = nextSaturday();
