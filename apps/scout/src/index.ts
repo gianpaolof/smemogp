@@ -99,7 +99,9 @@ async function main() {
       console.log(`✓ ${source.id}: ${status}, ${count} eventi (${Date.now() - t0}ms)`);
     } catch (err) {
       failures++;
-      const message = err instanceof Error ? err.message : String(err);
+      // Drizzle mette l'errore SQL vero in `cause`: senza, il log mostra solo la query
+      const cause = err instanceof Error && err.cause instanceof Error ? ` (causa: ${err.cause.message})` : "";
+      const message = (err instanceof Error ? err.message : String(err)) + cause;
       console.error(`✗ ${source.id}: ${message}`);
       if (!args["dry-run"]) {
         const run = { lastRunAt: new Date(), lastStatus: "error" as const, lastError: message };
