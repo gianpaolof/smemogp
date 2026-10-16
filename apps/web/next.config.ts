@@ -3,7 +3,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
-  // Data di stampa del colophon (/info): fissata al build, non letta durante il render
+  // «Ultimo ritocco» del colophon (/info): fissata al build, non letta durante il render
   env: { BUILD_DATE: new Date().toISOString() },
   // Rileva la rete assente e riprova navigazioni e prefetch al ritorno (hook useOffline)
   experimental: { useOffline: true },

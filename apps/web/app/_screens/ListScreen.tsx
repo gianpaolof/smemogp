@@ -49,8 +49,8 @@ export async function ListScreen({ searchParams }: { searchParams: SearchParams 
         >
           <AgendaData f={f} />
         </Suspense>
-        <Colophon />
       </main>
+      <Colophon />
       <BottomBar vm={presentBottomBar(f, "lista")} count={<Suspense fallback="gli eventi"><Count f={f} /></Suspense>} />
       <RestoreFilters path="/" query={serializeFilters(f)} />
     </>
