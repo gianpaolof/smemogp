@@ -1,12 +1,13 @@
-import { sql } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import { eventSources, events, type Db, type NewEvent } from "@smemogp/db";
 import type { RawEvent, Source } from "../types";
-import { chooseId, loadCandidates, type Comparable } from "./dedup";
+import { archiveAndDelete } from "./archive";
+import { chooseId, findMatch, loadCandidates, type Comparable } from "./dedup";
 import { exclusionReason } from "./exclude";
 import { geocode } from "./geocode";
 import { toNewEvent } from "./normalize";
 
-export type PersistStats = { saved: number; merged: number; excluded: number; past: number };
+export type PersistStats = { saved: number; merged: number; excluded: number; stale: number; past: number };
 
 /** Stesse regole dell'upsert, per duplicati dentro lo stesso lotto. */
 function mergeRows(a: NewEvent, b: NewEvent): NewEvent {
@@ -33,8 +34,40 @@ export function geocodeQueries(row: Pick<NewEvent, "venueName" | "address" | "ci
   return [...new Set(queries.filter((q) => q && q !== city))];
 }
 
+/**
+ * Eventi già salvati che un evento ora escluso aggiornerebbe (es. arriva la descrizione
+ * «per bambini»). Serve la stessa provenienza esatta (fonte + URL) e, su quella, la dedup:
+ * stesso id oppure stesso evento per `findMatch`. Mai la sola somiglianza del titolo.
+ */
+async function findStale(db: Db, sourceId: string, excluded: { row: NewEvent; reason: string }[]) {
+  if (!excluded.length) return [];
+  const linked = await db
+    .select({
+      url: eventSources.url,
+      id: events.id,
+      title: events.title,
+      startsAt: events.startsAt,
+      endsAt: events.endsAt,
+      venueName: events.venueName,
+      city: events.city,
+      lat: events.lat,
+      lng: events.lng,
+    })
+    .from(eventSources)
+    .innerJoin(events, eq(events.id, eventSources.eventId))
+    .where(and(eq(eventSources.sourceId, sourceId), inArray(eventSources.url, [...new Set(excluded.map((x) => x.row.url))])))
+    .all();
+  const stale = new Map<string, { id: string; title: string; reason: string }>();
+  for (const { row, reason } of excluded) {
+    const sameUrl = linked.filter((l) => l.url === row.url);
+    const hit = sameUrl.find((l) => l.id === row.id) ?? findMatch({ ...row, id: row.id! }, sameUrl);
+    if (hit) stale.set(hit.id, { id: hit.id, title: hit.title, reason });
+  }
+  return [...stale.values()];
+}
+
 /** Inizio di oggi a Roma (con margine): eventi finiti prima non si salvano. */
-const startOfTodayRome = () => new Date(Date.now() - 24 * 3600 * 1000);
+export const startOfTodayRome = () => new Date(Date.now() - 24 * 3600 * 1000);
 
 /**
  * Unico punto di scrittura degli eventi, per scout online e ingest della skill:
@@ -44,11 +77,13 @@ export async function persistEvents(
   db: Db,
   source: Pick<Source, "id" | "category">,
   raw: RawEvent[],
-  { dryRun = false } = {},
+  // Cancellare ciò che era già salvato è da attivare esplicitamente (SCOUT_REMOVE_EXCLUDED=1)
+  { dryRun = false, removeStale = process.env.SCOUT_REMOVE_EXCLUDED === "1" } = {},
 ): Promise<{ rows: NewEvent[]; stats: PersistStats }> {
-  const stats: PersistStats = { saved: 0, merged: 0, excluded: 0, past: 0 };
+  const stats: PersistStats = { saved: 0, merged: 0, excluded: 0, stale: 0, past: 0 };
   const cutoff = startOfTodayRome();
   const rows: NewEvent[] = [];
+  const excluded: { row: NewEvent; reason: string }[] = [];
 
   for (const e of raw) {
     if ((e.endsAt ?? e.startsAt) < cutoff) {
@@ -59,10 +94,18 @@ export async function persistEvents(
     if (reason) {
       stats.excluded++;
       console.log(`  escluso «${e.title.slice(0, 60)}» (${reason})`);
+      excluded.push({ row: toNewEvent(e, source as Source), reason });
       continue;
     }
     rows.push(toNewEvent(e, source as Source));
   }
+
+  // Le esclusioni valgono anche per ciò che era già stato salvato: archivio + cancellazione
+  const stale = await findStale(db, source.id, excluded);
+  stats.stale = stale.length;
+  const remove = removeStale && !dryRun;
+  for (const s of stale) console.log(`  ${remove ? "rimosso" : "da rimuovere (cancellazione non attiva)"} «${s.title.slice(0, 60)}» → ${s.id.slice(0, 8)}`);
+  if (remove) await archiveAndDelete(db, stale);
 
   for (const row of rows) {
     if (row.lat == null && (row.address || row.venueName || row.city)) {

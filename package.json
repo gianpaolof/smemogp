@@ -17,6 +17,8 @@
     "db:generate": "npm run generate -w @smemogp/db",
     "db:migrate": "npm run migrate -w @smemogp/db",
     "db:studio": "npm run studio -w @smemogp/db",
-    "typecheck": "npm run typecheck --workspaces --if-present"
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "scout:prune-excluded": "npm run prune-excluded -w scout --",
+    "scout:restore": "npm run restore -w scout --"
   }
 }

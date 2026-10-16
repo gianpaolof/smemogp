@@ -64,5 +64,16 @@ export const geocache = sqliteTable("geocache", {
   createdAt: integer("created_at", { mode: "timestamp" }).notNull().default(sql`(unixepoch())`),
 });
 
+// Archivio degli eventi cancellati dalle esclusioni: evento + provenienze, per ripristino fedele
+export const deletedEvents = sqliteTable("deleted_events", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  eventId: text("event_id").notNull(),
+  reason: text("reason").notNull(),
+  payload: text("payload", { mode: "json" }).$type<ArchivedEvent>().notNull(),
+  deletedAt: integer("deleted_at", { mode: "timestamp" }).notNull().default(sql`(unixepoch())`),
+});
+
+export type ArchivedEvent = { event: Event; sources: (typeof eventSources.$inferSelect)[] };
+
 export type Event = typeof events.$inferSelect;
 export type NewEvent = typeof events.$inferInsert;

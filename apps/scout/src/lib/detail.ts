@@ -31,8 +31,9 @@ export function detailLinks(source: Source, pages: FetchedContent[], listEvents:
         });
     }
   } else {
-    const host = new URL(source.url).host;
-    for (const e of listEvents) if (new URL(e.url).host === host) links.push(withoutQuery(e.url));
+    // Stesso sito anche con un altro dominio nazionale: la lista di eventbrite.it linka anche eventbrite.com
+    const site = (u: string) => new URL(u).hostname.split(".").slice(-2, -1)[0];
+    for (const e of listEvents) if (site(e.url) === site(source.url)) links.push(withoutQuery(e.url));
   }
   return [...new Set(links)].slice(0, source.detail?.max ?? DEFAULT_MAX);
 }
@@ -65,13 +66,53 @@ export async function followDetails(
     try {
       const html = await fetchText(link);
       const event = pickDetailEvent(link, extractJsonLd(html, link));
-      if (event) byUrl.set(link, withTextRange({ ...byUrl.get(link), ...stripNulls(event), url: link }, html));
+      const description = mergeDescription(event?.description, eventbriteDescription(html));
+      if (event) byUrl.set(link, withTextRange({ ...byUrl.get(link), ...stripNulls({ ...event, description }), url: link }, html));
     } catch {
       failed++;
     }
   }
   if (failed) console.warn(`[detail] ${source.id}: ${failed}/${links.length} dettagli non letti`);
   return [...byUrl.values()];
+}
+
+/** Riassunto in testa (spesso è lì che si dice il pubblico), poi il testo completo se aggiunge qualcosa. */
+export function mergeDescription(summary?: string | null, full?: string | null): string | null {
+  if (!full) return summary ?? null;
+  if (!summary || full.includes(summary)) return full;
+  return `${summary}\n${full}`;
+}
+
+function findKey(node: unknown, key: string): unknown {
+  if (!node || typeof node !== "object") return undefined;
+  if (key in node) return (node as Record<string, unknown>)[key];
+  for (const v of Object.values(node)) {
+    const found = findKey(v, key);
+    if (found !== undefined) return found;
+  }
+}
+
+/**
+ * Eventbrite: il JSON-LD ha solo il riassunto, il testo completo (pubblico, età) sta in
+ * __NEXT_DATA__ → structuredContent.modules di tipo "text" (HTML). Altre pagine: null.
+ */
+export function eventbriteDescription(html: string): string | null {
+  const data = cheerio.load(html)("script#__NEXT_DATA__").text();
+  if (!data) return null;
+  let content: unknown;
+  try {
+    content = findKey(JSON.parse(data), "structuredContent");
+  } catch {
+    return null;
+  }
+  const modules = (content as { modules?: { type?: string; text?: string }[] } | null)?.modules ?? [];
+  const text = modules
+    .filter((m) => m.type === "text" && m.text)
+    .map((m) => cheerio.load(m.text!.replace(/<br\s*\/?>|<\/(p|h\d|li|div)>/gi, "\n")).text())
+    .join("\n")
+    .replace(/\n\s*\n+/g, "\n")
+    .trim();
+  return text || null;
 }
 
 /** JSON-LD senza endDate (TorinoToday): la fine la prende dal testo «dal 10 al 25 ottobre 2026». */

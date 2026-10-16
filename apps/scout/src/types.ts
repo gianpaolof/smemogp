@@ -57,6 +57,8 @@ export type RawEvent = {
   category?: Category;
   priceText?: string | null;
   imageUrl?: string | null;
+  /** Pubblico dichiarato dalla fonte (es. Comune: «A chi è rivolto»). Solo per le esclusioni, non salvato. */
+  audience?: string | null;
   url: string;
 };
 

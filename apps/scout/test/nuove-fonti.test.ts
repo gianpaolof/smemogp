@@ -124,6 +124,20 @@ test("Comune di Torino: l'ora «UTC» del sito è ora di Torino", () => {
   assert.equal(e.venueName, "Museo Regionale di Scienze Naturali");
 });
 
+// Visto dal vivo (2026-10-16): la descrizione non dice a chi è rivolto, la scheda sì
+test("Comune di Torino: «A chi è rivolto» Famiglie → escluso; Tutti → tenuto", () => {
+  const url = "https://eventi.comune.torino.it/calendario/cuordiferro/";
+  const e = parseComuneDetail(fixture("comune-cuordiferro.html"), url)!;
+  assert.equal(e.title, "Cuordiferro");
+  assert.equal(e.audience, "Famiglie");
+  assert.equal(exclusionReason({ ...e, audience: null }), null, "il solo testo non basta");
+  assert.equal(exclusionReason(e), "pubblico: famiglie");
+
+  const tutti = parseComuneDetail(fixture("comune-mostra.html"), url)!;
+  assert.equal(tutti.audience, "Tutti");
+  assert.equal(exclusionReason(tutti), null);
+});
+
 test("repairJsonLd: virgola finale e date PHP", () => {
   const html = `<script type="application/ld+json">{"@type":"Event","name":"X","startDate":{"date":"2026-10-22 00:00:00.000000","timezone":"UTC"},"organizer":{"name":"Y",}}</script>`;
   assert.equal(extractJsonLd(repairJsonLd(html), "https://e.it/").length, 1);

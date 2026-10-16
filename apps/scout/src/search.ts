@@ -126,7 +126,7 @@ async function runTopic(db: Db, topic: SearchTopic, days: number) {
   const { rows, stats } = await persistEvents(db, { id: sourceId, category: topic.category }, inPeriod, { dryRun: args["dry-run"] });
   console.log(
     `  ${topic.id}: letti ${raw.length}, fuori periodo ${raw.length - inPeriod.length}, pagine fallite ${failed}` +
-      ` → salvati ${stats.saved}, fusi ${stats.merged}, esclusi ${stats.excluded}, passati ${stats.past}`,
+      ` → salvati ${stats.saved}, fusi ${stats.merged}, esclusi ${stats.excluded}, già salvati da escludere ${stats.stale}, passati ${stats.past}`,
   );
   if (args["dry-run"]) {
     console.table(rows.map((r) => ({ title: r.title.slice(0, 50), startsAt: r.startsAt, city: r.city, url: r.url.slice(0, 60) })));

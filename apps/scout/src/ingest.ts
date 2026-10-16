@@ -99,7 +99,7 @@ async function main() {
     dryRun: args["dry-run"],
   });
   console.log(
-    `Ingest ${sourceId}${args["dry-run"] ? " (dry-run)" : ""}: salvati ${stats.saved}, fusi ${stats.merged}, esclusi ${stats.excluded}, passati ${stats.past}, scartati ${rejected}`,
+    `Ingest ${sourceId}${args["dry-run"] ? " (dry-run)" : ""}: salvati ${stats.saved}, fusi ${stats.merged}, esclusi ${stats.excluded}, già salvati da escludere ${stats.stale}, passati ${stats.past}, scartati ${rejected}`,
   );
   if (!args["dry-run"] && stats.saved) await revalidateSite();
 }

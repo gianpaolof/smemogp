@@ -57,7 +57,7 @@ async function runSource(db: Db, source: Source) {
   if (source.defaultVenue) raw = raw.map((e) => withDefaultVenue(e, source.defaultVenue!));
 
   const { rows, stats } = await persistEvents(db, source, raw, { dryRun: args["dry-run"] });
-  console.log(`  ${source.id}: salvati ${stats.saved}, fusi ${stats.merged}, esclusi ${stats.excluded}, passati ${stats.past}`);
+  console.log(`  ${source.id}: salvati ${stats.saved}, fusi ${stats.merged}, esclusi ${stats.excluded}, già salvati da escludere ${stats.stale}, passati ${stats.past}`);
 
   if (args["dry-run"]) {
     console.table(

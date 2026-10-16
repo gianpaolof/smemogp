@@ -10,14 +10,18 @@ const ev = (title: string, venueName: string | null = null, description: string 
 
 test("scarta lirica e opera", () => {
   for (const e of [
-    ev("La Traviata di Giuseppe Verdi"),
+    ev("La Traviata di Giuseppe Verdi", null, "Opera lirica"),
     ev("Gala lirico al Carignano"),
-    ev("Recital del soprano Anna Netrebko"),
+    ev("Recital lirico del soprano Anna Netrebko"),
     ev("Stagione lirica 2026"),
     ev("Opera buffa in piazza"),
+    ev("Opera seria in teatro"),
+    ev("La vedova allegra", null, "Operetta in tre atti"),
+    ev("Serata di operette"),
     ev("Melodramma in tre atti"),
-    ev("Carmen", null, "di Georges Bizet"),
+    // Il Regio è escluso come luogo intero: anche concerti e balletti, non solo l'opera (scelta provvisoria)
     ev("Concerto sinfonico", "Teatro Regio Torino"),
+    ev("Festival Verismo | La bohème", "Teatro Regio di Torino"),
   ]) {
     assert.ok(exclusionReason(e), `doveva escludere: ${e.title}`);
   }
@@ -32,6 +36,14 @@ test("tiene «opera» nel senso di opera d'arte e il resto", () => {
     ev("Jazz al Folk Club", null, "Live con trio"),
     ev("Sagra della pasta alla norma"),
     ev("Carmen Consoli in concerto"),
+    ev("Tosca"),
+    ev("La Traviata di Giuseppe Verdi"),
+    ev("Carmen", null, "di Georges Bizet"),
+    ev("Recital del soprano Anna Netrebko"),
+    ev("Concerto per tenore e pianoforte"),
+    ev("Presentazione del libretto"),
+    // Visto dal vivo (Eventbrite, 2026-10-16): il Regio è solo il punto di ritrovo del tour
+    ev("I Caffè Storici di Torino: un viaggio a ritroso nel tempo", "Davanti Ingresso Teatro Regio", "Unisciti a noi per scoprire i caffè storici di Torino, luoghi in cui il caffè incontra la storia!"),
     // Visto dal vivo (Museo Egizio, 2026-10-11): il sax soprano non è lirica
     ev("Sax Appeal: classici e colonne sonore", "Museo Egizio", "Quartetto con sax soprano, contralto e tenore"),
   ]) {
@@ -62,15 +74,61 @@ test("scarta corsi per neogenitori e attività per neonati", () => {
   }
 });
 
-test("tiene sagre, feste per bambini e frasi come «da 0 a 99 anni»", () => {
+test("scarta eventi dedicati a famiglie e bambini", () => {
   for (const e of [
     ev("Festa di Halloween - Centro per le Famiglie", null, "Festa di Halloween per bambini e famiglie: vieni mascherato!"),
-    ev("Fiera del Rapulé", null, "Ingresso libero, per tutti da 0 a 99 anni."),
     ev("Letture per bambini - mamma Isa", null, "Letture per bambini a cura di mamme, nonne e maestre del territorio."),
+    ev("Laboratorio per i bambini"),
+    ev("Spettacolo per le famiglie"),
+    ev("Visita guidata per famiglie"),
+    ev("Domenica al museo", null, "Attività dedicate alle famiglie."),
+    ev("Giochiamo insieme", null, "Un pomeriggio rivolto ai bambini."),
+    ev("Creiamo insieme", null, "Per genitori e figli."),
+    // Sfuggiti alle regole precedenti (DB remoto, 2026-10-16)
+    ev("Laboratorio al Circolo dei lettori", null, "Lab per bambine e bambini"),
+    ev("La tartaruga e il pinguino innamorato", null, "Spettacolo musicale per bambini"),
+    ev("Saldo Junior!", null, "Corso base di saldatura a stagno per bambini"),
+    ev("Torino Magica – Halloween per famiglie"),
+    ev("Open singing per famiglie"),
+    ev("Pierino e il lupo con Maestro Lorenzo", null, "Un preschool musical"),
+    ev("Laboratorio gratuito per bambini"),
+    // L'eccezione «tante attività» non deve salvare un evento dedicato
+    ev("Domenica speciale", null, "Giornata dedicata ai bambini con tante attività per famiglie"),
+    ev("Alice è tornata", null, "Uno spettacolo per bambini dai 6 anni sulla capacità di ritrovare lo stupore."),
+    ev("Carlo Tancredi di Barolo: L'educazione del giovane Marchese", null, "Attività teatralizzata per famiglie a Palazzo Barolo"),
+    // L'eccezione di prezzo vale solo nella sua frase
+    ev("Domenica in museo", null, "Ingresso gratuito per tutti, laboratorio per bambini"),
+  ]) {
+    assert.ok(exclusionReason(e), `doveva escludere: ${e.title}`);
+  }
+});
+
+test("tiene eventi generici con menzioni di famiglie o bambini", () => {
+  for (const e of [
+    ev("Fiera del Rapulé", null, "Ingresso libero, per tutti da 0 a 99 anni."),
+    ev("Concerto in piazza", null, "Ingresso gratuito per bambini."),
+    ev("Mostra fotografica", null, "Riduzioni per le famiglie."),
+    ev("Concerto d'autunno", null, "Biglietto a prezzo ridotto per bambini"),
+    ev("Notte bianca", null, "Ingresso libero e gratuito per famiglie"),
+    ev("Rassegna jazz", null, "Biglietti 10 euro, 5 € per bambini"),
+    ev("Saldo Junior in concerto"),
+    // Visto sul DB remoto (2026-10-16): attività per famiglie come contorno di una fiera
+    ev("Mostra Mercato Nazionale del Tartufo Bianco delle Colline Torinesi 2026", null, "Tre giorni dedicati al pregiato Tuber Magnatum Pico, con il PalaTartufo gastronomico, la mostra mercato del tartufo, l'Expo della Collina e tante attività per famiglie nel cuore delle colline torinesi."),
+    ev("Festa patronale", null, "Musica, stand gastronomici e anche giochi per bambini"),
+    ev("Festa di paese", null, "Adatta anche alle famiglie."),
+    ev("Film sulla famiglia", null, "La storia di due bambini."),
+    ev("Jazz dal vivo", "Centro per le Famiglie"),
     ev("Il neonato collettivo teatrale in scena"),
     ev("Laboratorio per ragazzi 8-12 anni"),
     ev("Biblioteca 0-18: un tè tra gli scaffali"),
   ]) {
     assert.equal(exclusionReason(e), null, `non doveva escludere: ${e.title}`);
   }
+});
+
+// Falso negativo noto (2026-10-16): «tante/anche/varie… attività per famiglie» è trattato come
+// contorno di un evento più ampio. Senza «dedicato/rivolto/pensato» o un pubblico dichiarato
+// dalla fonte, un evento davvero per famiglie scritto così passa. Se cambia, aggiornare qui.
+test("falso negativo noto: «tante attività per famiglie» senza altri segnali viene tenuto", () => {
+  assert.equal(exclusionReason(ev("Domenica al museo", null, "Domenica al museo: tante attività per famiglie")), null);
 });

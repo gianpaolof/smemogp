@@ -1,3 +1,4 @@
+import * as cheerio from "cheerio";
 import type { Category } from "@smemogp/db";
 import { fetchText } from "../../lib/http";
 import { romeTime } from "../../lib/itdate";
@@ -49,13 +50,17 @@ export function parseComuneDetail(html: string, url: string): RawEvent | null {
   if (!e) return null;
   const label = html.match(/"category"\s*:\s*"([^"]+)"/)?.[1] ?? "";
   const category = CATEGORY.find(([re]) => re.test(label.trim()))?.[1];
-  if (!e.allDay) return { ...e, category };
+  // «A chi è rivolto»: Tutti, Adulti, Famiglie, Bambini, Ragazzi e giovani, Professionisti (sonda 2026-10-16)
+  const $ = cheerio.load(html);
+  const audience = $("#destinatari p").map((_, el) => $(el).text().trim()).get().filter(Boolean).join(", ") || null;
+  if (!e.allDay) return { ...e, category, audience };
   // Solo giorno: new Date("2026-11-06") è mezzanotte UTC, il giorno scritto è quello giusto
   const ymd = (d: Date) => d.toISOString().slice(0, 10).split("-").map(Number) as [number, number, number];
   const end = e.endsAt && e.endsAt.toISOString().slice(0, 10) !== e.startsAt.toISOString().slice(0, 10) ? e.endsAt : null;
   return {
     ...e,
     category,
+    audience,
     startsAt: romeTime(...ymd(e.startsAt), 12),
     endsAt: end ? romeTime(...ymd(end), 23, 59) : null,
   };
