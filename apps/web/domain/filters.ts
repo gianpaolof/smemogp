@@ -1,5 +1,5 @@
 import { CATEGORIES } from "@smemogp/db/constants";
-import type { Category, Filters, LatLng, Period } from "./types";
+import type { Category, EventItem, Filters, LatLng, Period } from "./types";
 
 export const PERIODS: readonly Period[] = ["stasera", "oggi", "weekend", "settimana", "mese"];
 export const RADIUS_MIN_KM = 1;
@@ -14,7 +14,10 @@ export const DEFAULT_FILTERS: Filters = {
   origin: null,
   range: null,
   weekendOnly: false,
+  q: "",
 };
+
+const MAX_QUERY_LENGTH = 80;
 
 type Params = Record<string, string | string[] | undefined> | URLSearchParams;
 
@@ -78,6 +81,7 @@ export function parseFilters(params: Params): Filters {
     origin: hasOrigin ? { lat: round3(lat), lng: round3(lng) } : null,
     range,
     weekendOnly,
+    q: (get(params, "q") ?? "").trim().replace(/\s+/g, " ").slice(0, MAX_QUERY_LENGTH),
   };
 }
 
@@ -93,6 +97,7 @@ export function serializeFilters(f: Filters): string {
   if (f.radiusKm !== DEFAULT_FILTERS.radiusKm) p.set("raggio", String(f.radiusKm));
   if (f.categories.length) p.set("cat", [...f.categories].sort().join(","));
   if (f.weekendOnly) p.set("solo", "weekend");
+  if (f.q) p.set("q", f.q);
   if (f.origin) {
     p.set("lat", String(round3(f.origin.lat)));
     p.set("lng", String(round3(f.origin.lng)));
@@ -108,6 +113,23 @@ export function hrefWith(path: string, f: Filters): string {
 export function toggleCategory(f: Filters, c: Category): Filters {
   const categories = f.categories.includes(c) ? f.categories.filter((x) => x !== c) : [...f.categories, c];
   return { ...f, categories };
+}
+
+/** Minuscolo e senza accenti: «città» trova «Citta», «Caffè» trova «caffe». */
+const fold = (s: string) => s.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase();
+
+/**
+ * Ogni parola della ricerca deve comparire (anche come parte di parola) in titolo, descrizione,
+ * luogo o città. Query vuota: tutto passa.
+ */
+export function matchesQuery(
+  e: Pick<EventItem, "title" | "description" | "venueName" | "city">,
+  q: string,
+): boolean {
+  const words = fold(q).split(" ").filter(Boolean);
+  if (!words.length) return true;
+  const text = fold([e.title, e.description, e.venueName, e.city].filter(Boolean).join(" "));
+  return words.every((w) => text.includes(w));
 }
 
 export function withOrigin(f: Filters, origin: LatLng | null): Filters {

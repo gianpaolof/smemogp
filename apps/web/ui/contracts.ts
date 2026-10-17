@@ -25,6 +25,8 @@ export type HeaderVM = {
   viewSwitch: ViewSwitch;
   /** "Torino — raggio 10 km" */
   scopeLabel: string;
+  /** Campo di ricerca: `path` e `query` servono a `useFilterNavigation` */
+  search: { path: string; query: string; q: string };
 };
 
 export type EventRowVM = {

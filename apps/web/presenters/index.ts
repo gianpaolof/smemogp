@@ -84,6 +84,7 @@ export function presentHeader(f: Filters, view: View): HeaderVM {
         ? { label: "Mappa", href: hrefWith(PATHS.mappa, f), direction: "nav-forward", icon: "map" }
         : { label: "Lista", href: hrefWith(PATHS.lista, f), direction: "nav-back", icon: "list" },
     scopeLabel,
+    search: { path, query: serializeFilters(f), q: f.q },
   };
 }
 
@@ -121,6 +122,7 @@ function presentRow(e: EventItem, f: Filters, day: string, highlight: boolean): 
 function presentEmpty(f: Filters, view: View): EmptyVM {
   const path = PATHS[view];
   const actions: EmptyVM["actions"] = [];
+  if (f.q) actions.push({ label: "Cancella la ricerca", href: hrefWith(path, { ...f, q: "" }) });
   if (f.period === "stasera") actions.push({ label: "Tutta la settimana", href: hrefWith(path, { ...f, period: "settimana" }) });
   if (f.radiusKm < 25) actions.push({ label: "Allarga a 25 km", href: hrefWith(path, { ...f, radiusKm: 25 }) });
   if (f.categories.length) actions.push({ label: "Tutte le categorie", href: hrefWith(path, { ...f, categories: [] }) });
@@ -131,7 +133,7 @@ function presentEmpty(f: Filters, view: View): EmptyVM {
   const periodMsg = f.period === "custom" ? "personalizzato" : PERIOD_LABELS[f.period as Exclude<typeof f.period, "custom">].toLowerCase();
   return {
     title: "Niente in programma",
-    message: `Nessun evento ${what} entro ${f.radiusKm} km per ${periodMsg}.`.replace("  ", " "),
+    message: `Nessun evento ${what}${f.q ? ` con «${f.q}»` : ""} entro ${f.radiusKm} km per ${periodMsg}.`.replace("  ", " "),
     actions,
   };
 }
