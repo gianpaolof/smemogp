@@ -4,9 +4,11 @@ import { dayKey, romeHour, isWeekendDay } from "./time";
 /** Senza orario di fine, un evento si considera concluso 3 ore dopo l'inizio. */
 const DEFAULT_DURATION_MS = 3 * 3_600_000;
 
-/** Fine effettiva: `endsAt`, o inizio + 3 ore. */
+/** Fine effettiva: `endsAt`, o inizio + 3 ore (anche se la fonte dà fine = inizio). */
 export function endOf(e: Pick<EventItem, "startsAt" | "endsAt">): Date {
-  return e.endsAt ? new Date(e.endsAt) : new Date(new Date(e.startsAt).getTime() + DEFAULT_DURATION_MS);
+  const start = new Date(e.startsAt);
+  const end = e.endsAt ? new Date(e.endsAt) : null;
+  return end && end > start ? end : new Date(start.getTime() + DEFAULT_DURATION_MS);
 }
 
 export function isOver(e: Pick<EventItem, "startsAt" | "endsAt">, now: Date) {
@@ -34,22 +36,20 @@ export type AgendaDay = {
   ongoing: EventItem[];
 };
 
+const nextDay = (day: string) => new Date(Date.parse(`${day}T12:00:00Z`) + 86_400_000).toISOString().slice(0, 10);
+
 /** Evento tocca un sabato/domenica Roma in [from, to). */
 export function touchesWeekend(e: EventItem, from: Date, to: Date): boolean {
-  const eventStart = new Date(e.startsAt);
-  const eventEnd = e.endsAt ? new Date(e.endsAt) : new Date(eventStart.getTime() + 3 * 3_600_000);
-  const overlayStart = new Date(Math.max(eventStart.getTime(), from.getTime()));
-  const overlayEnd = new Date(Math.min(eventEnd.getTime(), to.getTime()));
+  const start = Math.max(new Date(e.startsAt).getTime(), from.getTime());
+  const end = Math.min(endOf(e).getTime(), to.getTime());
+  if (start >= end) return false;
 
-  if (overlayStart >= overlayEnd) return false;
-
-  // Scannerizza ogni giorno dell'overlay
-  let current = new Date(overlayStart);
-  while (current < overlayEnd) {
-    if (isWeekendDay(dayKey(current.toISOString()))) return true;
-    current.setUTCDate(current.getUTCDate() + 1);
+  // Ogni giorno di calendario dell'intersezione, ultimo (anche parziale) compreso
+  const last = dayKey(new Date(end - 1).toISOString());
+  for (let day = dayKey(new Date(start).toISOString()); ; day = nextDay(day)) {
+    if (isWeekendDay(day)) return true;
+    if (day >= last) return false;
   }
-  return false;
 }
 
 /**

@@ -33,6 +33,9 @@ export async function MapRoute({ searchParams }: { searchParams: SearchParams })
   const params = await searchParams;
   const f = parseFilters(params);
   const selectedId = typeof params.evento === "string" ? params.evento : null;
+  // Il pannello filtri limita le date a partire da oggi: dato di richiesta
+  await connection();
+  const now = new Date();
   return (
     <>
       <Header vm={presentHeader(f, "mappa")} count={<Suspense fallback="…"><Count f={f} /></Suspense>} />
@@ -41,7 +44,7 @@ export async function MapRoute({ searchParams }: { searchParams: SearchParams })
           <MapData f={f} selectedId={selectedId} />
         </Suspense>
       </main>
-      <BottomBar vm={presentBottomBar(f, "mappa")} count={<Suspense fallback="gli eventi"><Count f={f} /></Suspense>} />
+      <BottomBar vm={presentBottomBar(f, "mappa", now)} count={<Suspense fallback="gli eventi"><Count f={f} /></Suspense>} />
       <RestoreFilters path="/mappa" query={serializeFilters(f)} />
     </>
   );
