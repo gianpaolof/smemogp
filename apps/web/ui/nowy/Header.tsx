@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import type { HeaderVM } from "@/ui/contracts";
 import { Icon } from "./icons";
 import { PendingBar } from "./PendingBar";
+import { SearchBox } from "./SearchBox";
 
 const cell = "press relative flex h-12 items-center justify-center px-1 text-xs font-semibold";
 
@@ -54,6 +55,7 @@ export function Header({ vm, count }: { vm: HeaderVM; count?: ReactNode }) {
           </Link>
         </span>
       </div>
+      <SearchBox vm={vm.search} />
     </header>
   );
 }

@@ -44,8 +44,8 @@ html {
   background: var(--bg);
   color: var(--fg);
   -webkit-tap-highlight-color: transparent;
-  /* Altezza dell'header sticky (48 periodi + 38 scope + bordi): il numero del giorno si aggancia sotto */
-  --header-h: calc(87px + env(safe-area-inset-top));
+  /* Altezza dell'header sticky (48 periodi + 38 scope + 40 ricerca + bordi): il numero del giorno si aggancia sotto */
+  --header-h: calc(127px + env(safe-area-inset-top));
   overscroll-behavior-y: none;
 }
 

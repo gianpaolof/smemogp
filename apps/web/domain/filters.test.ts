@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert";
-import { parseFilters, serializeFilters, DEFAULT_FILTERS } from "./filters";
+import { matchesQuery, parseFilters, serializeFilters, DEFAULT_FILTERS } from "./filters";
 
 test("parseFilters: default when empty", () => {
   const f = parseFilters(new URLSearchParams());
@@ -50,4 +50,23 @@ test("parseFilters + serializeFilters round-trip", () => {
   const serialized = serializeFilters(parsed);
   const reparsed = parseFilters(new URLSearchParams(serialized));
   assert.deepStrictEqual(parsed, reparsed);
+});
+
+test("parseFilters: q trimmed, spaces collapsed, capped", () => {
+  assert.strictEqual(parseFilters(new URLSearchParams("q=%20%20teatro%20%20regio%20")).q, "teatro regio");
+  assert.strictEqual(parseFilters(new URLSearchParams(`q=${"a".repeat(200)}`)).q.length, 80);
+  const f = parseFilters(new URLSearchParams("q=jazz%20club"));
+  assert.deepStrictEqual(parseFilters(new URLSearchParams(serializeFilters(f))), f);
+});
+
+test("matchesQuery: every word, any field, accent and case insensitive", () => {
+  const e = { title: "Serata Jazz", description: "Al caffè letterario", venueName: "Circolo dei Lettori", city: "Torino" };
+  assert.ok(matchesQuery(e, ""));
+  assert.ok(matchesQuery(e, "jazz"));
+  assert.ok(matchesQuery(e, "JAZZ circolo"));
+  assert.ok(matchesQuery(e, "caffe"));
+  assert.ok(matchesQuery(e, "Càffé"));
+  assert.ok(matchesQuery(e, "torino lettor"));
+  assert.ok(!matchesQuery(e, "jazz rock"));
+  assert.ok(matchesQuery({ title: "X", description: null, venueName: null, city: null }, "x"));
 });

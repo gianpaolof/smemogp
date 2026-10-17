@@ -17,6 +17,8 @@ export type Filters = {
   range: { from: string; to: string } | null;
   /** Restringe a sabati e domeniche. Combinabile con period o range. */
   weekendOnly: boolean;
+  /** Ricerca testuale su titolo, descrizione e luogo. "" = nessuna. */
+  q: string;
 };
 
 /** Evento pronto per la presentazione (date come ISO string, serializzabile). */

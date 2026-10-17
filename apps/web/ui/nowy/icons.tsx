@@ -18,6 +18,7 @@ const PATHS = {
   minus: "M5 12h14",
   theme: "M12 3a9 9 0 1 0 0 18zM12 3a9 9 0 0 1 0 18",
   fit: "M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5",
+  search: "M10.5 4a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13zM15.5 15.5 20 20",
 } as const;
 
 export type IconName = keyof typeof PATHS;

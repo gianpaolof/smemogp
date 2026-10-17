@@ -12,7 +12,7 @@ export type Remembered = { radiusKm?: number; origin?: LatLng | null };
 
 export type GpsFailure = "denied" | "timeout" | "unavailable" | "unsupported";
 
-/** Azioni sui filtri che non sono semplici link: raggio, posizione, date range. Aggiornano l'URL in una transition. */
+/** Azioni sui filtri che non sono semplici link: raggio, posizione, date range, testo. Aggiornano l'URL in una transition. */
 export function useFilterNavigation(path: string, query: string) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -40,6 +40,11 @@ export function useFilterNavigation(path: string, query: string) {
     go({ ...current, weekendOnly });
   };
 
+  const setQuery = (q: string) => {
+    const next = parseFilters(new URLSearchParams({ q })).q;
+    if (next !== current.q) go({ ...current, q: next });
+  };
+
   const locateMe = () =>
     new Promise<void>((resolve, reject: (reason: GpsFailure) => void) => {
       if (!("geolocation" in navigator)) return reject("unsupported");
@@ -54,5 +59,5 @@ export function useFilterNavigation(path: string, query: string) {
       );
     });
 
-  return { pending, setRadius, setOrigin, setRange, setWeekendOnly, locateMe };
+  return { pending, setRadius, setOrigin, setRange, setWeekendOnly, setQuery, locateMe };
 }

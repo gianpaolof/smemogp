@@ -2,6 +2,7 @@ import { getEvents, type EventsQuery } from "@/data/events";
 import { buildQuery, type SearchParams } from "./query";
 import type { Filters } from "@/domain/types";
 import { touchesWeekend } from "@/domain/agenda";
+import { matchesQuery } from "@/domain/filters";
 
 export interface LoadEventsResult {
   events: Awaited<ReturnType<typeof getEvents>>;
@@ -10,15 +11,17 @@ export interface LoadEventsResult {
 
 /**
  * Shared helper: passa per buildQuery (range → bounds), getEvents (fetch),
- * e applica il filtro weekend (post-fetch, puro).
+ * e applica i filtri weekend e testo (post-fetch, puri).
  * Usato da ListScreen, MapRoute, DesktopMapLoader, api/events.
  */
 export async function loadEvents(f: Filters, now: Date): Promise<LoadEventsResult> {
   const { query, from, to } = buildQueryWithBounds(f, now);
   const events = await getEvents(query);
 
-  // Post-filtro weekend: non entra nella chiave di cache
-  const filtered = f.weekendOnly ? events.filter(e => touchesWeekend(e, from, to)) : events;
+  // Post-filtri weekend e testo: non entrano nella chiave di cache
+  const filtered = events.filter(
+    (e) => (!f.weekendOnly || touchesWeekend(e, from, to)) && matchesQuery(e, f.q),
+  );
 
   return { events: filtered, from };
 }
