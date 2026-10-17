@@ -36,6 +36,9 @@ async function AgendaData({ f }: { f: Filters }) {
 
 export async function ListScreen({ searchParams }: { searchParams: SearchParams }) {
   const f = parseFilters(await searchParams);
+  // Il pannello filtri limita le date a partire da oggi: dato di richiesta
+  await connection();
+  const now = new Date();
   return (
     <>
       <Header vm={presentHeader(f, "lista")} count={<Suspense fallback="…"><Count f={f} /></Suspense>} />
@@ -51,7 +54,7 @@ export async function ListScreen({ searchParams }: { searchParams: SearchParams 
         </Suspense>
       </main>
       <Colophon />
-      <BottomBar vm={presentBottomBar(f, "lista")} count={<Suspense fallback="gli eventi"><Count f={f} /></Suspense>} />
+      <BottomBar vm={presentBottomBar(f, "lista", now)} count={<Suspense fallback="gli eventi"><Count f={f} /></Suspense>} />
       <RestoreFilters path="/" query={serializeFilters(f)} />
     </>
   );

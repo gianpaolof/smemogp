@@ -275,9 +275,8 @@ export function presentMap(
   };
 }
 
-export function presentBottomBar(f: Filters, view: View): BottomBarVM {
+export function presentBottomBar(f: Filters, view: View, now: Date): BottomBarVM {
   const path = PATHS[view];
-  const now = new Date();
   const today = now.toISOString().split("T")[0];
   const maxDate = new Date(now.getTime() + 60 * 24 * 60 * 60 * 1000);
   const max = maxDate.toISOString().split("T")[0];

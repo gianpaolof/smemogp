@@ -4,8 +4,9 @@ import { rangeBounds, isWeekendDay } from "./time";
 
 test("rangeBounds: single day", () => {
   const { from, to } = rangeBounds("2026-10-17", "2026-10-17");
-  assert.strictEqual(from.getUTCHours(), 23); // Roma midnight = 23 UTC
-  assert.strictEqual(to.getUTCHours(), 23); // Next midnight
+  // Ottobre prima del 25 = ora legale: mezzanotte di Roma = 22 UTC del giorno prima
+  assert.strictEqual(from.toISOString(), "2026-10-16T22:00:00.000Z");
+  assert.strictEqual(to.toISOString(), "2026-10-17T22:00:00.000Z");
 });
 
 test("rangeBounds: multi-day interval", () => {
@@ -15,11 +16,10 @@ test("rangeBounds: multi-day interval", () => {
 });
 
 test("rangeBounds: DST crossing (25 Oct 2026)", () => {
-  // 25 Oct 2026 3am → 2am (clocks back, hour repeats), interval = 25 hours
+  // 24–26 ott inclusi = 3 giorni; il 25 le 3 tornano alle 2 e quel giorno dura 25 ore
   const { from, to } = rangeBounds("2026-10-24", "2026-10-26");
-  const ms = to.getTime() - from.getTime();
-  const hours = ms / (60 * 60 * 1000);
-  assert(hours >= 50 && hours <= 52, `Expected ~51 hours (DST), got ${hours}`);
+  const hours = (to.getTime() - from.getTime()) / (60 * 60 * 1000);
+  assert.strictEqual(hours, 73);
 });
 
 test("isWeekendDay: Saturday", () => {

@@ -52,16 +52,15 @@ export function parseFilters(params: Params): Filters {
   const al = get(params, "al");
   const validDal = dal && isValidDate(dal) ? dal : null;
   const validAl = al && isValidDate(al) ? al : null;
-  const today = new Date().toISOString().split("T")[0];
 
+  // Niente "oggi" qui (funzione pura, chiamata prima di `connection()`): un `dal` passato
+  // lo riporta a oggi `buildQuery`. `al` prima di `dal` = solo `dal`; oltre 60 giorni = troncato.
   let range: { from: string; to: string } | null = null;
   if (validDal) {
-    const from = validDal < today ? today : validDal;
+    const from = validDal;
     const to = validAl && validAl >= from ? validAl : from;
-    const daysDiff = Math.floor((new Date(to).getTime() - new Date(from).getTime()) / (24 * 60 * 60 * 1000));
-    if (daysDiff <= MAX_RANGE_DAYS) {
-      range = { from, to };
-    }
+    const maxTo = new Date(Date.parse(from) + MAX_RANGE_DAYS * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+    range = { from, to: to > maxTo ? maxTo : to };
   }
 
   // Solo weekend modifier
