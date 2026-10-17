@@ -4,6 +4,7 @@ import type { EventDetailVM } from "@/ui/contracts";
 import { HERO_SHARE, heroDay, heroTitle } from "@/ui/heroNames";
 import { EventActions } from "./EventActions";
 import { EventImage } from "./EventImage";
+import { CategoryGlyph } from "./glyphs";
 import { Icon } from "./icons";
 
 export function EventDetail({ vm }: { vm: EventDetailVM }) {
@@ -25,6 +26,7 @@ export function EventDetail({ vm }: { vm: EventDetailVM }) {
           {vm.statusLabel && (
             <span className="mr-1.5 bg-fg px-1 py-px text-[10px] font-bold tracking-wide text-bg uppercase">{vm.statusLabel}</span>
           )}
+          <CategoryGlyph category={vm.category} className="mr-1 inline align-[-2px]" />
           {vm.categoryLabel}
         </span>
         {/* Titolo e giorno arrivano in volo dalla riga della lista (SharedHero) */}

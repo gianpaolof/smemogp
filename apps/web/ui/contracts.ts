@@ -4,7 +4,12 @@
  * I componenti client di un tema possono usare `hooks/`, mai `data/`.
  */
 
+import type { Category } from "@/domain/types";
+
 export type NavItem = { label: string; href: string; active: boolean };
+
+/** Chip di categoria: `category` sceglie il glifo, non è testo da mostrare */
+export type CategoryNavItem = NavItem & { category: Category };
 
 /**
  * Dati per salvare un evento con un tocco (★). Eccezione documentata alla regola «stringhe già
@@ -28,6 +33,8 @@ export type EventRowVM = {
   title: string;
   /** "21:00 — Musica" */
   kicker: string;
+  /** Sceglie il glifo della riga e del marker */
+  category: Category;
   /** "Spazio A, 2,4 km · da €15" */
   meta: string;
   imageUrl: string | null;
@@ -67,7 +74,7 @@ export type FilterPanelVM = {
   path: string;
   query: string;
   periods: NavItem[];
-  categories: NavItem[];
+  categories: CategoryNavItem[];
   radiusKm: number;
   radiusSteps: readonly number[];
   originLabel: string;
@@ -89,7 +96,7 @@ export type FilterPanelVM = {
   weekendToggleDisabledReason?: string;
 };
 
-export type BottomBarVM = { quickCategories: NavItem[]; panel: FilterPanelVM };
+export type BottomBarVM = { quickCategories: CategoryNavItem[]; panel: FilterPanelVM };
 
 export type MapRowVM = EventRowVM & {
   dayNum: string;
@@ -114,6 +121,7 @@ export type EventDetailVM = {
   /** Titoli lunghi: un gradino di corpo in meno */
   longTitle: boolean;
   categoryLabel: string;
+  category: Category;
   /** Giorno mostrato (aaaa-mm-gg), lo stesso della sezione in lista: aggancia il numero del giorno */
   dayKey: string;
   dayNum: string;

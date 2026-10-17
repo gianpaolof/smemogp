@@ -8,7 +8,9 @@ import { Circle, MapContainer, Marker, TileLayer, Tooltip, useMap, useMapEvent }
 import MarkerClusterGroup from "react-leaflet-cluster";
 import { useReducedMotion } from "@/hooks/useMotion";
 import { useResolvedTheme } from "@/hooks/useTheme";
+import type { Category } from "@/domain/types";
 import type { MapVM } from "@/ui/contracts";
+import { glyphMarkup } from "./glyphs";
 
 // CARTO ora richiede API key (anche Voyager): Esri Gray Canvas è raster, neutro, senza chiave.
 // In scuro le tile Dark Gray native: strade chiare su fondo scuro. Le chiare invertite davano strade
@@ -33,15 +35,17 @@ const STEM = 14;
 const CALLOUT_HALF_W = 136;
 
 /**
- * Un solo linguaggio: quadrati. Più eventi nello stesso luogo = quadrato col numero e ombra "a pila".
+ * Un solo linguaggio: quadrati col glifo della categoria. Più eventi nello stesso luogo = quadrato
+ * con ombra "a pila": glifo e numero nel badge se la categoria è una sola, altrimenti solo il numero.
  * Il selezionato è un pin: quadrato più grande su un'asta, ancorato alla punta.
  */
-function icon(selected: boolean, count: number) {
+function icon(selected: boolean, count: number, category: Category | null) {
   const box = count > 1 ? (selected ? 36 : 28) : selected ? 32 : 28;
   const height = selected ? box + STEM : box;
+  const html = !category ? `<span>${count}</span>` : count > 1 ? `${glyphMarkup(category)}<b>${count}</b>` : glyphMarkup(category);
   return divIcon({
-    className: `nowy-marker${selected ? " is-selected" : ""}${count > 1 ? " has-count" : ""}`,
-    html: count > 1 ? `<span>${count}</span>` : "",
+    className: `nowy-marker${selected ? " is-selected" : ""}${count > 1 ? " has-count" : ""}${category ? " has-glyph" : ""}`,
+    html,
     // Area di tocco ≥ 28px: il quadrato visibile è disegnato dentro (::before)
     iconSize: [box, height],
     iconAnchor: [box / 2, selected ? height : box / 2],
@@ -227,7 +231,8 @@ function LiveMap({ vm, selectedId, focusSelected, onSelect, fitKey, arriveZoomed
 
   // Più eventi nello stesso luogo: un solo marker (il selezionato o il primo), gli altri si scorrono nella card
   const markers = useMemo(() => {
-    const byPlace = new Map<string, { key: string; row: Row; count: number }>();
+    // category: null se nel luogo ci sono categorie diverse (il marker mostra solo il numero)
+    const byPlace = new Map<string, { key: string; row: Row; count: number; category: Category | null }>();
     for (const r of vm.rows) {
       const key = `${r.lat.toFixed(5)},${r.lng.toFixed(5)}`;
       const prev = byPlace.get(key);
@@ -235,6 +240,7 @@ function LiveMap({ vm, selectedId, focusSelected, onSelect, fitKey, arriveZoomed
         key,
         row: !prev || r.id === selectedId ? r : prev.row,
         count: (prev?.count ?? 0) + 1,
+        category: !prev || prev.category === r.category ? r.category : null,
       });
     }
     return [...byPlace.values()];
@@ -300,7 +306,7 @@ function LiveMap({ vm, selectedId, focusSelected, onSelect, fitKey, arriveZoomed
         // Niente caricamento a blocchi: all'arrivo il marker selezionato dev'essere già nel gruppo
         // (ShowSelected apre il suo cluster). Le righe sono al massimo qualche centinaio.
       >
-        {markers.map(({ key, row, count }) => (
+        {markers.map(({ key, row, count, category }) => (
           <Marker
             key={key}
             ref={(m) => {
@@ -308,7 +314,7 @@ function LiveMap({ vm, selectedId, focusSelected, onSelect, fitKey, arriveZoomed
               else markerRefs.current.delete(row.id);
             }}
             position={[row.lat, row.lng]}
-            icon={icon(row.id === selectedId, count)}
+            icon={icon(row.id === selectedId, count, category)}
             title={count > 1 ? `${count} eventi qui. ${row.title}` : row.title}
             alt={row.title}
             zIndexOffset={row.id === selectedId ? 1000 : 0}

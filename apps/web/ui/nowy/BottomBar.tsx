@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import type { BottomBarVM } from "@/ui/contracts";
 import { FiltersSheet } from "./FiltersSheet";
+import { CategoryGlyph } from "./glyphs";
 import { Icon } from "./icons";
 import { PendingBar } from "./PendingBar";
 import { SavedLink } from "./SavedLink";
@@ -24,7 +25,7 @@ export function BottomBar({ vm, count }: { vm: BottomBarVM; count?: ReactNode })
           aria-current={c.active ? "true" : undefined}
           className={`${cell} ${c.active ? "bg-fg text-bg" : "hover:bg-line-soft"}`}
         >
-          {c.active && <Icon name="check" />}
+          {c.active ? <Icon name="check" /> : <CategoryGlyph category={c.category} />}
           {c.label}
           <PendingBar />
         </Link>

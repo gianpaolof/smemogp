@@ -315,6 +315,41 @@ input.nowy-range::-moz-range-thumb { width: 18px; height: 18px; border: 3px soli
   font-variant-numeric: tabular-nums;
 }
 .nowy-marker.is-selected.has-count span { color: var(--accent-fg); }
+/* Glifo di categoria (ui/nowy/glyphs) sopra il quadrato: in negativo, centrato sul quadrato e non
+   sull'icona (il selezionato ha l'asta sotto). Il quadrato cresce di 2px perché il glifo resti leggibile. */
+.nowy-marker.has-glyph::before { width: 20px; height: 20px; }
+.nowy-marker.has-glyph.has-count::before { width: 24px; height: 24px; }
+.nowy-marker.is-selected.has-glyph::before { width: 26px; height: 26px; }
+.nowy-marker.is-selected.has-glyph.has-count::before { width: 30px; height: 30px; }
+.nowy-glyph {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 11px;
+  height: 11px;
+  color: var(--bg);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.nowy-marker.has-count .nowy-glyph { width: 13px; height: 13px; }
+.nowy-marker.is-selected .nowy-glyph { top: calc(50% - 7px); width: 14px; height: 14px; color: var(--accent-fg); }
+/* Stesso luogo, stessa categoria: il numero va in un badge sull'angolo */
+.nowy-marker.has-glyph b {
+  position: absolute;
+  top: -4px;
+  right: -6px;
+  min-width: 15px;
+  height: 15px;
+  padding: 0 2px;
+  background: var(--bg);
+  color: var(--fg);
+  box-shadow: inset 0 0 0 1.5px var(--fg);
+  font: 900 10px/15px var(--font-sans);
+  font-stretch: 75%;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  pointer-events: none;
+}
 /* Cluster: quadrato pieno, bordo nel colore di fondo per staccarlo dalla mappa */
 .nowy-cluster {
   background: var(--fg);

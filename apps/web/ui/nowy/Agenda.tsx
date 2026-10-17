@@ -4,6 +4,7 @@ import type { AgendaVM, EventRowVM, RowGroupVM } from "@/ui/contracts";
 import { heroDay, heroTitle } from "@/ui/heroNames";
 import { EmptyState } from "./EmptyState";
 import { EventImage } from "./EventImage";
+import { CategoryGlyph } from "./glyphs";
 import { Icon } from "./icons";
 import { NewBadge } from "./NewBadge";
 import { RowPending } from "./RowPending";
@@ -29,6 +30,8 @@ function Row({ row, past = false }: { row: EventRowVM; past?: boolean }) {
           className={`press relative flex min-w-0 flex-1 items-center gap-3 px-3 py-2.5 ${row.highlight ? "" : "hover:bg-line-soft"}`}
         >
           <RowPending />
+          {/* Glifo di categoria in colonna, all'altezza del kicker: si scorre a colpo d'occhio */}
+          <CategoryGlyph category={row.category} className={`shrink-0 self-start text-base ${past ? "text-muted" : ""}`} />
           <div className="flex min-w-0 flex-1 flex-col gap-0.5">
             <span className={`text-xs font-semibold tabular-nums ${row.highlight ? "" : "text-muted"}`}>
               {row.highlight && (

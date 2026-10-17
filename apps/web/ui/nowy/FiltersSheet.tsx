@@ -6,6 +6,7 @@ import { useFilterNavigation, type GpsFailure } from "@/hooks/useFilterNavigatio
 import { haptic } from "@/hooks/useMotion";
 import { useTheme, type ThemeChoice } from "@/hooks/useTheme";
 import type { FilterPanelVM } from "@/ui/contracts";
+import { CategoryGlyph } from "./glyphs";
 import { Icon } from "./icons";
 import { InfoLink } from "./InfoLink";
 
@@ -283,7 +284,7 @@ export function FiltersSheet({
                 aria-current={c.active ? "true" : undefined}
                 className={`${chip} ${c.active ? "bg-fg text-bg" : "hover:bg-line-soft"}`}
               >
-                {c.active && <Icon name="check" />}
+                {c.active ? <Icon name="check" /> : <CategoryGlyph category={c.category} />}
                 {c.label}
               </Link>
             ))}

@@ -126,6 +126,41 @@ test("tiene eventi generici con menzioni di famiglie o bambini", () => {
   }
 });
 
+// Visti sul DB remoto (2026-10-16): talk venduti come «spettacolo» e balletti classici
+test("scarta balletto, conferenze e persone sgradite", () => {
+  for (const e of [
+    ev("Il Lago dei Cigni - International Classical Ballet of Ukraine", "Teatro Concordia", "Il corpo di ballo presenta Il Lago dei Cigni di Tchaikovsky."),
+    ev("Gala di balletto"),
+    ev("Roberto Saviano - Quel che resta di me", "Teatro Colosseo", "Roberto Saviano torna a teatro con uno spettacolo."),
+    ev("Andrea Scanzi - Ora o mai più"),
+    ev("Gianluca Gotto - Questione di Karma"),
+    ev("UMBERTO GALIMBERTI - L'ETICA DEL VIANDANTE", null, "Teatro Prosa"),
+    ev("Conferenza sul Rinascimento", "Circolo dei lettori"),
+    ev("Lectio magistralis di filosofia"),
+    ev("Incontro con l'autore"),
+    ev("Presentazione del libro «Le città invisibili»"),
+  ]) {
+    assert.ok(exclusionReason(e), `doveva escludere: ${e.title}`);
+  }
+});
+
+test("tiene conferenze a sfondo etico, danza e conferenze stampa", () => {
+  for (const e of [
+    ev("Conferenza di Emergency: vent'anni in Afghanistan"),
+    ev("Don Luigi Ciotti in dialogo con gli studenti"),
+    ev("Incontro con l'autore", null, "Con Medici Senza Frontiere, testimonianze dal Mediterraneo."),
+    ev("49a Castagnata - Fèra à la Costa", null, "Castagne, vin brulé e conferenza sulla storia del borgo."),
+    ev("Moltitudini. Una residenza tra arte e poesia", null, "L'artista dialoga con i poeti."),
+    ev("ANTONELLO COSTA - GIOCHIAMO AL VARIETÀ", null, "Con il corpo di ballo e l'orchestra."),
+    ev("ALISEO VARIATION / I LOVE YOU, SCHUBERT! - BALLETTO TEATRO DI TORINO"),
+    ev("Conferenza sui diritti umani"),
+    ev("Danza contemporanea alla Lavanderia a Vapore"),
+    ev("Mostra di Chagall", null, "Inaugurazione dopo la conferenza stampa delle 11."),
+  ]) {
+    assert.equal(exclusionReason(e), null, `non doveva escludere: ${e.title}`);
+  }
+});
+
 // Falso negativo noto (2026-10-16): «tante/anche/varie… attività per famiglie» è trattato come
 // contorno di un evento più ampio. Senza «dedicato/rivolto/pensato» o un pubblico dichiarato
 // dalla fonte, un evento davvero per famiglie scritto così passa. Se cambia, aggiornare qui.
